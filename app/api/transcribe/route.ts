@@ -6,6 +6,8 @@ const groq = new Groq({
 });
 
 export async function POST(req: Request) {
+    console.log("Debug: GROQ_API_KEY present?", !!process.env.GROQ_API_KEY);
+    console.log("Debug: Key length:", process.env.GROQ_API_KEY?.length);
     try {
         const formData = await req.formData();
         const file = formData.get("file") as File;
