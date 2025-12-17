@@ -11,30 +11,31 @@ Your task is to extract structured client and invoice details from a voice trans
 
 STRICT EXTRACTION RULES:
 1. Extract ONLY these fields:
-   - clientName (string)
-   - clientCompany (string)
-   - clientEmail (string)
-   - clientLocality (string)
-   - clientCity (string)
-   - clientPincode (string or number)
-   - clientState (string)
-   - invoiceNumber (string)
-   - invoiceDate (string, format YYYY-MM-DD if possible)
+    - clientName (string)
+    - clientCompany (string)
+    - clientEmail (string)
+    - clientLocality (string)
+    - clientCity (string)
+    - clientPincode (string or number)
+    - clientState (string)
+    - invoiceNumber (string)
+    - invoiceDate (string, format YYYY-MM-DD if possible)
 
 2. STRICTLY IGNORE all financial line items, prices, rates, quantities, and tax percentages.
-   - DO NOT extract "Website design for $500".
-   - DO NOT extract "2 hours of consulting".
-   - DO NOT extract "GST 18%".
-   - If the user mentions items, IGNORE THEM COMPLETELY. The "items" and "gstList" arrays must remain untouched.
+    - DO NOT extract "Website design for $500".
+    - DO NOT extract "2 hours of consulting".
+    - DO NOT extract "GST 18%".
+    - If the user mentions items, IGNORE THEM COMPLETELY. The "items" and "gstList" arrays must remain untouched.
 
 3. Return JSON ONLY.
-   - Format: { "clientDetails": { ... }, "invoiceDetails": { ... } }
-   - If a field is not mentioned, exclude it or set it to null.
-   - Do not return markdown code blocks. Just the raw JSON.
+    - Format: { "clientDetails": { ... }, "invoiceDetails": { ... } }
+    - If a field is not mentioned, exclude it or set it to null.
+    - Do not return markdown code blocks. Just the raw JSON.
 `;
 
 export async function POST(req: Request) {
-    console.log("Debug [Extract]: GROQ_API_KEY present?", !!process.env.GROQ_API_KEY);
+    console.log("Debug [Extract]: GROQ_API_KEY loaded?", !!process.env.GROQ_API_KEY);
+
     try {
         const body = await req.json();
         const { text } = body;
