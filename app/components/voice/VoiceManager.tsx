@@ -1,147 +1,106 @@
 "use client";
 
 import { useFormContext } from "react-hook-form";
-import { useState, useCallback, useRef, useEffect } from "react";
+import { useState, useCallback, useRef } from "react";
 import { toast } from "sonner";
 import { VoiceMicrophone } from "./VoiceMicrophone";
 import { TranscriptModal } from "./TranscriptModal";
-
-// Define strict types for window.SpeechRecognition
-type SpeechRecognitionEvent = Event & {
-    results: {
-        [index: number]: {
-            [index: number]: {
-                transcript: string;
-            };
-        };
-        length: number;
-    };
-};
-
-type SpeechRecognitionErrorEvent = Event & {
-    error: string;
-};
-
-interface SpeechRecognition extends EventTarget {
-    continuous: boolean;
-    interimResults: boolean;
-    start: () => void;
-    stop: () => void;
-    onresult: ((event: SpeechRecognitionEvent) => void) | null;
-    onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
-    onend: (() => void) | null;
-}
-
-interface SpeechRecognitionConstructor {
-    new(): SpeechRecognition;
-}
-
-declare global {
-    interface Window {
-        SpeechRecognition?: SpeechRecognitionConstructor;
-        webkitSpeechRecognition?: SpeechRecognitionConstructor;
-    }
-}
 
 export function VoiceManager() {
     const { setValue } = useFormContext();
     const [isListening, setIsListening] = useState(false);
     const [showModal, setShowModal] = useState(false);
-    const [showPermissionHelp, setShowPermissionHelp] = useState(false);
     const [transcript, setTranscript] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
 
-    const recognitionRef = useRef<SpeechRecognition | null>(null);
+    // MediaRecorder refs
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const chunksRef = useRef<Blob[]>([]);
+    const streamRef = useRef<MediaStream | null>(null);
 
-    useEffect(() => {
-        // Initialize SpeechRecognition
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            recognitionRef.current = new SpeechRecognition();
-            recognitionRef.current.continuous = true;
-            recognitionRef.current.interimResults = true;
+    const startRecording = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            streamRef.current = stream;
 
-            recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
-                let finalTranscript = "";
-                for (let i = 0; i < event.results.length; i++) {
-                    const result = event.results[i];
-                    if (result && result[0]) {
-                        finalTranscript += result[0].transcript;
-                    }
+            const recorder = new MediaRecorder(stream);
+            mediaRecorderRef.current = recorder;
+            chunksRef.current = [];
+
+            recorder.ondataavailable = (e) => {
+                if (e.data.size > 0) {
+                    chunksRef.current.push(e.data);
                 }
-                setTranscript(finalTranscript);
             };
 
-            recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
-                console.error("Speech Recognition Error:", event.error);
-                if (event.error === "not-allowed") {
-                    setShowPermissionHelp(true);
-                    toast.error("Microphone access blocked");
+            recorder.onstop = async () => {
+                const audioBlob = new Blob(chunksRef.current, { type: "audio/webm" });
+                await handleTranscribe(audioBlob);
+
+                // Critical Cleanup
+                if (streamRef.current) {
+                    streamRef.current.getTracks().forEach(track => track.stop());
+                    streamRef.current = null;
                 }
+                mediaRecorderRef.current = null;
                 setIsListening(false);
             };
 
-            recognitionRef.current.onend = () => {
-                if (isListening) {
-                    // If stopped unexpectedly but state says listening (e.g. silence timeout), we pause UI.
-                    // But we want manual stop only. 
-                    // Ideally we restart if we want 'always on', but here we want toggle.
-                    // If we just sync state:
-                    // setIsListening(false); 
-                    // Actually, let's keep it simple: manual stop mainly. 
-                    // If it stops by itself, we update UI.
-                    setIsListening(false);
-                }
-            };
-        }
-    }, [isListening]);
-
-    const checkMicrophoneAccess = async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            stream.getTracks().forEach((track) => track.stop());
-            return true;
-        } catch (error) {
-            console.error("Microphone access check failed:", error);
-            return false;
+            recorder.start();
+            setIsListening(true);
+            toast.info("Listening... Speak now.");
+        } catch (err) {
+            console.error("Failed to start recording:", err);
+            toast.error("Microphone access blocked or not found.");
         }
     };
 
-    const toggleListening = useCallback(async () => {
-        if (!recognitionRef.current) {
-            toast.error("Voice input is not supported in this browser.");
-            return;
+    const stopRecording = () => {
+        if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+            mediaRecorderRef.current.stop();
+            // UI update happens in onstop
         }
+    };
 
+    const toggleListening = useCallback(() => {
         if (isListening) {
-            recognitionRef.current.stop();
-            setIsListening(false);
-            setShowModal(true);
+            stopRecording();
         } else {
-            // 1. Check permission FIRST
-            const hasAccess = await checkMicrophoneAccess();
-
-            if (!hasAccess) {
-                setShowPermissionHelp(true);
-                toast.error("Microphone blocked. Please allow access.");
-                return;
-            }
-
-            // 2. Only start if allowed
-            setTranscript("");
-            setShowPermissionHelp(false);
-            try {
-                recognitionRef.current.start();
-                setIsListening(true);
-                toast.info("Listening... Speak now.");
-            } catch (err) {
-                console.error(err);
-                // If start fails despite check, it's likely a browser quirk or rapid toggling
-                toast.error("Failed to start recording");
-                setIsListening(false);
-            }
+            startRecording();
         }
     }, [isListening]);
+
+    const handleTranscribe = async (audioBlob: Blob) => {
+        setIsProcessing(true);
+        // Show modal loading state immediately if desired, or wait for text
+        // Current UX: wait for text then show modal. 
+        // Let's show a loading toast for feedback
+        const loadingToast = toast.loading("Processing audio...");
+
+        try {
+            const formData = new FormData();
+            formData.append("file", audioBlob, "recording.webm");
+
+            const response = await fetch("/api/transcribe", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) throw new Error("Transcription failed");
+
+            const { text } = await response.json();
+            setTranscript(text);
+            setShowModal(true);
+            toast.dismiss(loadingToast);
+        } catch (err) {
+            console.error(err);
+            toast.error("Failed to transcribe audio");
+            toast.dismiss(loadingToast);
+            setIsListening(false); // Valid safety fallback
+        } finally {
+            setIsProcessing(false);
+        }
+    };
 
     const handleProceed = async (finalText: string) => {
         setIsProcessing(true);
@@ -152,25 +111,16 @@ export function VoiceManager() {
                 body: JSON.stringify({ text: finalText }),
             });
 
-            if (!response.ok) {
-                throw new Error("Extraction failed");
-            }
+            if (!response.ok) throw new Error("Extraction failed");
 
             const { data } = await response.json();
 
             let updatedCount = 0;
-
-            // Helper to update fields if value is present
             const processFields = (obj: any, prefix: string = "") => {
                 Object.keys(obj).forEach(key => {
                     const value = obj[key];
                     if (value !== null && value !== undefined && value !== "") {
-                        // If it's a nested object (e.g. clientDetails), recurse?
-                        // No, our schema returns flat objects inside keys like clientDetails.
-                        // Wait, the API returns { clientDetails: { ... }, invoiceDetails: { ... } }
-
                         if (typeof value === 'object' && !Array.isArray(value)) {
-                            // Recurse for nested objects
                             processFields(value, prefix ? `${prefix}.${key}` : key);
                         } else {
                             const fieldPath = prefix ? `${prefix}.${key}` : key;
@@ -191,7 +141,6 @@ export function VoiceManager() {
 
             setShowModal(false);
             setTranscript("");
-
         } catch (err) {
             console.error(err);
             toast.error("Failed to process voice command");
@@ -210,48 +159,6 @@ export function VoiceManager() {
                 onClose={() => setShowModal(false)}
                 onProceed={handleProceed}
             />
-
-            {showPermissionHelp && (
-                <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-[fade-in_0.2s_ease-out]">
-                    <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-md shadow-2xl p-6 text-center space-y-6">
-                        <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto">
-                            <div className="w-8 h-8 text-red-500">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="22" /></svg>
-                            </div>
-                        </div>
-                        <div className="space-y-2">
-                            <h3 className="text-xl font-bold text-white">Microphone Blocked</h3>
-                            <p className="text-neutral-400 text-sm">
-                                We cannot record your voice because permission was denied.
-                            </p>
-                        </div>
-
-                        <div className="bg-neutral-950 rounded-lg p-4 text-left space-y-3 text-sm border border-neutral-800">
-                            <p className="font-semibold text-white">How to enable:</p>
-                            <ol className="list-decimal list-inside space-y-2 text-neutral-400">
-                                <li>Click the <span className="text-white font-medium">Lock Icon 🔒</span> in your browser URL bar.</li>
-                                <li>Find <strong>Microphone</strong> and toggle it to <span className="text-green-500 font-medium">Allow / On</span>.</li>
-                                <li>Refresh the page.</li>
-                            </ol>
-                        </div>
-
-                        <div className="flex gap-3">
-                            <button
-                                onClick={() => setShowPermissionHelp(false)}
-                                className="flex-1 px-4 py-2 rounded-lg bg-neutral-800 text-white hover:bg-neutral-700 transition"
-                            >
-                                Close
-                            </button>
-                            <button
-                                onClick={() => window.location.reload()}
-                                className="flex-1 px-4 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition"
-                            >
-                                Reload Page
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
         </>
     );
 }
