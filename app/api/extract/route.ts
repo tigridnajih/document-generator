@@ -27,7 +27,15 @@ STRICT EXTRACTION RULES:
     - DO NOT extract "GST 18%".
     - If the user mentions items, IGNORE THEM COMPLETELY. The "items" and "gstList" arrays must remain untouched.
 
-3. Return JSON ONLY.
+3. LANGUAGE & TRANSLITERATION (CRITICAL):
+    - Input transcript may be in any language (e.g., Malayalam, Hindi, Spanish).
+    - YOU MUST INTELLIGENTLY TRANSLATE to English for the JSON output values:
+      Example: If input is "കണ്ണൂർ" (Kannur), output "Kannur".
+      Example: If input is "ഇൻവോയ്സ് തീയതി ഇന്നലെ" (Invoice date yesterday), output calculated date.
+    - PROPER NAMES: Transliterate client names/companies to English script if in native script.
+    - DO NOT return non-English characters in the JSON values.
+
+4. Return JSON ONLY.
     - Format: { "clientDetails": { ... }, "invoiceDetails": { ... } }
     - If a field is not mentioned, exclude it or set it to null.
     - Do not return markdown code blocks. Just the raw JSON.
