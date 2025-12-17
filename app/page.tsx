@@ -13,6 +13,7 @@ import { DocCard } from "@/components/ui/DocCard";
 import { ShineButton } from "@/components/ui/ShineButton";
 import { InvoiceFields } from "@/components/feature/InvoiceFields";
 import { LiveTotal } from "@/components/feature/LiveTotal";
+import { VoiceManager } from "@/components/voice/VoiceManager";
 import { DocType } from "@/lib/types";
 import { API_URL } from "@/lib/constants";
 import { documentFormSchema, DocumentFormValues } from "@/lib/schemas";
@@ -238,6 +239,7 @@ export default function Home() {
         </div>
 
         <FormProvider {...methods}>
+          <VoiceManager />
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="bg-gradient-to-b from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-6 sm:p-8 space-y-8"
