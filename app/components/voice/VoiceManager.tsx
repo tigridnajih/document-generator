@@ -96,7 +96,18 @@ export function VoiceManager() {
         }
     }, [isListening]);
 
-    const toggleListening = useCallback(() => {
+    const checkMicrophoneAccess = async () => {
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            stream.getTracks().forEach((track) => track.stop());
+            return true;
+        } catch (error) {
+            console.error("Microphone access check failed:", error);
+            return false;
+        }
+    };
+
+    const toggleListening = useCallback(async () => {
         if (!recognitionRef.current) {
             toast.error("Voice input is not supported in this browser.");
             return;
@@ -107,6 +118,16 @@ export function VoiceManager() {
             setIsListening(false);
             setShowModal(true);
         } else {
+            // 1. Check permission FIRST
+            const hasAccess = await checkMicrophoneAccess();
+
+            if (!hasAccess) {
+                setShowPermissionHelp(true);
+                toast.error("Microphone blocked. Please allow access.");
+                return;
+            }
+
+            // 2. Only start if allowed
             setTranscript("");
             setShowPermissionHelp(false);
             try {
@@ -115,7 +136,9 @@ export function VoiceManager() {
                 toast.info("Listening... Speak now.");
             } catch (err) {
                 console.error(err);
+                // If start fails despite check, it's likely a browser quirk or rapid toggling
                 toast.error("Failed to start recording");
+                setIsListening(false);
             }
         }
     }, [isListening]);
