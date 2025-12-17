@@ -47,6 +47,7 @@ export function VoiceManager() {
     const { setValue } = useFormContext();
     const [isListening, setIsListening] = useState(false);
     const [showModal, setShowModal] = useState(false);
+    const [showPermissionHelp, setShowPermissionHelp] = useState(false);
     const [transcript, setTranscript] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -74,7 +75,8 @@ export function VoiceManager() {
             recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
                 console.error("Speech Recognition Error:", event.error);
                 if (event.error === "not-allowed") {
-                    toast.error("Microphone access denied");
+                    setShowPermissionHelp(true);
+                    toast.error("Microphone access blocked");
                 }
                 setIsListening(false);
             };
@@ -106,6 +108,7 @@ export function VoiceManager() {
             setShowModal(true);
         } else {
             setTranscript("");
+            setShowPermissionHelp(false);
             try {
                 recognitionRef.current.start();
                 setIsListening(true);
@@ -184,6 +187,48 @@ export function VoiceManager() {
                 onClose={() => setShowModal(false)}
                 onProceed={handleProceed}
             />
+
+            {showPermissionHelp && (
+                <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-[fade-in_0.2s_ease-out]">
+                    <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-md shadow-2xl p-6 text-center space-y-6">
+                        <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto">
+                            <div className="w-8 h-8 text-red-500">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="22" /></svg>
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <h3 className="text-xl font-bold text-white">Microphone Blocked</h3>
+                            <p className="text-neutral-400 text-sm">
+                                We cannot record your voice because permission was denied.
+                            </p>
+                        </div>
+
+                        <div className="bg-neutral-950 rounded-lg p-4 text-left space-y-3 text-sm border border-neutral-800">
+                            <p className="font-semibold text-white">How to enable:</p>
+                            <ol className="list-decimal list-inside space-y-2 text-neutral-400">
+                                <li>Click the <span className="text-white font-medium">Lock Icon 🔒</span> in your browser URL bar.</li>
+                                <li>Find <strong>Microphone</strong> and toggle it to <span className="text-green-500 font-medium">Allow / On</span>.</li>
+                                <li>Refresh the page.</li>
+                            </ol>
+                        </div>
+
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setShowPermissionHelp(false)}
+                                className="flex-1 px-4 py-2 rounded-lg bg-neutral-800 text-white hover:bg-neutral-700 transition"
+                            >
+                                Close
+                            </button>
+                            <button
+                                onClick={() => window.location.reload()}
+                                className="flex-1 px-4 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 transition"
+                            >
+                                Reload Page
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
