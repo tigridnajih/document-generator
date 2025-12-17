@@ -53,7 +53,7 @@ export async function POST(req: Request) {
                 { role: "system", content: systemPrompt },
                 { role: "user", content: `Extract data from this transcript: "${text}"` },
             ],
-            model: "llama-3.1-70b-versatile", // Fast and good enough for extraction
+            model: "llama-3.3-70b-versatile", // Fast and good enough for extraction
             temperature: 0,
             response_format: { type: "json_object" },
         });
