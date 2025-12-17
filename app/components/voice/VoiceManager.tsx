@@ -86,15 +86,18 @@ export function VoiceManager() {
                 body: formData,
             });
 
-            if (!response.ok) throw new Error("Transcription failed");
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Transcription failed");
+            }
 
             const { text } = await response.json();
             setTranscript(text);
             setShowModal(true);
             toast.dismiss(loadingToast);
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            toast.error("Failed to transcribe audio");
+            toast.error(err.message || "Failed to transcribe audio");
             toast.dismiss(loadingToast);
             setIsListening(false); // Valid safety fallback
         } finally {

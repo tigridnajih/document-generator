@@ -26,10 +26,10 @@ export async function POST(req: Request) {
         });
 
         return NextResponse.json({ text: transcription.text });
-    } catch (error) {
-        console.error("Transcription error:", error);
+    } catch (error: any) {
+        console.error("Transcription error details:", error);
         return NextResponse.json(
-            { error: "Failed to transcribe audio" },
+            { error: error?.message || "Failed to transcribe audio" },
             { status: 500 }
         );
     }
