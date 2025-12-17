@@ -160,7 +160,10 @@ export function VoiceManager() {
                 body: JSON.stringify({ text: finalText }),
             });
 
-            if (!response.ok) throw new Error("Extraction failed");
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Extraction failed");
+            }
 
             const { data } = await response.json();
 
@@ -190,9 +193,9 @@ export function VoiceManager() {
 
             setShowModal(false);
             setTranscript("");
-        } catch (err) {
+        } catch (err: any) {
             console.error(err);
-            toast.error("Failed to process command");
+            toast.error(err.message || "Failed to process command");
         } finally {
             setIsProcessing(false);
         }

@@ -34,6 +34,7 @@ STRICT EXTRACTION RULES:
 `;
 
 export async function POST(req: Request) {
+    console.log("Debug [Extract]: GROQ_API_KEY present?", !!process.env.GROQ_API_KEY);
     try {
         const body = await req.json();
         const { text } = body;
@@ -64,10 +65,10 @@ export async function POST(req: Request) {
         const extractedData = JSON.parse(content);
 
         return NextResponse.json({ success: true, data: extractedData });
-    } catch (error) {
-        console.error("Extraction error:", error);
+    } catch (error: any) {
+        console.error("Extraction error details:", error);
         return NextResponse.json(
-            { error: "Failed to extract data" },
+            { error: error?.message || "Failed to extract data" },
             { status: 500 }
         );
     }
