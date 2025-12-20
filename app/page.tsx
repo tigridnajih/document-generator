@@ -288,6 +288,7 @@ export default function Home() {
             fileName={successData?.fileName || ""}
             downloadUrl={successData?.downloadUrl || ""}
             viewUrl={successData?.viewUrl}
+            docType={docType}
           />
           <form
             onSubmit={handleSubmit(onSubmit)}

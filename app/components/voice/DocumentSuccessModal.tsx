@@ -8,6 +8,7 @@ interface DocumentSuccessModalProps {
     fileName: string;
     downloadUrl: string;
     viewUrl?: string;
+    docType?: string;
 }
 
 export function DocumentSuccessModal({
@@ -16,6 +17,7 @@ export function DocumentSuccessModal({
     fileName,
     downloadUrl,
     viewUrl,
+    docType,
 }: DocumentSuccessModalProps) {
     if (!isOpen) return null;
 
@@ -34,7 +36,7 @@ export function DocumentSuccessModal({
                             Document Generated!
                         </h3>
                         <p className="text-neutral-400 text-sm">
-                            Your <span className="text-white font-medium">{fileName || "document"}</span> is ready.
+                            Your <span className="text-white font-medium">{(docType || "document").toUpperCase()}</span> document is ready.
                         </p>
                     </div>
 
