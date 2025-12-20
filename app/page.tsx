@@ -14,6 +14,7 @@ import { ShineButton } from "@/components/ui/ShineButton";
 import { InvoiceFields } from "@/components/feature/InvoiceFields";
 import { LiveTotal } from "@/components/feature/LiveTotal";
 import { VoiceManager } from "@/components/voice/VoiceManager";
+import { DocumentSuccessModal } from "@/components/voice/DocumentSuccessModal";
 import { DocType } from "@/lib/types";
 import { API_URL } from "@/lib/constants";
 import { documentFormSchema, DocumentFormValues } from "@/lib/schemas";
@@ -21,6 +22,12 @@ import { documentFormSchema, DocumentFormValues } from "@/lib/schemas";
 export default function Home() {
   const [docType, setDocType] = useState<DocType>("proposal");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [successData, setSuccessData] = useState<{
+    fileName: string;
+    downloadUrl: string;
+    viewUrl?: string;
+  } | null>(null);
 
   // Initialize form
   const methods = useForm({
@@ -165,23 +172,26 @@ export default function Home() {
       const result = await res.json();
       console.log("API Response Body:", result);
 
-      if (result?.success && result?.downloadUrl) {
+      if (result?.success || result?.downloadUrl) {
         toast.dismiss(loadingToast);
-        toast.success(result.message || "Document generated successfully", {
-          action: {
-            label: "Download",
-            onClick: () => window.open(result.downloadUrl, "_blank"),
-          },
+
+        // Final Document Data for Modal
+        setSuccessData({
+          fileName: result.fileName || "document.pdf",
+          downloadUrl: result.downloadUrl || "",
+          viewUrl: result.viewUrl
         });
-        // Auto open
-        window.open(result.downloadUrl, "_blank");
+        setShowSuccessModal(true);
+
+        toast.success(result.message || "Document generated successfully");
       } else {
+        console.error("Response check failed:", { success: result?.success, url: result?.downloadUrl });
         throw new Error("Generation failed");
       }
-    } catch (err) {
+    } catch (err: any) {
       toast.dismiss(loadingToast);
-      toast.error("Failed to generate document");
-      console.error(err);
+      toast.error(`Failed to generate document: ${err.message || "Unknown error"}`);
+      console.error("Submission Error:", err);
     } finally {
       setIsSubmitting(false);
     }
@@ -240,6 +250,13 @@ export default function Home() {
 
         <FormProvider {...methods}>
           <VoiceManager />
+          <DocumentSuccessModal
+            isOpen={showSuccessModal}
+            onClose={() => setShowSuccessModal(false)}
+            fileName={successData?.fileName || ""}
+            downloadUrl={successData?.downloadUrl || ""}
+            viewUrl={successData?.viewUrl}
+          />
           <form
             onSubmit={handleSubmit(onSubmit)}
             className="bg-gradient-to-b from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-6 sm:p-8 space-y-8"
