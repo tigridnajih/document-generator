@@ -181,12 +181,21 @@ export default function Home() {
       if (result?.success || result?.downloadUrl) {
         toast.dismiss(loadingToast);
 
+        // Sanitize URLs (n8n sometimes adds "- " or whitespace)
+        const sanitizeUrl = (url: any) => {
+          if (typeof url !== "string") return "";
+          return url.trim().replace(/^- /, "");
+        };
+
         // Final Document Data for Modal
-        setSuccessData({
+        const finalData = {
           fileName: result.fileName || "document.pdf",
-          downloadUrl: result.downloadUrl || "",
-          viewUrl: result.viewUrl
-        });
+          downloadUrl: sanitizeUrl(result.downloadUrl),
+          viewUrl: sanitizeUrl(result.viewUrl)
+        };
+
+        console.log("SETTING SUCCESS DATA:", finalData);
+        setSuccessData(finalData);
         setShowSuccessModal(true);
 
         toast.success(result.message || "Document generated successfully");
