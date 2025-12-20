@@ -172,33 +172,50 @@ export default function Home() {
       let result = await res.json();
       console.log("Raw API Response:", result);
 
-      // Handle n8n array response structure
+      // Handle n8n response structure (can be array or object, possibly nested)
+      let finalItem = Array.isArray(result) ? result[0] : result;
+
+      // If it's an array, look for an item that is an actual evaluated result (no {{ expression }})
       if (Array.isArray(result)) {
-        result = result[0];
-        console.log("Extracted first item from array:", result);
+        const evaluatedItem = result.find(
+          (item) => {
+            const dUrl = item.downloadUrl || item.downloadUrl1;
+            return dUrl && !dUrl.includes("{{");
+          }
+        );
+        if (evaluatedItem) finalItem = evaluatedItem;
       }
 
-      if (result?.success || result?.downloadUrl) {
+      // Check for nested data in common n8n wrappers
+      const docResponse = finalItem?.data || finalItem?.json || finalItem;
+
+      if (docResponse?.success || docResponse?.downloadUrl || docResponse?.downloadUrl1 || docResponse?.viewUrl || docResponse?.previewUrl1) {
         toast.dismiss(loadingToast);
 
         // Sanitize URLs (n8n sometimes adds "- " or whitespace)
         const sanitizeUrl = (url: any) => {
           if (typeof url !== "string") return "";
-          return url.trim().replace(/^- /, "");
+          let sanitized = url.trim().replace(/^- /, "");
+          // If the URL still starts with {{, it's an unevaluated n8n expression
+          return sanitized.startsWith("{{") || sanitized.startsWith("={{") ? "" : sanitized;
         };
 
-        // Final Document Data for Modal
         const finalData = {
-          fileName: result.fileName,
-          downloadUrl: sanitizeUrl(result.downloadUrl),
-          viewUrl: sanitizeUrl(result.viewUrl)
+          fileName: String(docResponse.fileName || "document.pdf"),
+          downloadUrl: sanitizeUrl(docResponse.downloadUrl || docResponse.downloadUrl1),
+          viewUrl: sanitizeUrl(docResponse.viewUrl || docResponse.previewUrl1 || docResponse.viewUrl1),
         };
+
+        // If even then we have an expression in fileName, try to clean it
+        if (typeof finalData.fileName === "string" && finalData.fileName.includes("{{")) {
+          finalData.fileName = "document.pdf";
+        }
 
         console.log("SETTING SUCCESS DATA:", finalData);
         setSuccessData(finalData);
         setShowSuccessModal(true);
 
-        toast.success(result.message || "Document generated successfully");
+        toast.success(docResponse.message || "Document generated successfully");
       } else {
         console.error("Response check failed:", result);
         throw new Error("The server responded but did not provide a document URL.");
