@@ -203,7 +203,7 @@ export default function Home() {
         const finalData = {
           fileName: String(docResponse.fileName || "document.pdf"),
           downloadUrl: sanitizeUrl(docResponse.downloadUrl || docResponse.downloadUrl1),
-          viewUrl: sanitizeUrl(docResponse.viewUrl || docResponse.previewUrl1 || docResponse.viewUrl1),
+          viewUrl: sanitizeUrl(docResponse.viewUrl || docResponse.previewUrl || docResponse.previewUrl1 || docResponse.viewUrl1),
         };
 
         // If even then we have an expression in fileName, try to clean it
