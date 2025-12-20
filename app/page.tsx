@@ -169,8 +169,14 @@ export default function Home() {
 
       if (!res.ok) throw new Error("Request failed");
 
-      const result = await res.json();
-      console.log("API Response Body:", result);
+      let result = await res.json();
+      console.log("Raw API Response:", result);
+
+      // Handle n8n array response structure
+      if (Array.isArray(result)) {
+        result = result[0];
+        console.log("Extracted first item from array:", result);
+      }
 
       if (result?.success || result?.downloadUrl) {
         toast.dismiss(loadingToast);
@@ -185,8 +191,8 @@ export default function Home() {
 
         toast.success(result.message || "Document generated successfully");
       } else {
-        console.error("Response check failed:", { success: result?.success, url: result?.downloadUrl });
-        throw new Error("Generation failed");
+        console.error("Response check failed:", result);
+        throw new Error("The server responded but did not provide a document URL.");
       }
     } catch (err: any) {
       toast.dismiss(loadingToast);
