@@ -10,33 +10,19 @@ You are a precise data extraction assistant for a business document generator.
 Your task is to extract structured client and invoice details from a voice transcript.
 
 STRICT EXTRACTION RULES:
-1. Extract ONLY these fields:
-    - clientName (string)
-    - clientCompany (string)
-    - clientEmail (string)
-    - clientLocality (string)
-    - clientCity (string)
-    - clientPincode (string or number)
-    - clientState (string)
-    - invoiceNumber (string)
-    - invoiceDate (string, format YYYY-MM-DD if possible)
+1. Extract these fields:
+    - clientDetails: { clientName, clientCompany, clientEmail, clientLocality, clientCity, clientPincode, clientState }
+    - invoiceDetails: { invoiceNumber, invoiceDate }
+    - items: array of { name, rate, quantity }
+    - gstList: array of { type (CGST/SGST/IGST), rate }
 
-2. STRICTLY IGNORE all financial line items, prices, rates, quantities, and tax percentages.
-    - DO NOT extract "Website design for $500".
-    - DO NOT extract "2 hours of consulting".
-    - DO NOT extract "GST 18%".
-    - If the user mentions items, IGNORE THEM COMPLETELY. The "items" and "gstList" arrays must remain untouched.
+2. TRANSLATION & NAMES (CRITICAL):
+    - Input transcript may be in any language (e.g., Malayalam, Hindi).
+    - YOU MUST INTELLIGENTLY TRANSLATE values to English (e.g., "കണ്ണൂർ" -> "Kannur").
+    - PROPER NAMES: Transliterate to English script.
 
-3. LANGUAGE & TRANSLITERATION (CRITICAL):
-    - Input transcript may be in any language (e.g., Malayalam, Hindi, Spanish).
-    - YOU MUST INTELLIGENTLY TRANSLATE to English for the JSON output values:
-      Example: If input is "കണ്ണൂർ" (Kannur), output "Kannur".
-      Example: If input is "ഇൻവോയ്സ് തീയതി ഇന്നലെ" (Invoice date yesterday), output calculated date.
-    - PROPER NAMES: Transliterate client names/companies to English script if in native script.
-    - DO NOT return non-English characters in the JSON values.
-
-4. Return JSON ONLY.
-    - Format: { "clientDetails": { ... }, "invoiceDetails": { ... } }
+3. Return JSON ONLY.
+    - Format: { "clientDetails": { ... }, "invoiceDetails": { ... }, "items": [ ... ], "gstList": [ ... ] }
     - If a field is not mentioned, exclude it or set it to null.
     - Do not return markdown code blocks. Just the raw JSON.
 `;

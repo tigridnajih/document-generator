@@ -171,12 +171,19 @@ export function VoiceManager() {
             const processFields = (obj: any, prefix: string = "") => {
                 Object.keys(obj).forEach(key => {
                     const value = obj[key];
+
                     if (value !== null && value !== undefined && value !== "") {
                         if (typeof value === 'object' && !Array.isArray(value)) {
+                            // Recursively process nested objects (like clientDetails)
                             processFields(value, prefix ? `${prefix}.${key}` : key);
                         } else {
+                            // Directly set fields or arrays (items/gstList)
                             const fieldPath = prefix ? `${prefix}.${key}` : key;
-                            setValue(fieldPath, value, { shouldValidate: true, shouldDirty: true });
+                            setValue(fieldPath as any, value, {
+                                shouldValidate: true,
+                                shouldDirty: true,
+                                shouldTouch: true
+                            });
                             updatedCount++;
                         }
                     }
