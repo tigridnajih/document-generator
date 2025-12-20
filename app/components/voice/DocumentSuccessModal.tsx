@@ -34,7 +34,7 @@ export function DocumentSuccessModal({
                             Document Generated!
                         </h3>
                         <p className="text-neutral-400 text-sm">
-                            Your {fileName || "document"} is ready.
+                            Your <span className="text-white font-medium">{fileName || "document"}</span> is ready.
                         </p>
                     </div>
 

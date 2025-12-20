@@ -189,7 +189,7 @@ export default function Home() {
 
         // Final Document Data for Modal
         const finalData = {
-          fileName: result.fileName || "document.pdf",
+          fileName: result.fileName,
           downloadUrl: sanitizeUrl(result.downloadUrl),
           viewUrl: sanitizeUrl(result.viewUrl)
         };
