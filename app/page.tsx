@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -232,7 +233,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
       <div className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center">
+        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
           <Image
             src="/logo.png"
             alt="Tigrid Technologies"
@@ -240,6 +241,11 @@ export default function Home() {
             height={28}
             priority
           />
+          <Link href="/dashboard">
+            <ShineButton className="!px-4 !py-2 !text-sm !w-auto">
+              Dashboard
+            </ShineButton>
+          </Link>
         </div>
       </div>
 
