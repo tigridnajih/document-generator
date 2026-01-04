@@ -6,14 +6,17 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react"; // Added useMemo here
 
 // Format currency - moved outside LiveTotal so CountUp can access it
+// Format currency - with consistent 2 decimal places
 const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
         style: "currency",
         currency: "INR",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
     }).format(amount);
 };
 
-// Simple CountUp component for financial precision
+// Simple CountUp component for financial precision - using standardized formatting
 function CountUp({ value }: { value: number }) {
     const [displayValue, setDisplayValue] = useState(value);
 
@@ -22,98 +25,100 @@ function CountUp({ value }: { value: number }) {
         const end = value;
         if (start === end) return;
 
-        const duration = 600;
+        const duration = 400; // Snappier for production feel
         const startTime = performance.now();
 
         const animate = (currentTime: number) => {
             const elapsed = currentTime - startTime;
             const progress = Math.min(elapsed / duration, 1);
-
-            // Ease out quart
             const ease = 1 - Math.pow(1 - progress, 4);
-
             const current = start + (end - start) * ease;
             setDisplayValue(current);
-
-            if (progress < 1) {
-                requestAnimationFrame(animate);
-            }
+            if (progress < 1) requestAnimationFrame(animate);
         };
 
         requestAnimationFrame(animate);
-    }, [value]); // minimal dependency to avoid jitter
+    }, [value]);
 
-    return <>{formatCurrency(displayValue).replace(/[^0-9.,]/g, '')}</>;
+    return <span>{formatCurrency(displayValue)}</span>; // Include currency symbol here for stability
 }
 
 export function LiveTotal() {
     const { control } = useFormContext<DocumentFormData>();
 
-    // Watch all relevant fields to trigger re-renders
     const items = useWatch({ control, name: "items" }) || [];
     const gstList = useWatch({ control, name: "gstList" }) || [];
 
-    // Calculate totals using useMemo for performance
     const subTotal = useMemo(() => {
         return items.reduce((sum, item) => {
             return sum + (Number(item.rate) || 0) * (Number(item.quantity) || 0);
         }, 0);
     }, [items]);
 
-    const gstTotal = useMemo(() => {
-        return gstList.reduce((sum, gst) => {
-            return sum + (subTotal * (Number(gst.rate) || 0)) / 100;
-        }, 0);
+    const gstTotals = useMemo(() => {
+        return gstList.map(gst => ({
+            label: `${gst.type} (${gst.rate}%)`,
+            amount: (subTotal * (Number(gst.rate) || 0)) / 100
+        }));
     }, [subTotal, gstList]);
 
-    const grandTotal = useMemo(() => {
-        return subTotal + gstTotal;
-    }, [subTotal, gstTotal]);
+    const totalTax = useMemo(() => {
+        return gstTotals.reduce((sum, tax) => sum + tax.amount, 0);
+    }, [gstTotals]);
+
+    const grandTotal = useMemo(() => subTotal + totalTax, [subTotal, totalTax]);
 
     if (items.length === 0) return null;
 
     return (
         <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="bg-neutral-900/90 backdrop-blur-3xl border border-neutral-800/50 rounded-2xl py-10 px-8 space-y-8 shadow-[0_30px_80px_-20px_rgba(0,0,0,0.6)] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)] relative overflow-hidden group"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="border-t border-white/5 pt-10 mt-10 space-y-6"
         >
-            {/* Background Atmosphere - Balanced & Serious */}
-            <div className="absolute top-[-25%] right-[-5%] w-[400px] h-[400px] bg-orange-500/[0.03] rounded-full blur-[100px] pointer-events-none" />
+            <div className="max-w-md ml-auto space-y-4">
+                {/* Calculation Stack */}
+                <div className="space-y-3">
+                    <div className="flex justify-between items-center text-sm">
+                        <span className="text-neutral-500 font-medium">Subtotal</span>
+                        <span className="text-neutral-200 font-mono">{formatCurrency(subTotal)}</span>
+                    </div>
 
-            <div className="space-y-4 text-sm relative z-10">
-                <div className="flex justify-between items-center text-neutral-400 font-medium">
-                    <span className="tracking-wide">Subtotal</span>
-                    <span className="font-mono text-neutral-100">{formatCurrency(subTotal)}</span>
+                    <AnimatePresence mode="popLayout">
+                        {gstTotals.map((tax, i) => (
+                            <motion.div
+                                key={i}
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="flex justify-between items-center text-sm"
+                            >
+                                <span className="text-neutral-500 font-medium">{tax.label}</span>
+                                <span className="text-neutral-300 font-mono">+{formatCurrency(tax.amount)}</span>
+                            </motion.div>
+                        ))}
+                    </AnimatePresence>
                 </div>
 
-                <AnimatePresence>
-                    {gstList.map((gst, i) => (
-                        <motion.div
-                            key={i}
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: "auto" }}
-                            exit={{ opacity: 0, height: 0 }}
-                            className="flex justify-between items-center text-neutral-400 overflow-hidden"
-                        >
-                            <span className="flex items-center gap-2">
-                                {gst.type}
-                                <span className="text-[10px] text-neutral-600 font-bold px-1.5 py-0.5 rounded bg-neutral-800/50 uppercase">
-                                    {gst.rate}%
-                                </span>
-                            </span>
-                            <span className="font-mono text-neutral-300">{formatCurrency((subTotal * (Number(gst.rate) || 0)) / 100)}</span>
-                        </motion.div>
-                    ))}
-                </AnimatePresence>
-            </div>
+                {/* Divider */}
+                <div className="h-[1px] bg-white/10 w-full" />
 
-            <div className="pt-10 flex flex-col items-end gap-3 relative z-10">
-                <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-neutral-500">Total Payable</span>
-                <span className="text-5xl sm:text-6xl font-bold tracking-[-0.03em] text-white flex items-baseline gap-4 drop-shadow-2xl">
-                    <span className="text-neutral-500 text-xl sm:text-2xl font-semibold tracking-normal">INR</span>
-                    <CountUp value={grandTotal} />
-                </span>
+                {/* Grand Total */}
+                <div className="flex justify-between items-end pt-2">
+                    <span className="text-xs font-bold uppercase tracking-widest text-neutral-500 mb-2">Total Payable</span>
+                    <div className="text-right">
+                        <div className="text-4xl sm:text-5xl font-bold tracking-tight text-white">
+                            <CountUp value={grandTotal} />
+                        </div>
+                    </div>
+                </div>
+
+                {/* Zero State / Helper Info */}
+                {grandTotal === 0 && (
+                    <p className="text-[10px] text-neutral-600 font-medium text-right italic uppercase tracking-wider">
+                        Awaiting line items for calculation
+                    </p>
+                )}
             </div>
         </motion.div>
     );
