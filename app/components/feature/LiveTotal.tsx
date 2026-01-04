@@ -36,9 +36,6 @@ export function LiveTotal() {
             animate={{ opacity: 1, scale: 1 }}
             className="bg-neutral-900/90 backdrop-blur-2xl border border-neutral-800/80 rounded-2xl p-8 space-y-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden group"
         >
-            {/* Subtle top glow for authority */}
-            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent opacity-50" />
-
             {/* Background Atmosphere */}
             <div className="absolute top-[-20%] right-[-10%] w-96 h-96 bg-orange-500/5 rounded-full blur-[100px] pointer-events-none" />
 

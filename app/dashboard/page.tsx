@@ -128,10 +128,14 @@ function DashboardContent() {
                     <div className="flex items-center gap-4">
                         <Link href="/" className="group">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-black font-bold text-xl tracking-tighter shadow-lg shadow-white/10 group-hover:scale-105 transition-transform duration-300">
-                                    T
-                                </div>
-                                <span className="font-bold text-lg tracking-tight text-neutral-200 group-hover:text-white transition-colors">Tigrid</span>
+                                <Image
+                                    src="/logo.png"
+                                    alt="Tigrid Logo"
+                                    width={120}
+                                    height={32}
+                                    className="h-8 w-auto object-contain opacity-90 group-hover:opacity-100 transition-opacity"
+                                    priority
+                                />
                             </div>
                         </Link>
                     </div>

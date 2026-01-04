@@ -243,10 +243,14 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 group cursor-default">
-              <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white font-bold text-xl tracking-tighter shadow-lg shadow-orange-500/20">
-                T
-              </div>
-              <span className="font-bold text-lg tracking-tight text-neutral-200">Tigrid</span>
+              <Image
+                src="/logo.png"
+                alt="Tigrid Logo"
+                width={120}
+                height={32}
+                className="h-8 w-auto object-contain"
+                priority
+              />
             </div>
           </div>
           <Link href="/dashboard">

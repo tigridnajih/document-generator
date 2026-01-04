@@ -62,7 +62,7 @@ export function DocCard({
             onMouseLeave={handleMouseLeave}
             onClick={() => onSelect(type)}
             className={clsx(
-                "relative overflow-hidden rounded-2xl border p-6 cursor-pointer transition-all duration-300 group select-none",
+                "relative overflow-hidden rounded-2xl border p-4 sm:p-5 cursor-pointer transition-all duration-300 group select-none h-full flex flex-col",
                 "hover:-translate-y-1 hover:border-neutral-700/80",
                 active
                     ? "bg-neutral-900/80 border-orange-500/50 shadow-[0_0_50px_-10px_rgba(249,115,22,0.15)] ring-1 ring-orange-500/20 scale-[1.02]"
@@ -83,11 +83,11 @@ export function DocCard({
                 }}
             />
 
-            <div className="relative z-10 flex flex-col justify-between h-full">
-                <div>
+            <div className="relative z-10 flex flex-col h-full">
+                <div className="flex-1">
                     {icon && (
                         <div className={clsx(
-                            "mb-5 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300",
+                            "mb-3 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300",
                             active
                                 ? "bg-orange-500/10 text-orange-500 border border-orange-500/20 shadow-inner shadow-orange-500/10"
                                 : "bg-neutral-800/30 text-neutral-500 border border-neutral-800/50 group-hover:bg-neutral-800/80 group-hover:text-orange-400 group-hover:border-orange-500/20"
@@ -96,19 +96,19 @@ export function DocCard({
                         </div>
                     )}
                     <h3 className={clsx(
-                        "font-semibold text-lg mb-2 transition-colors tracking-tight",
+                        "font-semibold text-base mb-1 transition-colors tracking-tight",
                         active ? "text-white" : "text-neutral-400 group-hover:text-white"
                     )}>
                         {label}
                     </h3>
-                    <p className="text-sm text-neutral-600 group-hover:text-neutral-500 transition-colors leading-relaxed font-medium">
+                    <p className="text-sm text-neutral-600 group-hover:text-neutral-500 transition-colors leading-relaxed font-medium line-clamp-2">
                         {description}
                     </p>
                 </div>
 
                 {active && (
-                    <div className="mt-5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-orange-500 animate-[fade-in_0.3s_ease-out]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_currentColor]" />
+                    <div className="mt-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-orange-500 animate-[fade-in_0.3s_ease-out]">
+                        <span className="w-1 h-1 rounded-full bg-orange-500 shadow-[0_0_8px_currentColor]" />
                         Selected
                     </div>
                 )}
