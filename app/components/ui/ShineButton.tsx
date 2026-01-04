@@ -16,17 +16,12 @@ export const ShineButton = forwardRef<HTMLButtonElement, ShineButtonProps>(
             <button
                 ref={ref}
                 className={cn(
-                    "relative inline-flex w-full items-center justify-center overflow-hidden rounded-lg",
-                    "bg-gradient-to-r from-orange-500 to-orange-600",
-                    "px-8 py-4 font-semibold text-white text-base",
-                    "transition-all hover:from-orange-600 hover:to-orange-700 hover:shadow-lg hover:shadow-orange-500/20",
-                    "active:scale-[0.98]",
-                    "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-none",
+                    "relative inline-flex w-full items-center justify-center overflow-hidden rounded-xl bg-orange-600 px-6 py-3.5 font-semibold text-white transition-all hover:bg-orange-500 hover:scale-[1.02] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50",
                     className
                 )}
                 {...props}
             >
-                <span className="absolute inset-0 flex h-full w-full -translate-x-full animate-[shimmer_3s_infinite] bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+                <span className="absolute inset-0 flex h-full w-full -translate-x-full animate-[shimmer_2s_infinite] bg-gradient-to-r from-transparent via-white/20 to-transparent" />
                 <span className="relative z-10">{children}</span>
             </button>
         );

@@ -22,11 +22,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 <input
                     ref={ref}
                     className={cn(
-                        "w-full bg-neutral-800 border border-neutral-700 rounded-lg px-4 py-3 text-sm",
-                        "hover:border-neutral-600 hover:bg-neutral-800/80",
-                        "focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500",
-                        "transition-all placeholder:text-neutral-500",
-                        "disabled:opacity-50 disabled:cursor-not-allowed",
+                        "w-full bg-neutral-900 border border-neutral-700 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/50 transition-all placeholder:text-neutral-600",
                         startIcon ? "pl-10" : "",
                         className
                     )}
