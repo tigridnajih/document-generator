@@ -67,10 +67,6 @@ export default function Dashboard() {
                             priority
                             className="block sm:hidden"
                         />
-                        <div className="h-6 w-px bg-neutral-800 mx-2 hidden sm:block" />
-                        <h1 className="font-bold text-lg tracking-tight hidden sm:block">
-                            Dashboard <span className="text-neutral-600 mx-2">/</span> <span className="text-orange-500 capitalize">{activeTab}s</span>
-                        </h1>
                     </div>
 
                     <Link href="/">
@@ -83,6 +79,11 @@ export default function Dashboard() {
             </header>
 
             <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+
+                {/* Page Title - Visible on all devices */}
+                <h1 className="font-bold text-2xl sm:text-3xl tracking-tight">
+                    Dashboard <span className="text-neutral-600 mx-2">/</span> <span className="text-orange-500 capitalize">{activeTab}s</span>
+                </h1>
 
                 {/* Top Controls: Tabs & Time Range */}
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
