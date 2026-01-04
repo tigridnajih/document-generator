@@ -312,14 +312,18 @@ export default function Home() {
           />
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="relative bg-neutral-900/20 backdrop-blur-3xl border border-white/5 rounded-3xl p-6 sm:p-10 space-y-10 shadow-2xl shadow-black/50"
+            className="relative bg-neutral-900/40 backdrop-blur-3xl border border-white/5 rounded-3xl p-6 sm:p-10 space-y-10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.03)] transition-all duration-300"
           >
             <Section title="Client Information">
-              <Input
-                {...register("clientDetails.clientName")}
-                placeholder="Client Name"
-                startIcon={<User className="w-4 h-4" />}
-              />
+              <div className="relative group/first-field">
+                <Input
+                  {...register("clientDetails.clientName")}
+                  placeholder="Client Name"
+                  startIcon={<User className="w-4 h-4" />}
+                  autoFocus
+                  className="bg-neutral-800/20 ring-1 ring-white/10"
+                />
+              </div>
               {errors.clientDetails?.clientName && (
                 <p className="text-red-500 text-xs mt-1 ml-2">
                   {errors.clientDetails.clientName.message}
