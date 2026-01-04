@@ -231,7 +231,13 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-white">
+    <main className="min-h-screen bg-neutral-950 text-white relative overflow-hidden">
+      {/* Animated Background Gradient Mesh */}
+      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-[120px] opacity-50 animate-pulse" />
+        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-500/5 rounded-full blur-[100px] opacity-30" />
+        <div className="absolute top-[40%] left-[50%] w-[400px] h-[400px] bg-neutral-800/20 rounded-full blur-[80px] opacity-20" />
+      </div>
       <div className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
         <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Image
@@ -250,12 +256,15 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-10 space-y-10">
-        <div className="text-center space-y-2">
-          <h1 className="font-bold tracking-tight text-3xl sm:text-4xl">
-            Business Document <span className="text-orange-500">Generator</span>
+      <div className="max-w-7xl mx-auto px-4 py-16 space-y-12 relative z-10">
+        <div className="text-center space-y-4">
+          <h1 className="font-bold tracking-tight text-4xl sm:text-5xl lg:text-6xl">
+            Business Document{" "}
+            <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent animate-gradient">
+              Generator
+            </span>
           </h1>
-          <p className="text-sm text-neutral-400">
+          <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto">
             Generate professional business documents instantly
           </p>
         </div>
@@ -299,8 +308,11 @@ export default function Home() {
           />
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="bg-gradient-to-b from-neutral-900 to-neutral-950 border border-neutral-800 rounded-2xl p-6 sm:p-8 space-y-8"
+            className="relative bg-gradient-to-b from-neutral-900/80 to-neutral-950/80 backdrop-blur-xl border border-neutral-800/50 rounded-3xl p-6 sm:p-10 space-y-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
           >
+            {/* Gradient border glow */}
+            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-orange-500/10 via-transparent to-orange-500/10 blur-2xl -z-10" />
+
             <Section title="Client Details">
               <Input
                 {...register("clientDetails.clientName")}
