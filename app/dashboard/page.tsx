@@ -18,8 +18,9 @@ export default function Dashboard() {
     const [activeTab, setActiveTab] = useState<DocumentType>("proposal");
     const [timeRange, setTimeRange] = useState<TimeRange>("Weekly");
     const [searchQuery, setSearchQuery] = useState("");
+    const [selectedDate, setSelectedDate] = useState("");
 
-    // Filter documents based on active tab and search query
+    // Filter documents based on active tab, search query, and date
     const filteredDocuments = useMemo(() => {
         return MOCK_DOCUMENTS.filter((doc) => {
             const matchesType = doc.type === activeTab;
@@ -29,9 +30,13 @@ export default function Dashboard() {
                 doc.clientCompany.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 doc.number.toLowerCase().includes(searchQuery.toLowerCase());
 
-            return matchesType && matchesSearch;
+            // Date filter logic
+            const matchesDate = !selectedDate ||
+                new Date(doc.createdDate).toISOString().split('T')[0] === selectedDate;
+
+            return matchesType && matchesSearch && matchesDate;
         });
-    }, [activeTab, searchQuery]);
+    }, [activeTab, searchQuery, selectedDate]);
 
     // Calculate stats
     const totalCount = filteredDocuments.length;
@@ -175,9 +180,15 @@ export default function Dashboard() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    {/* Date filter - now visible on mobile */}
-                    <div className="w-full sm:w-48 relative opacity-50 cursor-not-allowed">
-                        <input disabled type="date" className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-500" />
+                    {/* Date filter - now functional */}
+                    <div className="w-full sm:w-auto sm:min-w-[200px] relative">
+                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
+                        <input
+                            type="date"
+                            value={selectedDate}
+                            onChange={(e) => setSelectedDate(e.target.value)}
+                            className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50 transition-all text-neutral-300"
+                        />
                     </div>
                 </div>
 
