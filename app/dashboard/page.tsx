@@ -1,49 +1,99 @@
-"use client";
 
-import { useMemo, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Search, Calendar, FileText, FileCheck, FileSpreadsheet, Plus, ExternalLink } from "lucide-react";
+import Link from "next/link";
+import { FileText, FileSpreadsheet, Plus } from "lucide-react";
 
-import { Input } from "@/components/ui/Input";
-import { ShineButton } from "@/components/ui/ShineButton";
 import { InteractiveBarChart } from "@/components/dashboard/InteractiveBarChart";
 import { StatCard } from "@/components/dashboard/StatCard";
-import { DocumentTable } from "@/components/dashboard/DocumentTable";
-import { motion } from "framer-motion";
-import { MOCK_CHART_DATA, MOCK_DOCUMENTS, DocumentType, TimeRange } from "@/lib/mock-dashboard-data";
-import { cn } from "@/lib/utils";
+import { DocumentTable, Document } from "@/components/dashboard/DocumentTable";
+import { DashboardControls } from "@/components/dashboard/DashboardControls";
+import { supabase } from "@/lib/supabase";
 
-export default function Dashboard() {
-    const [activeTab, setActiveTab] = useState<DocumentType>("proposal");
-    const [timeRange, setTimeRange] = useState<TimeRange>("Weekly");
-    const [searchQuery, setSearchQuery] = useState("");
-    const [selectedDate, setSelectedDate] = useState("");
+export const dynamic = 'force-dynamic';
 
-    // Filter documents based on active tab, search query, and date
-    const filteredDocuments = useMemo(() => {
-        return MOCK_DOCUMENTS.filter((doc) => {
-            const matchesType = doc.type === activeTab;
-            const matchesSearch =
-                searchQuery === "" ||
-                doc.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                doc.clientCompany.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                doc.number.toLowerCase().includes(searchQuery.toLowerCase());
+export default async function Dashboard({
+    searchParams,
+}: {
+    searchParams: { [key: string]: string | string[] | undefined };
+}) {
+    // Await searchParams in Next.js 15+ if needed, but for 13/14 it's direct. 
+    // Assuming standard behavior for now. If Next.js 15, might need await. Package.json said next 16? 
+    // Next 16 doesn't exist yet, it said "next": "16.0.10" in package.json... Wait.
+    // Reviewing package.json from step 19: "next": "16.0.10". That must be a typo in the user workspace or a canary version? 
+    // React 19 is also listed. This is likely a very new/canary build.
+    // In Next 15+, searchParams is a Promise. I should await it.
 
-            // Date filter logic
-            const matchesDate = !selectedDate ||
-                new Date(doc.createdDate).toISOString().split('T')[0] === selectedDate;
+    const params = await searchParams;
+    const q = (params?.q as string) || "";
+    const type = (params?.type as string) || "all";
+    const dateFrom = (params?.dateFrom as string) || "";
 
-            return matchesType && matchesSearch && matchesDate;
-        });
-    }, [activeTab, searchQuery, selectedDate]);
+    // Build Query
+    let query = supabase
+        .from("documents")
+        .select("*")
+        .order("generated_at", { ascending: false });
 
-    // Calculate stats
-    const totalCount = filteredDocuments.length;
-    const totalValue = filteredDocuments.reduce((sum, doc) => sum + doc.amount, 0);
+    // Filter by Type
+    if (type && type !== "all") {
+        query = query.eq("document_type", type);
+    }
 
-    // Get chart data
-    const chartData = MOCK_CHART_DATA[timeRange][activeTab];
+    // Filter by Date (Single Date Match)
+    if (dateFrom) {
+        // Filter: generated_at >= dateFrom 00:00 AND generated_at <= dateFrom 23:59:59
+        // or just simple string matching if formatted? No, it's timestamp.
+        const startDate = new Date(dateFrom);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(dateFrom);
+        endDate.setHours(23, 59, 59, 999);
+
+        query = query.gte("generated_at", startDate.toISOString()).lte("generated_at", endDate.toISOString());
+    }
+
+    // Filter by Search Term (Client Name, Company, Number)
+    if (q) {
+        query = query.or(`client_name.ilike.%${q}%,client_company.ilike.%${q}%,document_number.ilike.%${q}%`);
+    }
+
+    // Execute Query
+    const { data: documents, error } = await query;
+
+    if (error) {
+        console.error("Supabase Error:", error);
+        // Handle error gracefully or throw
+    }
+
+    const docs = (documents || []) as Document[];
+
+    // Compute Aggregates for UI
+    const totalCount = docs.length;
+    const totalValue = docs.reduce((sum, doc) => sum + Number(doc.amount || 0), 0);
+
+    // Compute Chart Data (Group by "Day" from generated_at)
+    // We'll show last 7 days or just the distribution of the current filtered set
+    // prompt: "Charts should automatically respect: Selected document type, Date range filter"
+    // So we just visualize the `docs` we fetched.
+    // Grouping by Date (YYYY-MM-DD)
+    const chartMap = new Map<string, number>();
+
+    docs.forEach(doc => {
+        const dateKey = new Date(doc.generated_at).toLocaleDateString('en-US', { weekday: 'short' });
+        // Using weekday name for better visual if few days, or just date.
+        // Let's use simplified date format for the chart keys.
+        // If many docs, maybe date string.
+        const d = new Date(doc.generated_at);
+        const key = `${d.getMonth() + 1}/${d.getDate()}`;
+        chartMap.set(key, (chartMap.get(key) || 0) + Number(doc.amount));
+    });
+
+    // Convert to array and sort? Or just take usage.
+    // For a nice chart, we might want to fill in gaps or just show what's there.
+    // Showing what's there is safest for "respecting filters".
+    const chartData = Array.from(chartMap.entries()).map(([name, value]) => ({ name, value }));
+
+    // If chartData is empty (no docs), maybe show empty state or defaults?
+    // InteractiveBarChart handles empty array fine.
 
     return (
         <div className="min-h-screen bg-neutral-950 text-white font-sans selection:bg-orange-500/30 overflow-hidden relative">
@@ -64,146 +114,58 @@ export default function Dashboard() {
                             priority
                             className="hidden sm:block"
                         />
-                        <Image
-                            src="/logo.png"
-                            alt="Tigrid"
-                            width={80}
-                            height={20}
-                            priority
-                            className="block sm:hidden"
-                        />
+                        <span className="font-bold text-xl tracking-tight sm:hidden">Tigrid</span>
                     </div>
 
                     <Link href="/">
                         <button className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors bg-neutral-900 border border-orange-500/50 hover:border-orange-500 px-4 py-2 rounded-full whitespace-nowrap shadow-[0_0_10px_-3px_rgba(249,115,22,0.3)]">
                             <Plus className="w-4 h-4 shrink-0" />
-                            <span>New Document</span>
+                            <span>Document Generator</span>
                         </button>
                     </Link>
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 py-8 space-y-8">
+            <main className="max-w-7xl mx-auto px-4 py-8 space-y-8 relative z-10">
 
-                {/* Page Title - Visible on all devices */}
+                {/* Page Title */}
                 <h1 className="font-bold text-2xl sm:text-3xl tracking-tight">
-                    Dashboard <span className="text-neutral-600 mx-2">/</span> <span className="text-orange-500 capitalize">{activeTab}s</span>
+                    Dashboard <span className="text-neutral-600 mx-2">/</span> <span className="text-orange-500 capitalize">{type}s</span>
                 </h1>
 
-                {/* Top Controls: Tabs & Time Range */}
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-
-                    {/* Tabs */}
-                    <div className="flex p-1 bg-neutral-900/50 border border-neutral-800 rounded-xl overflow-x-auto self-start max-w-full no-scrollbar">
-                        {(["proposal", "quotation", "invoice"] as DocumentType[]).map((type) => (
-                            <button
-                                key={type}
-                                onClick={() => setActiveTab(type)}
-                                className={cn(
-                                    "px-4 sm:px-6 py-2.5 text-sm font-medium rounded-lg transition-all capitalize flex items-center gap-2 whitespace-nowrap",
-                                    activeTab === type
-                                        ? "bg-neutral-800 text-white shadow-sm"
-                                        : "text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/50"
-                                )}
-                            >
-                                {type === "proposal" && <FileText className="w-4 h-4" />}
-                                {type === "quotation" && <FileCheck className="w-4 h-4" />}
-                                {type === "invoice" && <FileSpreadsheet className="w-4 h-4" />}
-                                {type}
-                            </button>
-                        ))}
-                    </div>
-
-                    {/* Time Range */}
-                    <div className="flex items-center gap-2 bg-neutral-900/30 border border-neutral-800 p-1 rounded-lg self-start">
-                        {(["Daily", "Weekly", "Monthly", "Yearly"] as TimeRange[]).map((range) => (
-                            <button
-                                key={range}
-                                onClick={() => setTimeRange(range)}
-                                className={cn(
-                                    "px-3 py-1.5 text-xs font-medium rounded-md transition-colors",
-                                    timeRange === range
-                                        ? "bg-neutral-800 text-white"
-                                        : "text-neutral-500 hover:text-neutral-300"
-                                )}
-                            >
-                                {range}
-                            </button>
-                        ))}
-                    </div>
-                </div>
+                {/* Client Controls (Filters, Search, Date) */}
+                <DashboardControls />
 
                 {/* Analytics Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 relative z-10">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5 }}
-                        className="lg:col-span-3"
-                    >
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                    <div className="lg:col-span-3">
                         <InteractiveBarChart
                             data={chartData}
-                            timeRange={timeRange}
-                            color="bg-orange-500"
+                            label={`Total Amount (${type})`}
                         />
-                    </motion.div>
-                    <motion.div
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                        className="space-y-4"
-                    >
+                    </div>
+                    <div className="space-y-4">
                         <StatCard
                             label="Total Documents"
                             value={totalCount}
                             icon={FileText}
-                            trend="+12% vs last period"
+                            trend="Based on current filters"
                         />
                         <StatCard
                             label="Total Value"
                             value={`$${totalValue.toLocaleString()}`}
                             icon={FileSpreadsheet}
-                            trend="+5.4%"
-                        />
-                    </motion.div>
-                </div>
-
-                {/* Filters & Search */}
-                <div className="flex flex-col sm:flex-row gap-4">
-                    <div className="relative flex-1">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
-                        <input
-                            type="text"
-                            placeholder="Search by client, company or ID..."
-                            className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50 transition-all placeholder:text-neutral-600"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-                    {/* Date filter - now functional */}
-                    <div className="w-full sm:w-auto sm:min-w-[200px] relative">
-                        <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none" />
-                        <input
-                            type="date"
-                            value={selectedDate}
-                            onChange={(e) => setSelectedDate(e.target.value)}
-                            className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50 transition-all text-neutral-300"
+                            trend="Based on current filters"
                         />
                     </div>
                 </div>
 
                 {/* Table */}
-                <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.4 }}
-                >
-                    <DocumentTable documents={filteredDocuments} />
-                </motion.div>
+                <div>
+                    <DocumentTable documents={docs} />
+                </div>
 
             </main>
         </div>
     );
 }
-
-// Simple icon wrapper for stats

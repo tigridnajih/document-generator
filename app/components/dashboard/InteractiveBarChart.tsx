@@ -1,6 +1,5 @@
 "use client";
 
-import { useMemo } from "react";
 import {
     BarChart,
     Bar,
@@ -11,35 +10,14 @@ import {
     ResponsiveContainer,
     Cell,
 } from "recharts";
-import { TimeRange } from "@/lib/mock-dashboard-data";
-import { cn } from "@/lib/utils";
 
 interface InteractiveBarChartProps {
-    data: number[];
-    timeRange: TimeRange;
-    color: string;
+    data: { name: string; value: number }[];
+    label?: string;
 }
 
-export function InteractiveBarChart({ data, timeRange, color }: InteractiveBarChartProps) {
-    // Generate labels based on time range
-    const chartData = useMemo(() => {
-        let labels: string[] = [];
-        if (timeRange === "Daily") labels = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-        else if (timeRange === "Weekly") labels = ["Week 1", "Week 2", "Week 3", "Week 4"];
-        else if (timeRange === "Monthly") labels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun"];
-        else labels = ["2021", "2022", "2023", "2024"];
-
-        return data.map((val, idx) => ({
-            name: labels[idx] || `${idx + 1}`,
-            value: val,
-        }));
-    }, [data, timeRange]);
-
-    // Extract color class to hex for Recharts (simplified mapping)
-    const hexColor = useMemo(() => {
-        // ALWAYS RETURN ORANGE as requested
-        return "#f97316";
-    }, [color]);
+export function InteractiveBarChart({ data, label = "Document Velocity" }: InteractiveBarChartProps) {
+    const hexColor = "#f97316"; // Always Orange
 
     return (
         <div className="w-full h-80 bg-neutral-900/50 backdrop-blur-md border border-neutral-800 rounded-xl p-6 relative overflow-hidden group hover:border-neutral-700 transition-all duration-500">
@@ -48,11 +26,11 @@ export function InteractiveBarChart({ data, timeRange, color }: InteractiveBarCh
 
             <h3 className="text-neutral-400 text-sm font-medium mb-4 flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-current opacity-70" style={{ color: hexColor }} />
-                Document Velocity
+                {label}
             </h3>
 
             <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#262626" vertical={false} />
                     <XAxis
                         dataKey="name"
@@ -67,6 +45,7 @@ export function InteractiveBarChart({ data, timeRange, color }: InteractiveBarCh
                         fontSize={12}
                         tickLine={false}
                         axisLine={false}
+                        tickFormatter={(value) => `$${value.toLocaleString()}`}
                     />
                     <Tooltip
                         cursor={{ fill: "rgba(255,255,255,0.05)" }}
@@ -78,9 +57,13 @@ export function InteractiveBarChart({ data, timeRange, color }: InteractiveBarCh
                             boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
                         }}
                         itemStyle={{ color: hexColor }}
+                        formatter={(value: number | undefined) => [
+                            value !== undefined ? `$${value.toLocaleString()}` : "",
+                            label
+                        ]}
                     />
                     <Bar dataKey="value" radius={[4, 4, 0, 0]} animationDuration={1500}>
-                        {chartData.map((entry, index) => (
+                        {data.map((entry, index) => (
                             <Cell key={`cell-${index}`} fill={hexColor} fillOpacity={0.8} />
                         ))}
                     </Bar>
