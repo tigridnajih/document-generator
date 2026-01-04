@@ -59,7 +59,7 @@ export function DocumentTable({ documents }: DocumentTableProps) {
                                 </td>
                                 <td className="px-6 py-4">
                                     <div className="flex items-center gap-3">
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm ${getAvatarColor(doc.clientName)}`}>
+                                        <div className={`w-8 h-8 shrink-0 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm ${getAvatarColor(doc.clientName)}`}>
                                             {getInitials(doc.clientName)}
                                         </div>
                                         <div className="flex flex-col">

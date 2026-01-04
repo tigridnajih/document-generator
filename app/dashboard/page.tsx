@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowLeft, Search, Calendar, FileText, FileCheck, FileSpreadsheet, Plus, ExternalLink } from "lucide-react";
 
 import { Input } from "@/components/ui/Input";
@@ -47,16 +48,34 @@ export default function Dashboard() {
                 <div className="absolute bottom-[10%] left-[-10%] w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[150px] opacity-30" />
             </div>
 
-            {/* Header */}
             <header className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
                 <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-                    <h1 className="font-bold text-xl tracking-tight">
-                        Dashboard <span className="text-neutral-600 mx-2">/</span> <span className="text-orange-500 capitalize">{activeTab}s</span>
-                    </h1>
+                    <div className="flex items-center gap-4">
+                        <Image
+                            src="/logo.png"
+                            alt="Tigrid"
+                            width={100}
+                            height={24}
+                            priority
+                            className="hidden sm:block"
+                        />
+                        <Image
+                            src="/logo.png"
+                            alt="Tigrid"
+                            width={80}
+                            height={20}
+                            priority
+                            className="block sm:hidden"
+                        />
+                        <div className="h-6 w-px bg-neutral-800 mx-2 hidden sm:block" />
+                        <h1 className="font-bold text-lg tracking-tight hidden sm:block">
+                            Dashboard <span className="text-neutral-600 mx-2">/</span> <span className="text-orange-500 capitalize">{activeTab}s</span>
+                        </h1>
+                    </div>
 
                     <Link href="/">
-                        <button className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors bg-neutral-900 border border-neutral-800 hover:border-neutral-700 px-4 py-2 rounded-full">
-                            <Plus className="w-4 h-4" />
+                        <button className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors bg-neutral-900 border border-orange-500/50 hover:border-orange-500 px-4 py-2 rounded-full whitespace-nowrap shadow-[0_0_10px_-3px_rgba(249,115,22,0.3)]">
+                            <Plus className="w-4 h-4 shrink-0" />
                             <span>New Document</span>
                         </button>
                     </Link>
@@ -69,13 +88,13 @@ export default function Dashboard() {
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
                     {/* Tabs */}
-                    <div className="flex p-1 bg-neutral-900/50 border border-neutral-800 rounded-xl overflow-hidden self-start">
+                    <div className="flex p-1 bg-neutral-900/50 border border-neutral-800 rounded-xl overflow-x-auto self-start max-w-full no-scrollbar">
                         {(["proposal", "quotation", "invoice"] as DocumentType[]).map((type) => (
                             <button
                                 key={type}
                                 onClick={() => setActiveTab(type)}
                                 className={cn(
-                                    "px-6 py-2.5 text-sm font-medium rounded-lg transition-all capitalize flex items-center gap-2",
+                                    "px-4 sm:px-6 py-2.5 text-sm font-medium rounded-lg transition-all capitalize flex items-center gap-2 whitespace-nowrap",
                                     activeTab === type
                                         ? "bg-neutral-800 text-white shadow-sm"
                                         : "text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/50"
@@ -155,8 +174,8 @@ export default function Dashboard() {
                             onChange={(e) => setSearchQuery(e.target.value)}
                         />
                     </div>
-                    {/* Date filter placeholder - keeping it simple for now as requested */}
-                    <div className="hidden sm:block w-48 relative opacity-50 cursor-not-allowed">
+                    {/* Date filter - now visible on mobile */}
+                    <div className="w-full sm:w-48 relative opacity-50 cursor-not-allowed">
                         <input disabled type="date" className="w-full bg-neutral-900/50 border border-neutral-800 rounded-xl px-4 py-3 text-sm text-neutral-500" />
                     </div>
                 </div>

@@ -242,7 +242,7 @@ export default function Home() {
             priority
           />
           <Link href="/dashboard">
-            <button className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors bg-neutral-900 border border-neutral-800 hover:border-neutral-700 px-4 py-2 rounded-full whitespace-nowrap">
+            <button className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors bg-neutral-900 border border-orange-500/50 hover:border-orange-500 px-4 py-2 rounded-full whitespace-nowrap shadow-[0_0_10px_-3px_rgba(249,115,22,0.3)]">
               <Eye className="w-4 h-4" />
               <span>View Dashboard</span>
             </button>
