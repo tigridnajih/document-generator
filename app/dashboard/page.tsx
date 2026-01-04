@@ -118,70 +118,72 @@ function DashboardContent() {
         <div className="min-h-screen bg-neutral-950 text-white font-sans selection:bg-orange-500/30 overflow-hidden relative">
             {/* Background Mesh Gradient */}
             <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-[120px] opacity-50 animate-pulse" />
-                <div className="absolute bottom-[10%] left-[-10%] w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[150px] opacity-30" />
+                <div className="absolute top-[-10%] right-[-5%] w-[800px] h-[800px] bg-neutral-900/30 rounded-full blur-[120px] opacity-20" />
+                <div className="absolute bottom-[0%] left-[-10%] w-[600px] h-[600px] bg-neutral-900/10 rounded-full blur-[100px] opacity-20" />
+                <div className="absolute top-[20%] left-[20%] w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[150px] opacity-30 animate-pulse" />
             </div>
 
-            <header className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
-                <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <header className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-800/60 supports-[backdrop-filter]:bg-neutral-950/40">
+                <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                        <Image
-                            src="/logo.png"
-                            alt="Tigrid"
-                            width={100}
-                            height={24}
-                            priority
-                            className="hidden sm:block"
-                        />
-                        <span className="font-bold text-xl tracking-tight sm:hidden">Tigrid</span>
+                        <Link href="/" className="group">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-lg bg-white flex items-center justify-center text-black font-bold text-xl tracking-tighter shadow-lg shadow-white/10 group-hover:scale-105 transition-transform duration-300">
+                                    T
+                                </div>
+                                <span className="font-bold text-lg tracking-tight text-neutral-200 group-hover:text-white transition-colors">Tigrid</span>
+                            </div>
+                        </Link>
                     </div>
 
                     <Link href="/">
-                        <button className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors bg-neutral-900 border border-orange-500/50 hover:border-orange-500 px-4 py-2 rounded-full whitespace-nowrap shadow-[0_0_10px_-3px_rgba(249,115,22,0.3)]">
-                            <Plus className="w-4 h-4 shrink-0" />
-                            <span>Document Generator</span>
+                        <button className="flex items-center gap-2 text-sm font-medium text-neutral-950 bg-white hover:bg-neutral-200 transition-all px-5 py-2.5 rounded-full shadow-lg shadow-white/5 active:scale-95 duration-200">
+                            <Plus className="w-4 h-4 shrink-0 stroke-[2.5]" />
+                            <span>New Document</span>
                         </button>
                     </Link>
                 </div>
             </header>
 
-            <main className="max-w-7xl mx-auto px-4 py-8 space-y-8 relative z-10">
-                <h1 className="font-bold text-2xl sm:text-3xl tracking-tight">
-                    Dashboard <span className="text-neutral-600 mx-2">/</span> <span className="text-orange-500 capitalize">{type === 'all' ? 'All' : type + 's'}</span>
-                </h1>
-
-                {/* Type Filters */}
-                <DashboardControls />
+            <main className="max-w-7xl mx-auto px-6 py-10 space-y-10 relative z-10">
+                <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-6 pb-6 border-b border-neutral-800/40">
+                    <h1 className="font-bold text-3xl sm:text-4xl tracking-tighter text-white">
+                        Dashboard <span className="text-neutral-700 font-light mx-2">/</span> <span className="text-neutral-400 font-medium capitalize">{type === 'all' ? 'Overview' : type + 's'}</span>
+                    </h1>
+                    {/* Type Filters moved to align with title or just below suitable for layout */}
+                    <div className="self-start sm:self-auto">
+                        <DashboardControls />
+                    </div>
+                </div>
 
                 {/* Analytics Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    <div className="lg:col-span-3">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="lg:col-span-2">
                         <InteractiveBarChart
                             data={chartData}
-                            label={`Total Amount (${type})`}
+                            label={`Document Velocity (${type})`}
                         />
                     </div>
-                    <div className="space-y-4">
+                    <div className="space-y-6 flex flex-col justify-between h-full">
                         <StatCard
                             label="Total Documents"
                             value={totalCount}
                             icon={FileText}
-                            trend="Based on current filters"
+                            trend="+12% vs last month"
                         />
                         <StatCard
                             label="Total Value"
                             value={`$${totalValue.toLocaleString()}`}
                             icon={FileSpreadsheet}
-                            trend="Based on current filters"
+                            trend="+8.5% vs last month"
                         />
                     </div>
                 </div>
 
                 {/* Search & Date Controls (Moved below Graph) */}
-                <DashboardSearch />
-
-                {/* Table */}
-                <div>
+                <div className="space-y-6">
+                    <DashboardSearch />
+                    {/* Table */}
                     <DocumentTable documents={documents} />
                 </div>
             </main>
