@@ -250,15 +250,15 @@ export default function Home() {
             </div>
           </div>
           <Link href="/dashboard">
-            <button className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors bg-neutral-900/50 hover:bg-neutral-900 border border-neutral-800 hover:border-neutral-700 px-5 py-2.5 rounded-full whitespace-nowrap shadow-sm">
-              <Eye className="w-4 h-4" />
+            <button className="flex items-center gap-2 text-sm font-medium text-neutral-950 bg-white hover:bg-neutral-200 transition-all px-5 py-2.5 rounded-full shadow-lg shadow-white/5 active:scale-95 duration-200">
+              <Eye className="w-4 h-4 shrink-0 stroke-[2.5]" />
               <span>View Dashboard</span>
             </button>
           </Link>
         </div>
       </header>
 
-      <div className="max-w-3xl mx-auto px-6 py-12 space-y-10 relative z-10">
+      <div className="max-w-7xl mx-auto px-6 py-12 space-y-10 relative z-10">
         <div className="text-center space-y-3">
           <h1 className="font-bold tracking-tighter text-3xl sm:text-4xl text-white">
             Create New Document
