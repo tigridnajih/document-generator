@@ -70,16 +70,16 @@ export function DocCard({
                 "shadow-lg shadow-black/10"
             )}
         >
-            {/* Gradient border glow effect */}
+            {/* Subtle Gradient border glow effect */}
             {active && (
-                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-orange-500/10 via-transparent to-transparent opacity-100 -z-10" />
+                <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-orange-500/5 via-transparent to-transparent opacity-100 -z-10" />
             )}
 
-            {/* Hover spotlight effect */}
+            {/* Hover spotlight effect - Very Subtle */}
             <div
-                className="pointer-events-none absolute -inset-px opacity-0 transition duration-500 group-hover:opacity-100"
+                className="pointer-events-none absolute -inset-px opacity-0 transition duration-700 group-hover:opacity-100"
                 style={{
-                    background: `radial-gradient(500px circle at ${position.x}px ${position.y}px, rgba(249,115,22,0.06), transparent 40%)`,
+                    background: `radial-gradient(400px circle at ${position.x}px ${position.y}px, rgba(249,115,22,0.03), transparent 40%)`,
                 }}
             />
 
@@ -87,31 +87,24 @@ export function DocCard({
                 <div className="flex-1">
                     {icon && (
                         <div className={clsx(
-                            "mb-3 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300",
+                            "mb-4 w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-500",
                             active
-                                ? "bg-orange-500/10 text-orange-500 border border-orange-500/20 shadow-inner shadow-orange-500/10"
-                                : "bg-neutral-800/30 text-neutral-500 border border-neutral-800/50 group-hover:bg-neutral-800/80 group-hover:text-orange-400 group-hover:border-orange-500/20"
+                                ? "bg-orange-500/10 text-orange-500 border border-orange-500/10"
+                                : "bg-neutral-800/40 text-neutral-600 border border-neutral-800/0 group-hover:text-neutral-400 group-hover:bg-neutral-800/60"
                         )}>
                             {icon}
                         </div>
                     )}
                     <h3 className={clsx(
-                        "font-semibold text-base mb-1 transition-colors tracking-tight",
-                        active ? "text-white" : "text-neutral-400 group-hover:text-white"
+                        "font-semibold text-base mb-1 transition-all duration-300 tracking-tight",
+                        active ? "text-white" : "text-neutral-500 group-hover:text-neutral-300"
                     )}>
                         {label}
                     </h3>
-                    <p className="text-sm text-neutral-600 group-hover:text-neutral-500 transition-colors leading-relaxed font-medium line-clamp-2">
+                    <p className="text-[13px] text-neutral-600 group-hover:text-neutral-500 transition-colors leading-relaxed font-medium line-clamp-2">
                         {description}
                     </p>
                 </div>
-
-                {active && (
-                    <div className="mt-3 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-wider text-orange-500 animate-[fade-in_0.3s_ease-out]">
-                        <span className="w-1 h-1 rounded-full bg-orange-500 shadow-[0_0_8px_currentColor]" />
-                        Selected
-                    </div>
-                )}
             </div>
 
             {/* Active state bottom highlight line */}

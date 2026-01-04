@@ -234,12 +234,13 @@ export default function Home() {
     <main className="min-h-screen bg-neutral-950 text-white relative overflow-hidden font-sans selection:bg-orange-500/30">
       {/* Background Mesh Gradient - Consistent with Dashboard */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] right-[-5%] w-[800px] h-[800px] bg-neutral-900/40 rounded-full blur-[120px] opacity-20" />
-        <div className="absolute bottom-[0%] left-[-10%] w-[600px] h-[600px] bg-neutral-900/20 rounded-full blur-[100px] opacity-20" />
-        <div className="absolute top-[20%] left-[20%] w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[150px] opacity-20 animate-pulse" />
+        <div className="absolute top-[-10%] right-[-5%] w-[800px] h-[800px] bg-neutral-900/20 rounded-full blur-[120px] opacity-20" />
+        <div className="absolute bottom-[0%] left-[-10%] w-[600px] h-[600px] bg-neutral-900/10 rounded-full blur-[100px] opacity-20" />
+        {/* Subtler pulse */}
+        <div className="absolute top-[20%] left-[20%] w-[400px] h-[400px] bg-orange-500/2 rounded-full blur-[150px] opacity-10 animate-[pulse_4s_ease-in-out_infinite]" />
       </div>
 
-      <header className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-800/60 supports-[backdrop-filter]:bg-neutral-950/40">
+      <header className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-800/50 supports-[backdrop-filter]:bg-neutral-950/60">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-3 group cursor-default">
@@ -248,13 +249,13 @@ export default function Home() {
                 alt="Tigrid Logo"
                 width={120}
                 height={32}
-                className="h-8 w-auto object-contain"
+                className="h-8 w-auto object-contain opacity-90 transition-opacity group-hover:opacity-100"
                 priority
               />
             </div>
           </div>
           <Link href="/dashboard">
-            <button className="flex items-center gap-2 text-sm font-medium text-neutral-950 bg-white hover:bg-neutral-200 transition-all px-5 py-2.5 rounded-full shadow-lg shadow-white/5 active:scale-95 duration-200">
+            <button className="flex items-center gap-2 text-sm font-semibold text-neutral-900 bg-white hover:bg-neutral-100 transition-all px-5 py-2.5 rounded-full shadow-lg shadow-white/5 active:scale-[0.98] active:translate-y-[1px] duration-200 border border-transparent">
               <Eye className="w-4 h-4 shrink-0 stroke-[2.5]" />
               <span>View Dashboard</span>
             </button>
@@ -262,12 +263,12 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-12 space-y-10 relative z-10">
-        <div className="text-center space-y-3">
-          <h1 className="font-bold tracking-tighter text-3xl sm:text-5xl text-white">
+      <div className="max-w-7xl mx-auto px-6 py-16 space-y-12 relative z-10">
+        <div className="text-center space-y-4">
+          <h1 className="font-bold tracking-tighter text-4xl sm:text-5xl text-white drop-shadow-sm">
             Create New Document
           </h1>
-          <p className="text-neutral-500 max-w-lg mx-auto text-sm leading-relaxed">
+          <p className="text-neutral-500 max-w-lg mx-auto text-sm leading-relaxed font-medium">
             Generate professional proposals, quotations, and invoices in seconds.
           </p>
         </div>
