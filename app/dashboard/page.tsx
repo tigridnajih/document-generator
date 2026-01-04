@@ -2,12 +2,13 @@
 import Image from "next/image";
 import Link from "next/link";
 import { FileText, FileSpreadsheet, Plus } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 
 import { InteractiveBarChart } from "@/components/dashboard/InteractiveBarChart";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { DocumentTable, Document } from "@/components/dashboard/DocumentTable";
 import { DashboardControls } from "@/components/dashboard/DashboardControls";
-import { supabase } from "@/lib/supabase";
+import { isSupabaseConfigured, supabase } from "@/lib/supabase";
 
 export const dynamic = 'force-dynamic';
 
@@ -16,6 +17,31 @@ export default async function Dashboard({
 }: {
     searchParams: { [key: string]: string | string[] | undefined };
 }) {
+    // Check configuration first
+    if (!isSupabaseConfigured()) {
+        return (
+            <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-4 text-center space-y-4">
+                <div className="p-4 bg-orange-500/10 rounded-full">
+                    <AlertTriangle className="w-12 h-12 text-orange-500" />
+                </div>
+                <h1 className="text-2xl font-bold text-white">Supabase Connection Missing</h1>
+                <p className="text-neutral-400 max-w-md">
+                    The dashboard cannot connect to the database. Please verify your
+                    <code className="mx-2 px-2 py-1 bg-neutral-900 rounded text-orange-400">NEXT_PUBLIC_SUPABASE_URL</code>
+                    environment variable is set in your deployment settings.
+                </p>
+                <div className="text-xs text-neutral-600 font-mono">
+                    Note: .env.local keys are not automatically synced to Vercel/Netlify.
+                </div>
+                <Link href="/">
+                    <button className="px-6 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-white hover:bg-neutral-800 transition-colors">
+                        Go Back Home
+                    </button>
+                </Link>
+            </div>
+        );
+    }
+
     // Await searchParams in Next.js 15+ if needed, but for 13/14 it's direct. 
     // Assuming standard behavior for now. If Next.js 15, might need await. Package.json said next 16? 
     // Next 16 doesn't exist yet, it said "next": "16.0.10" in package.json... Wait.
@@ -28,43 +54,66 @@ export default async function Dashboard({
     const type = (params?.type as string) || "all";
     const dateFrom = (params?.dateFrom as string) || "";
 
-    // Build Query
-    let query = supabase
-        .from("documents")
-        .select("*")
-        .order("generated_at", { ascending: false });
+    let documents = [];
+    let fetchError = null;
 
-    // Filter by Type
-    if (type && type !== "all") {
-        query = query.eq("document_type", type);
+    try {
+        // Build Query
+        let query = supabase
+            .from("documents")
+            .select("*")
+            .order("generated_at", { ascending: false });
+
+        // Filter by Type
+        if (type && type !== "all") {
+            query = query.eq("document_type", type);
+        }
+
+        // Filter by Date (Single Date Match)
+        if (dateFrom) {
+            // Filter: generated_at >= dateFrom 00:00 AND generated_at <= dateFrom 23:59:59
+            // or just simple string matching if formatted? No, it's timestamp.
+            const startDate = new Date(dateFrom);
+            startDate.setHours(0, 0, 0, 0);
+            const endDate = new Date(dateFrom);
+            endDate.setHours(23, 59, 59, 999);
+
+            query = query.gte("generated_at", startDate.toISOString()).lte("generated_at", endDate.toISOString());
+        }
+
+        // Filter by Search Term (Client Name, Company, Number)
+        if (q) {
+            query = query.or(`client_name.ilike.%${q}%,client_company.ilike.%${q}%,document_number.ilike.%${q}%`);
+        }
+
+        // Execute Query
+        const result = await query;
+        if (result.error) throw result.error;
+        documents = result.data || [];
+
+    } catch (e: any) {
+        console.error("Critical Supabase Error:", e);
+        fetchError = e;
     }
 
-    // Filter by Date (Single Date Match)
-    if (dateFrom) {
-        // Filter: generated_at >= dateFrom 00:00 AND generated_at <= dateFrom 23:59:59
-        // or just simple string matching if formatted? No, it's timestamp.
-        const startDate = new Date(dateFrom);
-        startDate.setHours(0, 0, 0, 0);
-        const endDate = new Date(dateFrom);
-        endDate.setHours(23, 59, 59, 999);
-
-        query = query.gte("generated_at", startDate.toISOString()).lte("generated_at", endDate.toISOString());
+    if (fetchError) {
+        return (
+            <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center p-4 text-center space-y-4">
+                <AlertTriangle className="w-12 h-12 text-red-500" />
+                <h1 className="text-2xl font-bold text-white">Data Fetch Error</h1>
+                <p className="text-neutral-400">
+                    {fetchError.message || "An unexpected error occurred while fetching data."}
+                </p>
+                <Link href="/">
+                    <button className="px-6 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-white hover:bg-neutral-800 transition-colors">
+                        Go Back Home
+                    </button>
+                </Link>
+            </div>
+        );
     }
 
-    // Filter by Search Term (Client Name, Company, Number)
-    if (q) {
-        query = query.or(`client_name.ilike.%${q}%,client_company.ilike.%${q}%,document_number.ilike.%${q}%`);
-    }
-
-    // Execute Query
-    const { data: documents, error } = await query;
-
-    if (error) {
-        console.error("Supabase Error:", error);
-        // Handle error gracefully or throw
-    }
-
-    const docs = (documents || []) as Document[];
+    const docs = documents as Document[];
 
     // Compute Aggregates for UI
     const totalCount = docs.length;

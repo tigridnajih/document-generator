@@ -13,3 +13,7 @@ if (!envUrl) {
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+
+export const isSupabaseConfigured = () => {
+    return envUrl && envUrl.length > 0 && envKey && envKey.length > 0;
+};
