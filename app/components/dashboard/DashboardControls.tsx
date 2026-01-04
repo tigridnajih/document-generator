@@ -1,4 +1,4 @@
-"use strict";
+"use client";
 
 import { Search, Calendar, Plus, FileText, FileCheck, FileSpreadsheet, LayoutGrid } from "lucide-react";
 import Link from "next/link";
