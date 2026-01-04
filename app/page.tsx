@@ -248,23 +248,23 @@ export default function Home() {
             priority
           />
           <Link href="/dashboard">
-            <button className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors bg-neutral-900 border border-orange-500/50 hover:border-orange-500 px-4 py-2 rounded-full whitespace-nowrap shadow-[0_0_10px_-3px_rgba(249,115,22,0.3)]">
-              <Eye className="w-4 h-4" />
-              <span>View Dashboard</span>
+            <button className="flex items-center gap-1.5 text-xs font-medium text-neutral-400 hover:text-neutral-200 transition-colors border border-neutral-700 hover:border-neutral-600 px-3 py-1.5 rounded-lg">
+              <Eye className="w-3.5 h-3.5" />
+              <span>Dashboard</span>
             </button>
           </Link>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 py-16 space-y-12 relative z-10">
-        <div className="text-center space-y-4">
-          <h1 className="font-bold tracking-tight text-4xl sm:text-5xl lg:text-6xl">
+      <div className="max-w-7xl mx-auto px-4 py-8 space-y-8 relative z-10">
+        <div className="text-center space-y-2">
+          <h1 className="font-bold tracking-tight text-3xl sm:text-4xl lg:text-5xl">
             Business Document{" "}
             <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent animate-gradient">
               Generator
             </span>
           </h1>
-          <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto">
+          <p className="text-sm sm:text-base text-neutral-400 max-w-2xl mx-auto">
             Generate professional business documents instantly
           </p>
         </div>
@@ -308,7 +308,7 @@ export default function Home() {
           />
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="relative bg-gradient-to-b from-neutral-900/80 to-neutral-950/80 backdrop-blur-xl border border-neutral-800/50 rounded-3xl p-6 sm:p-10 space-y-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+            className="bg-neutral-900 border border-white/10 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl"
           >
             <Section title="Client Details">
               <Input

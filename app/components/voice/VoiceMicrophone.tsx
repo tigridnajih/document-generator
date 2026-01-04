@@ -14,17 +14,18 @@ export function VoiceMicrophone({ isListening, onToggle }: VoiceMicrophoneProps)
             onClick={onToggle}
             type="button"
             className={cn(
-                "fixed bottom-8 right-8 z-50 p-4 rounded-full shadow-lg transition-all duration-300",
+                "fixed bottom-8 right-8 z-50 p-3 rounded-full backdrop-blur-md transition-all duration-300",
+                "shadow-md hover:shadow-lg",
                 isListening
-                    ? "bg-red-500 hover:bg-red-600 animate-pulse"
-                    : "bg-orange-500 hover:bg-orange-600 hover:scale-105"
+                    ? "bg-red-500/90 hover:bg-red-600/90 animate-pulse"
+                    : "bg-orange-500/90 hover:bg-orange-600/90 hover:scale-105"
             )}
             title={isListening ? "Stop Recording" : "Start Voice Input"}
         >
             {isListening ? (
-                <Square className="w-6 h-6 text-white fill-current" />
+                <Square className="w-5 h-5 text-white fill-current" />
             ) : (
-                <Mic className="w-6 h-6 text-white" />
+                <Mic className="w-5 h-5 text-white" />
             )}
         </button>
     );
