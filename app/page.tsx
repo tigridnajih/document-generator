@@ -231,68 +231,67 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-neutral-950 text-white relative overflow-hidden">
-      {/* Animated Background Gradient Mesh */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] bg-orange-500/10 rounded-full blur-[120px] opacity-50 animate-pulse" />
-        <div className="absolute bottom-[-10%] left-[-10%] w-[500px] h-[500px] bg-orange-500/5 rounded-full blur-[100px] opacity-30" />
-        <div className="absolute top-[40%] left-[50%] w-[400px] h-[400px] bg-neutral-800/20 rounded-full blur-[80px] opacity-20" />
+    <main className="min-h-screen bg-neutral-950 text-white relative overflow-hidden font-sans selection:bg-orange-500/30">
+      {/* Background Mesh Gradient - Consistent with Dashboard */}
+      <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] right-[-5%] w-[800px] h-[800px] bg-neutral-900/30 rounded-full blur-[120px] opacity-20" />
+        <div className="absolute bottom-[0%] left-[-10%] w-[600px] h-[600px] bg-neutral-900/10 rounded-full blur-[100px] opacity-20" />
+        <div className="absolute top-[20%] left-[20%] w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[150px] opacity-30 animate-pulse" />
       </div>
-      <div className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
-        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-          <Image
-            src="/logo.png"
-            alt="Tigrid Technologies"
-            width={110}
-            height={28}
-            priority
-          />
+
+      <header className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-800/60 supports-[backdrop-filter]:bg-neutral-950/40">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3 group cursor-default">
+              <div className="w-8 h-8 rounded-lg bg-orange-500 flex items-center justify-center text-white font-bold text-xl tracking-tighter shadow-lg shadow-orange-500/20">
+                T
+              </div>
+              <span className="font-bold text-lg tracking-tight text-neutral-200">Tigrid</span>
+            </div>
+          </div>
           <Link href="/dashboard">
-            <button className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors bg-neutral-900 border border-orange-500/50 hover:border-orange-500 px-4 py-2 rounded-full whitespace-nowrap shadow-[0_0_10px_-3px_rgba(249,115,22,0.3)]">
+            <button className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors bg-neutral-900/50 hover:bg-neutral-900 border border-neutral-800 hover:border-neutral-700 px-5 py-2.5 rounded-full whitespace-nowrap shadow-sm">
               <Eye className="w-4 h-4" />
               <span>View Dashboard</span>
             </button>
           </Link>
         </div>
-      </div>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 py-16 space-y-12 relative z-10">
-        <div className="text-center space-y-4">
-          <h1 className="font-bold tracking-tight text-4xl sm:text-5xl lg:text-6xl">
-            Business Document{" "}
-            <span className="bg-gradient-to-r from-orange-400 via-orange-500 to-orange-600 bg-clip-text text-transparent animate-gradient">
-              Generator
-            </span>
+      <div className="max-w-3xl mx-auto px-6 py-12 space-y-10 relative z-10">
+        <div className="text-center space-y-3">
+          <h1 className="font-bold tracking-tighter text-3xl sm:text-4xl text-white">
+            Create New Document
           </h1>
-          <p className="text-base sm:text-lg text-neutral-400 max-w-2xl mx-auto">
-            Generate professional business documents instantly
+          <p className="text-neutral-500 max-w-lg mx-auto text-sm leading-relaxed">
+            Generate professional proposals, quotations, and invoices in seconds.
           </p>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           <DocCard
             label="Proposal"
-            description="Create proposal document"
+            description="Client pitch"
             type="proposal"
             currentType={docType}
             onSelect={setDocType}
-            icon={<FileText className="w-6 h-6" />}
+            icon={<FileText className="w-5 h-5" />}
           />
           <DocCard
             label="Quotation"
-            description="Create quotation document"
+            description="Price estimate"
             type="quotation"
             currentType={docType}
             onSelect={setDocType}
-            icon={<FileCheck className="w-6 h-6" />}
+            icon={<FileCheck className="w-5 h-5" />}
           />
           <DocCard
             label="Invoice"
-            description="Create invoice document"
+            description="Bill client"
             type="invoice"
             currentType={docType}
             onSelect={setDocType}
-            icon={<FileSpreadsheet className="w-6 h-6" />}
+            icon={<FileSpreadsheet className="w-5 h-5" />}
           />
         </div>
 
@@ -308,37 +307,42 @@ export default function Home() {
           />
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="relative bg-gradient-to-b from-neutral-900/80 to-neutral-950/80 backdrop-blur-xl border border-neutral-800/50 rounded-3xl p-6 sm:p-10 space-y-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
+            className="relative bg-neutral-900/40 backdrop-blur-xl border border-neutral-800/60 rounded-3xl p-6 sm:p-10 space-y-10 shadow-2xl shadow-black/40"
           >
-            <Section title="Client Details">
+            <Section title="Client Information">
               <Input
                 {...register("clientDetails.clientName")}
                 placeholder="Client Name"
                 startIcon={<User className="w-4 h-4" />}
               />
               {errors.clientDetails?.clientName && (
-                <p className="text-red-500 text-xs mt-1">
+                <p className="text-red-500 text-xs mt-1 ml-2">
                   {errors.clientDetails.clientName.message}
                 </p>
               )}
-              <Input
-                {...register("clientDetails.clientCompany")}
-                placeholder="Client Company"
-                startIcon={<Building2 className="w-4 h-4" />}
-              />
-              <Input
-                {...register("clientDetails.clientEmail")}
-                placeholder="Client Email"
-                type="email"
-                startIcon={<Mail className="w-4 h-4" />}
-              />
-              {errors.clientDetails?.clientEmail && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.clientDetails.clientEmail.message}
-                </p>
-              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  {...register("clientDetails.clientCompany")}
+                  placeholder="Company Name"
+                  startIcon={<Building2 className="w-4 h-4" />}
+                />
+                <div>
+                  <Input
+                    {...register("clientDetails.clientEmail")}
+                    placeholder="Email Address"
+                    type="email"
+                    startIcon={<Mail className="w-4 h-4" />}
+                  />
+                  {errors.clientDetails?.clientEmail && (
+                    <p className="text-red-500 text-xs mt-1 ml-2">
+                      {errors.clientDetails.clientEmail.message}
+                    </p>
+                  )}
+                </div>
+              </div>
+
               {docType === "invoice" && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 animate-[fade-in_0.3s_ease-out]">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-[fade-in_0.3s_ease-out]">
                   <Input
                     {...register("clientDetails.clientLocality")}
                     placeholder="Locality"
@@ -366,7 +370,7 @@ export default function Home() {
 
             {docType === "invoice" && (
               <Section title="Invoice Details" className="animate-[fade-in_0.4s_ease-out]">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
                     {...register("invoiceDetails.invoiceNumber")}
                     placeholder="Invoice Number"
@@ -374,9 +378,10 @@ export default function Home() {
                   />
                   <Input
                     {...register("invoiceDetails.invoiceDate")}
-                    placeholder="Invoice Date (DD/MM/YYYY)"
+                    placeholder="Invoice Date"
                     type="date"
                     startIcon={<Calendar className="w-4 h-4" />}
+                    className="[color-scheme:dark]"
                   />
                 </div>
               </Section>
@@ -389,12 +394,15 @@ export default function Home() {
               </>
             )}
 
-            <ShineButton
-              type="submit"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? "Generating..." : `Generate ${docType}`}
-            </ShineButton>
+            <div className="pt-4">
+              <ShineButton
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full h-12 text-base font-semibold tracking-wide shadow-xl shadow-orange-500/10 hover:shadow-orange-500/20 active:scale-[0.98] transition-all"
+              >
+                {isSubmitting ? "Generating..." : `Generate ${docType.charAt(0).toUpperCase() + docType.slice(1)}`}
+              </ShineButton>
+            </div>
           </form>
         </FormProvider>
       </div>

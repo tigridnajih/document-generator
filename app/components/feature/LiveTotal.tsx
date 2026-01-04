@@ -34,14 +34,17 @@ export function LiveTotal() {
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-neutral-900/50 backdrop-blur-md border border-neutral-800 rounded-2xl p-6 space-y-4"
+            className="bg-neutral-900/60 backdrop-blur-xl border border-neutral-800/80 rounded-2xl p-8 space-y-6 shadow-2xl shadow-black/40 relative overflow-hidden group"
         >
-            <h3 className="font-semibold text-orange-500 tracking-wide">Payment Summary</h3>
+            {/* Background Gradient */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-[80px] -z-10 translate-x-1/3 -translate-y-1/3 pointer-events-none" />
 
-            <div className="space-y-2 text-sm">
-                <div className="flex justify-between text-neutral-400">
+            <h3 className="text-xs font-semibold uppercase tracking-widest text-neutral-500">Payment Summary</h3>
+
+            <div className="space-y-3 text-sm">
+                <div className="flex justify-between text-neutral-300">
                     <span>Subtotal</span>
-                    <span>{formatCurrency(subTotal)}</span>
+                    <span className="font-medium font-mono text-neutral-200">{formatCurrency(subTotal)}</span>
                 </div>
 
                 <AnimatePresence>
@@ -54,15 +57,18 @@ export function LiveTotal() {
                             className="flex justify-between text-neutral-400"
                         >
                             <span>{gst.type} ({gst.rate}%)</span>
-                            <span>{formatCurrency((subTotal * (Number(gst.rate) || 0)) / 100)}</span>
+                            <span className="font-mono">{formatCurrency((subTotal * (Number(gst.rate) || 0)) / 100)}</span>
                         </motion.div>
                     ))}
                 </AnimatePresence>
             </div>
 
-            <div className="border-t border-neutral-800 pt-4 flex justify-between font-bold text-lg">
-                <span>Total</span>
-                <span className="text-orange-500">{formatCurrency(grandTotal)}</span>
+            <div className="border-t border-dashed border-neutral-800 pt-6 flex justify-between items-baseline">
+                <span className="text-neutral-400 font-medium">Total Payable</span>
+                <span className="text-3xl font-bold tracking-tight text-white flex items-baseline gap-1">
+                    <span className="text-orange-500 text-lg mr-1">INR</span>
+                    {formatCurrency(grandTotal).replace(/[^0-9.,]/g, '')}
+                </span>
             </div>
         </motion.div>
     );
