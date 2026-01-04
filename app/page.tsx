@@ -233,7 +233,7 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-neutral-950 text-white">
       <div className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
-        <div className="max-w-5xl mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
           <Image
             src="/logo.png"
             alt="Tigrid Technologies"
@@ -250,7 +250,7 @@ export default function Home() {
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-10 space-y-10">
+      <div className="max-w-7xl mx-auto px-4 py-10 space-y-10">
         <div className="text-center space-y-2">
           <h1 className="font-bold tracking-tight text-3xl sm:text-4xl">
             Business Document <span className="text-orange-500">Generator</span>
