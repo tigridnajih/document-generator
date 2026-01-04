@@ -310,9 +310,6 @@ export default function Home() {
             onSubmit={handleSubmit(onSubmit)}
             className="relative bg-gradient-to-b from-neutral-900/80 to-neutral-950/80 backdrop-blur-xl border border-neutral-800/50 rounded-3xl p-6 sm:p-10 space-y-8 shadow-[0_20px_50px_rgba(0,0,0,0.5)]"
           >
-            {/* Gradient border glow */}
-            <div className="absolute inset-0 rounded-3xl bg-gradient-to-r from-orange-500/10 via-transparent to-orange-500/10 blur-2xl -z-10" />
-
             <Section title="Client Details">
               <Input
                 {...register("clientDetails.clientName")}
