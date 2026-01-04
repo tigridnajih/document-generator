@@ -312,7 +312,7 @@ export default function Home() {
           />
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="relative bg-neutral-900/40 backdrop-blur-3xl border border-white/5 rounded-3xl p-6 sm:p-10 space-y-10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.03)] transition-all duration-300"
+            className="relative bg-neutral-900/40 backdrop-blur-3xl border border-white/5 rounded-3xl p-6 sm:p-10 space-y-10 shadow-[inset_0_1px_1px_rgba(255,255,255,0.03)] transition-all duration-300"
           >
             <Section title="Client Information">
               <div className="relative group/first-field">
