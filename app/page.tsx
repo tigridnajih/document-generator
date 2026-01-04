@@ -242,10 +242,10 @@ export default function Home() {
             priority
           />
           <Link href="/dashboard">
-            <ShineButton className="!px-4 !py-2 !text-sm !w-auto flex items-center gap-2">
+            <button className="flex items-center gap-2 text-sm font-medium text-neutral-400 hover:text-white transition-colors bg-neutral-900 border border-neutral-800 hover:border-neutral-700 px-4 py-2 rounded-full whitespace-nowrap">
               <Eye className="w-4 h-4" />
-              View Dashboard
-            </ShineButton>
+              <span>View Dashboard</span>
+            </button>
           </Link>
         </div>
       </div>
