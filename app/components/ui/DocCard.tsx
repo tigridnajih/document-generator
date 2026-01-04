@@ -90,14 +90,14 @@ export function DocCard({
                             "mb-4 w-9 h-9 flex items-center justify-center rounded-lg transition-all duration-500",
                             active
                                 ? "bg-orange-500/10 text-orange-500 border border-orange-500/10"
-                                : "bg-neutral-800/40 text-neutral-600 border border-neutral-800/0 group-hover:text-neutral-400 group-hover:bg-neutral-800/60"
+                                : "bg-neutral-800/40 text-neutral-200 border border-neutral-800/0 group-hover:text-white group-hover:bg-neutral-800/60"
                         )}>
                             {icon}
                         </div>
                     )}
                     <h3 className={clsx(
                         "font-semibold text-base mb-1 transition-all duration-300 tracking-tight",
-                        active ? "text-white" : "text-neutral-500 group-hover:text-neutral-300"
+                        active ? "text-white" : "text-white group-hover:text-neutral-200"
                     )}>
                         {label}
                     </h3>
