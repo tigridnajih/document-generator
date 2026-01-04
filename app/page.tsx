@@ -6,7 +6,7 @@ import Image from "next/image";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { User, Building2, Mail, MapPin, Map, Navigation, FileText, FileCheck, FileSpreadsheet, Hash, Calendar } from "lucide-react";
+import { User, Building2, Mail, MapPin, Map, Navigation, FileText, FileCheck, FileSpreadsheet, Hash, Calendar, Eye } from "lucide-react";
 
 import { Input } from "@/components/ui/Input";
 import { Section } from "@/components/ui/Section";
@@ -242,8 +242,9 @@ export default function Home() {
             priority
           />
           <Link href="/dashboard">
-            <ShineButton className="!px-4 !py-2 !text-sm !w-auto">
-              Dashboard
+            <ShineButton className="!px-4 !py-2 !text-sm !w-auto flex items-center gap-2">
+              <Eye className="w-4 h-4" />
+              View Dashboard
             </ShineButton>
           </Link>
         </div>
