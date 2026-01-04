@@ -51,14 +51,14 @@ export function InvoiceFields() {
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, scale: 0.95 }}
                                 key={field.id}
-                                className="group relative grid grid-cols-1 sm:grid-cols-12 gap-4 items-start p-4 rounded-xl bg-neutral-900/20 border border-white/5 hover:border-white/10 transition-all"
+                                className="group relative grid grid-cols-1 sm:grid-cols-12 gap-4 items-start transition-all"
                             >
                                 <div className="sm:col-span-6">
                                     <Input
                                         {...register(`items.${index}.name` as const)}
                                         placeholder="Description of service or product"
                                         startIcon={<Tag className="w-4 h-4" />}
-                                        className="bg-neutral-900/80"
+                                        className=""
                                     />
                                 </div>
                                 <div className="sm:col-span-3">
@@ -67,7 +67,7 @@ export function InvoiceFields() {
                                         placeholder="Rate"
                                         type="number"
                                         startIcon={<IndianRupee className="w-4 h-4" />}
-                                        className="bg-neutral-900/80"
+                                        className=""
                                     />
                                 </div>
                                 <div className="sm:col-span-2">
@@ -76,7 +76,7 @@ export function InvoiceFields() {
                                         placeholder="Qty"
                                         type="number"
                                         startIcon={<Hash className="w-4 h-4" />}
-                                        className="bg-neutral-900/80"
+                                        className=""
                                     />
                                 </div>
                                 <div className="sm:col-span-1 flex justify-end sm:justify-center pt-2 sm:pt-3">
@@ -112,7 +112,7 @@ export function InvoiceFields() {
                     </button>
                 }
             >
-                <div className="space-y-3">
+                <div className="space-y-4">
                     <AnimatePresence mode="popLayout">
                         {gstFields.map((field, index) => (
                             <motion.div
@@ -126,7 +126,7 @@ export function InvoiceFields() {
                                 <div className="sm:col-span-2 relative">
                                     <select
                                         {...register(`gstList.${index}.type` as const)}
-                                        className="w-full bg-neutral-900/50 backdrop-blur-sm border border-neutral-800/60 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500/20 appearance-none text-white hover:border-neutral-700/80 transition-all cursor-pointer"
+                                        className="w-full bg-neutral-950/40 backdrop-blur-md border border-neutral-800/50 rounded-xl px-4 py-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500/30 appearance-none text-white hover:bg-neutral-900/40 hover:border-neutral-700/60 transition-all duration-150 cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.2)]"
                                     >
                                         <option value="CGST">CGST</option>
                                         <option value="SGST">SGST</option>
