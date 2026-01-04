@@ -4,6 +4,30 @@ import { Download, ExternalLink, FileText } from "lucide-react";
 import { DashboardDocument } from "@/lib/mock-dashboard-data";
 import { StatusBadge } from "./StatusBadge";
 
+const COLORS = [
+    "bg-red-500", "bg-orange-500", "bg-amber-500", "bg-yellow-500", "bg-lime-500",
+    "bg-green-500", "bg-emerald-500", "bg-teal-500", "bg-cyan-500", "bg-sky-500",
+    "bg-blue-500", "bg-indigo-500", "bg-violet-500", "bg-purple-500", "bg-fuchsia-500",
+    "bg-pink-500", "bg-rose-500"
+];
+
+function getAvatarColor(name: string) {
+    let hash = 0;
+    for (let i = 0; i < name.length; i++) {
+        hash = name.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return COLORS[Math.abs(hash) % COLORS.length];
+}
+
+function getInitials(name: string) {
+    return name
+        .split(" ")
+        .map((n) => n[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase();
+}
+
 interface DocumentTableProps {
     documents: DashboardDocument[];
 }
@@ -33,14 +57,19 @@ export function DocumentTable({ documents }: DocumentTableProps) {
                     </thead>
                     <tbody className="divide-y divide-neutral-800/50">
                         {documents.map((doc) => (
-                            <tr key={doc.id} className="group hover:bg-neutral-800/30 transition-colors">
+                            <tr key={doc.id} className="group hover:bg-neutral-800/50 transition-all hover:scale-[1.01] hover:shadow-lg border-b border-neutral-800/50 hover:border-transparent cursor-default">
                                 <td className="px-6 py-4 font-medium text-white font-mono text-xs">
                                     {doc.number}
                                 </td>
                                 <td className="px-6 py-4">
-                                    <div className="flex flex-col">
-                                        <span className="text-neutral-200">{doc.clientName}</span>
-                                        <span className="text-xs text-neutral-500">{doc.clientCompany}</span>
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold text-white shadow-sm ${getAvatarColor(doc.clientName)}`}>
+                                            {getInitials(doc.clientName)}
+                                        </div>
+                                        <div className="flex flex-col">
+                                            <span className="text-neutral-200 font-medium">{doc.clientName}</span>
+                                            <span className="text-xs text-neutral-500">{doc.clientCompany}</span>
+                                        </div>
                                     </div>
                                 </td>
                                 <td className="px-6 py-4 text-neutral-400">

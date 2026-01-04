@@ -6,9 +6,11 @@ import { ArrowLeft, Search, Calendar, FileText, FileCheck, FileSpreadsheet, Plus
 
 import { Input } from "@/components/ui/Input";
 import { ShineButton } from "@/components/ui/ShineButton";
-import { AnalyticsChart } from "@/components/dashboard/AnalyticsChart";
+import { InteractiveBarChart } from "@/components/dashboard/InteractiveBarChart";
+import { StatusPieChart } from "@/components/dashboard/StatusPieChart";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { DocumentTable } from "@/components/dashboard/DocumentTable";
+import { motion } from "framer-motion";
 import { MOCK_CHART_DATA, MOCK_DOCUMENTS, DocumentType, TimeRange } from "@/lib/mock-dashboard-data";
 import { cn } from "@/lib/utils";
 
@@ -39,7 +41,12 @@ export default function Dashboard() {
     const chartData = MOCK_CHART_DATA[timeRange][activeTab];
 
     return (
-        <div className="min-h-screen bg-neutral-950 text-white font-sans selection:bg-orange-500/30">
+        <div className="min-h-screen bg-neutral-950 text-white font-sans selection:bg-orange-500/30 overflow-hidden relative">
+            {/* Background Mesh Gradient */}
+            <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-orange-500/10 rounded-full blur-[120px] opacity-50 animate-pulse" />
+                <div className="absolute bottom-[10%] left-[-10%] w-[600px] h-[600px] bg-blue-500/5 rounded-full blur-[150px] opacity-30" />
+            </div>
 
             {/* Header */}
             <header className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur border-b border-neutral-800">
@@ -103,15 +110,26 @@ export default function Dashboard() {
                 </div>
 
                 {/* Analytics Section */}
-                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                    <div className="lg:col-span-3">
-                        <AnalyticsChart
+                <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 relative z-10">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.5 }}
+                        className="lg:col-span-3"
+                    >
+                        <InteractiveBarChart
                             data={chartData}
                             timeRange={timeRange}
                             color={activeTab === "proposal" ? "bg-blue-500" : activeTab === "quotation" ? "bg-emerald-500" : "bg-orange-500"}
                         />
-                    </div>
-                    <div className="space-y-4">
+                    </motion.div>
+                    <motion.div
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5, delay: 0.2 }}
+                        className="space-y-4"
+                    >
+                        <StatusPieChart documents={MOCK_DOCUMENTS} />
                         <StatCard
                             label="Total Documents"
                             value={totalCount}
@@ -124,7 +142,7 @@ export default function Dashboard() {
                             icon={FileSpreadsheet}
                             trend="+5.4%"
                         />
-                    </div>
+                    </motion.div>
                 </div>
 
                 {/* Filters & Search */}
@@ -146,7 +164,13 @@ export default function Dashboard() {
                 </div>
 
                 {/* Table */}
-                <DocumentTable documents={filteredDocuments} />
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.4 }}
+                >
+                    <DocumentTable documents={filteredDocuments} />
+                </motion.div>
 
             </main>
         </div>
