@@ -109,7 +109,7 @@ export function DocumentTable({ documents }: DocumentTableProps) {
                                     ${Number(doc.amount).toLocaleString()}
                                 </td>
                                 <td className="px-6 py-4 text-right whitespace-nowrap">
-                                    <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-all duration-200 translate-x-2 group-hover:translate-x-0">
+                                    <div className="flex items-center justify-end gap-1">
                                         <Link href={doc.download_url} target="_blank" rel="noopener noreferrer">
                                             <button className="p-2 hover:bg-neutral-700/50 rounded-lg text-neutral-500 hover:text-white transition-colors" title="Download">
                                                 <Download className="w-4 h-4" />
