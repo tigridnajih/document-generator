@@ -37,10 +37,8 @@ export function InteractiveBarChart({ data, timeRange, color }: InteractiveBarCh
 
     // Extract color class to hex for Recharts (simplified mapping)
     const hexColor = useMemo(() => {
-        if (color.includes("blue")) return "#3b82f6";
-        if (color.includes("emerald")) return "#10b981";
-        if (color.includes("orange")) return "#f97316";
-        return "#f97316"; // default
+        // ALWAYS RETURN ORANGE as requested
+        return "#f97316";
     }, [color]);
 
     return (

@@ -7,7 +7,6 @@ import { ArrowLeft, Search, Calendar, FileText, FileCheck, FileSpreadsheet, Plus
 import { Input } from "@/components/ui/Input";
 import { ShineButton } from "@/components/ui/ShineButton";
 import { InteractiveBarChart } from "@/components/dashboard/InteractiveBarChart";
-import { StatusPieChart } from "@/components/dashboard/StatusPieChart";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { DocumentTable } from "@/components/dashboard/DocumentTable";
 import { motion } from "framer-motion";
@@ -120,7 +119,7 @@ export default function Dashboard() {
                         <InteractiveBarChart
                             data={chartData}
                             timeRange={timeRange}
-                            color={activeTab === "proposal" ? "bg-blue-500" : activeTab === "quotation" ? "bg-emerald-500" : "bg-orange-500"}
+                            color="bg-orange-500"
                         />
                     </motion.div>
                     <motion.div
@@ -129,7 +128,6 @@ export default function Dashboard() {
                         transition={{ duration: 0.5, delay: 0.2 }}
                         className="space-y-4"
                     >
-                        <StatusPieChart documents={MOCK_DOCUMENTS} />
                         <StatCard
                             label="Total Documents"
                             value={totalCount}

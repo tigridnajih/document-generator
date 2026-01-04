@@ -12,11 +12,7 @@ const COLORS = [
 ];
 
 function getAvatarColor(name: string) {
-    let hash = 0;
-    for (let i = 0; i < name.length; i++) {
-        hash = name.charCodeAt(i) + ((hash << 5) - hash);
-    }
-    return COLORS[Math.abs(hash) % COLORS.length];
+    return "bg-orange-500";
 }
 
 function getInitials(name: string) {
