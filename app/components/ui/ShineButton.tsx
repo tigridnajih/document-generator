@@ -16,7 +16,7 @@ export const ShineButton = forwardRef<HTMLButtonElement, ShineButtonProps>(
             <button
                 ref={ref}
                 className={cn(
-                    "relative inline-flex w-full items-center justify-center overflow-hidden rounded-xl bg-orange-600 px-6 py-3.5 font-semibold text-white transition-all hover:bg-orange-500 hover:scale-[1.02] active:scale-[0.98] disabled:pointer-events-none disabled:opacity-50",
+                    "relative inline-flex w-full items-center justify-center overflow-hidden rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 px-6 py-4 font-bold tracking-wide text-white transition-all duration-200 hover:from-orange-400 hover:to-orange-500 hover:scale-[1.01] hover:shadow-[0_8px_30px_-5px_rgba(249,115,22,0.4)] active:scale-[0.98] active:translate-y-0.5 disabled:pointer-events-none disabled:opacity-50 shadow-lg shadow-orange-500/20 border-t border-white/20",
                     className
                 )}
                 {...props}

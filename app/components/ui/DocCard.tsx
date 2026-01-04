@@ -62,12 +62,12 @@ export function DocCard({
             onMouseLeave={handleMouseLeave}
             onClick={() => onSelect(type)}
             className={clsx(
-                "relative overflow-hidden rounded-2xl border p-6 cursor-pointer transition-all duration-300 group",
-                "hover:scale-[1.02] hover:-translate-y-1 hover:border-neutral-700/80",
+                "relative overflow-hidden rounded-2xl border p-6 cursor-pointer transition-all duration-300 group select-none",
+                "hover:-translate-y-1 hover:border-neutral-700/80",
                 active
-                    ? "bg-neutral-900/80 border-orange-500/40 shadow-[0_0_40px_-10px_rgba(249,115,22,0.15)]"
-                    : "bg-neutral-900/40 backdrop-blur-md border-neutral-800/60 hover:bg-neutral-900/60",
-                "shadow-lg shadow-black/20 hover:shadow-xl hover:shadow-black/30"
+                    ? "bg-neutral-900/80 border-orange-500/50 shadow-[0_0_50px_-10px_rgba(249,115,22,0.15)] ring-1 ring-orange-500/20 scale-[1.02]"
+                    : "bg-neutral-900/20 backdrop-blur-md border-neutral-800/40 hover:bg-neutral-900/40 hover:shadow-xl hover:shadow-black/20",
+                "shadow-lg shadow-black/10"
             )}
         >
             {/* Gradient border glow effect */}
@@ -77,9 +77,9 @@ export function DocCard({
 
             {/* Hover spotlight effect */}
             <div
-                className="pointer-events-none absolute -inset-px opacity-0 transition duration-300 group-hover:opacity-100"
+                className="pointer-events-none absolute -inset-px opacity-0 transition duration-500 group-hover:opacity-100"
                 style={{
-                    background: `radial-gradient(500px circle at ${position.x}px ${position.y}px, rgba(249,115,22,0.08), transparent 40%)`,
+                    background: `radial-gradient(500px circle at ${position.x}px ${position.y}px, rgba(249,115,22,0.06), transparent 40%)`,
                 }}
             />
 
@@ -87,27 +87,27 @@ export function DocCard({
                 <div>
                     {icon && (
                         <div className={clsx(
-                            "mb-4 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300",
+                            "mb-5 w-10 h-10 flex items-center justify-center rounded-xl transition-all duration-300",
                             active
                                 ? "bg-orange-500/10 text-orange-500 border border-orange-500/20 shadow-inner shadow-orange-500/10"
-                                : "bg-neutral-800/50 text-neutral-400 border border-neutral-700/50 group-hover:bg-neutral-800 group-hover:text-orange-400 group-hover:border-orange-500/20"
+                                : "bg-neutral-800/30 text-neutral-500 border border-neutral-800/50 group-hover:bg-neutral-800/80 group-hover:text-orange-400 group-hover:border-orange-500/20"
                         )}>
                             {icon}
                         </div>
                     )}
                     <h3 className={clsx(
                         "font-semibold text-lg mb-2 transition-colors tracking-tight",
-                        active ? "text-white" : "text-neutral-300 group-hover:text-white"
+                        active ? "text-white" : "text-neutral-400 group-hover:text-white"
                     )}>
                         {label}
                     </h3>
-                    <p className="text-sm text-neutral-500 group-hover:text-neutral-400 transition-colors leading-relaxed">
+                    <p className="text-sm text-neutral-600 group-hover:text-neutral-500 transition-colors leading-relaxed font-medium">
                         {description}
                     </p>
                 </div>
 
                 {active && (
-                    <div className="mt-4 flex items-center gap-2 text-xs font-medium text-orange-500 animate-[fade-in_0.3s_ease-out]">
+                    <div className="mt-5 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-orange-500 animate-[fade-in_0.3s_ease-out]">
                         <span className="w-1.5 h-1.5 rounded-full bg-orange-500 shadow-[0_0_8px_currentColor]" />
                         Selected
                     </div>
@@ -116,8 +116,9 @@ export function DocCard({
 
             {/* Active state bottom highlight line */}
             {active && (
-                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-orange-500/50 to-transparent" />
+                <div className="absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-orange-500/60 to-transparent" />
             )}
         </div>
     );
 }
+

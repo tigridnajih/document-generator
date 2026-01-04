@@ -234,9 +234,9 @@ export default function Home() {
     <main className="min-h-screen bg-neutral-950 text-white relative overflow-hidden font-sans selection:bg-orange-500/30">
       {/* Background Mesh Gradient - Consistent with Dashboard */}
       <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-        <div className="absolute top-[-10%] right-[-5%] w-[800px] h-[800px] bg-neutral-900/30 rounded-full blur-[120px] opacity-20" />
-        <div className="absolute bottom-[0%] left-[-10%] w-[600px] h-[600px] bg-neutral-900/10 rounded-full blur-[100px] opacity-20" />
-        <div className="absolute top-[20%] left-[20%] w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[150px] opacity-30 animate-pulse" />
+        <div className="absolute top-[-10%] right-[-5%] w-[800px] h-[800px] bg-neutral-900/40 rounded-full blur-[120px] opacity-20" />
+        <div className="absolute bottom-[0%] left-[-10%] w-[600px] h-[600px] bg-neutral-900/20 rounded-full blur-[100px] opacity-20" />
+        <div className="absolute top-[20%] left-[20%] w-[400px] h-[400px] bg-orange-500/5 rounded-full blur-[150px] opacity-20 animate-pulse" />
       </div>
 
       <header className="sticky top-0 z-50 bg-neutral-950/80 backdrop-blur-md border-b border-neutral-800/60 supports-[backdrop-filter]:bg-neutral-950/40">
@@ -260,7 +260,7 @@ export default function Home() {
 
       <div className="max-w-7xl mx-auto px-6 py-12 space-y-10 relative z-10">
         <div className="text-center space-y-3">
-          <h1 className="font-bold tracking-tighter text-3xl sm:text-4xl text-white">
+          <h1 className="font-bold tracking-tighter text-3xl sm:text-5xl text-white">
             Create New Document
           </h1>
           <p className="text-neutral-500 max-w-lg mx-auto text-sm leading-relaxed">
@@ -307,7 +307,7 @@ export default function Home() {
           />
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="relative bg-neutral-900/40 backdrop-blur-xl border border-neutral-800/60 rounded-3xl p-6 sm:p-10 space-y-10 shadow-2xl shadow-black/40"
+            className="relative bg-neutral-900/20 backdrop-blur-3xl border border-white/5 rounded-3xl p-6 sm:p-10 space-y-10 shadow-2xl shadow-black/50"
           >
             <Section title="Client Information">
               <Input

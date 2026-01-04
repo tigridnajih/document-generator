@@ -32,19 +32,20 @@ export function LiveTotal() {
 
     return (
         <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-neutral-900/60 backdrop-blur-xl border border-neutral-800/80 rounded-2xl p-8 space-y-6 shadow-2xl shadow-black/40 relative overflow-hidden group"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="bg-neutral-900/90 backdrop-blur-2xl border border-neutral-800/80 rounded-2xl p-8 space-y-8 shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] relative overflow-hidden group"
         >
-            {/* Background Gradient */}
-            <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/5 rounded-full blur-[80px] -z-10 translate-x-1/3 -translate-y-1/3 pointer-events-none" />
+            {/* Subtle top glow for authority */}
+            <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-orange-500/50 to-transparent opacity-50" />
 
-            <h3 className="text-xs font-semibold uppercase tracking-widest text-neutral-500">Payment Summary</h3>
+            {/* Background Atmosphere */}
+            <div className="absolute top-[-20%] right-[-10%] w-96 h-96 bg-orange-500/5 rounded-full blur-[100px] pointer-events-none" />
 
-            <div className="space-y-3 text-sm">
-                <div className="flex justify-between text-neutral-300">
-                    <span>Subtotal</span>
-                    <span className="font-medium font-mono text-neutral-200">{formatCurrency(subTotal)}</span>
+            <div className="space-y-4 text-sm">
+                <div className="flex justify-between items-center text-neutral-400">
+                    <span className="font-medium tracking-wide">Subtotal</span>
+                    <span className="font-mono text-neutral-200">{formatCurrency(subTotal)}</span>
                 </div>
 
                 <AnimatePresence>
@@ -54,19 +55,19 @@ export function LiveTotal() {
                             initial={{ opacity: 0, height: 0 }}
                             animate={{ opacity: 1, height: "auto" }}
                             exit={{ opacity: 0, height: 0 }}
-                            className="flex justify-between text-neutral-400"
+                            className="flex justify-between items-center text-neutral-500"
                         >
-                            <span>{gst.type} ({gst.rate}%)</span>
+                            <span>{gst.type} <span className="text-xs text-neutral-600 ml-1">({gst.rate}%)</span></span>
                             <span className="font-mono">{formatCurrency((subTotal * (Number(gst.rate) || 0)) / 100)}</span>
                         </motion.div>
                     ))}
                 </AnimatePresence>
             </div>
 
-            <div className="border-t border-dashed border-neutral-800 pt-6 flex justify-between items-baseline">
-                <span className="text-neutral-400 font-medium">Total Payable</span>
-                <span className="text-3xl font-bold tracking-tight text-white flex items-baseline gap-1">
-                    <span className="text-orange-500 text-lg mr-1">INR</span>
+            <div className="pt-6 flex flex-col items-end gap-1 relative z-10">
+                <span className="text-xs font-semibold uppercase tracking-widest text-neutral-500">Total Payable</span>
+                <span className="text-4xl sm:text-5xl font-bold tracking-tighter text-white flex items-baseline gap-2 drop-shadow-lg">
+                    <span className="text-neutral-600 text-lg font-medium tracking-normal mr-1">INR</span>
                     {formatCurrency(grandTotal).replace(/[^0-9.,]/g, '')}
                 </span>
             </div>
