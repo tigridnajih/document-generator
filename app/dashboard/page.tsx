@@ -33,7 +33,6 @@ export default function Dashboard() {
 
     // Calculate stats
     const totalCount = filteredDocuments.length;
-    const sentCount = filteredDocuments.filter(d => d.status === "Sent").length;
     const totalValue = filteredDocuments.reduce((sum, doc) => sum + doc.amount, 0);
 
     // Get chart data
@@ -118,11 +117,6 @@ export default function Dashboard() {
                             value={totalCount}
                             icon={FileText}
                             trend="+12% vs last period"
-                        />
-                        <StatCard
-                            label="Documents Sent"
-                            value={sentCount}
-                            icon={ExternalLink}
                         />
                         <StatCard
                             label="Total Value"

@@ -28,7 +28,6 @@ export function DocumentTable({ documents }: DocumentTableProps) {
                             <th className="px-6 py-4">Client</th>
                             <th className="px-6 py-4">Date</th>
                             <th className="px-6 py-4">Amount</th>
-                            <th className="px-6 py-4">Status</th>
                             <th className="px-6 py-4 text-right">Actions</th>
                         </tr>
                     </thead>
@@ -51,9 +50,6 @@ export function DocumentTable({ documents }: DocumentTableProps) {
                                 </td>
                                 <td className="px-6 py-4 text-neutral-300 font-mono">
                                     ${doc.amount.toLocaleString()}
-                                </td>
-                                <td className="px-6 py-4">
-                                    <StatusBadge status={doc.status} />
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
