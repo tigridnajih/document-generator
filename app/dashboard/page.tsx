@@ -10,6 +10,7 @@ import { InteractiveBarChart } from "@/components/dashboard/InteractiveBarChart"
 import { StatCard } from "@/components/dashboard/StatCard";
 import { DocumentTable, Document } from "@/components/dashboard/DocumentTable";
 import { DashboardControls } from "@/components/dashboard/DashboardControls";
+import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { supabase } from "@/lib/supabase";
 
 function DashboardContent() {
@@ -146,11 +147,13 @@ function DashboardContent() {
 
             <main className="max-w-7xl mx-auto px-4 py-8 space-y-8 relative z-10">
                 <h1 className="font-bold text-2xl sm:text-3xl tracking-tight">
-                    Dashboard <span className="text-neutral-600 mx-2">/</span> <span className="text-orange-500 capitalize">{type}s</span>
+                    Dashboard <span className="text-neutral-600 mx-2">/</span> <span className="text-orange-500 capitalize">{type === 'all' ? 'All' : type + 's'}</span>
                 </h1>
 
+                {/* Type Filters */}
                 <DashboardControls />
 
+                {/* Analytics Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                     <div className="lg:col-span-3">
                         <InteractiveBarChart
@@ -174,6 +177,10 @@ function DashboardContent() {
                     </div>
                 </div>
 
+                {/* Search & Date Controls (Moved below Graph) */}
+                <DashboardSearch />
+
+                {/* Table */}
                 <div>
                     <DocumentTable documents={documents} />
                 </div>
