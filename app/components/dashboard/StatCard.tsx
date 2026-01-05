@@ -55,10 +55,10 @@ export function StatCard({ label, value, icon: Icon, trend, className }: StatCar
                         {label}
                     </p>
                     <p className="text-3xl sm:text-4xl font-semibold tracking-tighter text-white flex items-baseline gap-1">
-                        {typeof value === "string" && value.startsWith("$") && (
-                            <span className="text-xl sm:text-2xl text-neutral-500 font-normal mr-0.5">$</span>
+                        {typeof value === "string" && (value.startsWith("$") || value.startsWith("₹")) && (
+                            <span className="text-xl sm:text-2xl text-neutral-500 font-normal mr-0.5">₹</span>
                         )}
-                        <CountUp value={typeof value === "string" && value.includes(",") ? parseInt(value.replace(/[^0-9]/g, "")) : value} />
+                        <CountUp value={typeof value === "string" && (value.startsWith("$") || value.startsWith("₹")) ? parseInt(value.replace(/[^0-9]/g, "")) : value} />
                     </p>
                 </div>
 

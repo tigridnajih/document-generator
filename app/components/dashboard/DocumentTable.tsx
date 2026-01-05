@@ -108,7 +108,7 @@ export function DocumentTable({ documents, showAmount = true }: DocumentTablePro
                                 </td>
                                 {showAmount && (
                                     <td className="px-6 py-4 text-white font-medium font-mono text-right whitespace-nowrap tabular-nums">
-                                        ${Number(doc.amount).toLocaleString()}
+                                        ₹{Number(doc.amount).toLocaleString()}
                                     </td>
                                 )}
                                 <td className="px-6 py-4 text-right whitespace-nowrap">

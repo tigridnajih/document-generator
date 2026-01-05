@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FileText, FileSpreadsheet, Plus, AlertTriangle, FileCheck, LayoutGrid, TrendingUp, DollarSign } from "lucide-react";
+import { FileText, FileSpreadsheet, Plus, AlertTriangle, FileCheck, LayoutGrid, TrendingUp, Banknote } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 import { InteractiveBarChart } from "@/components/dashboard/InteractiveBarChart";
@@ -288,12 +288,12 @@ function DashboardContent() {
                             />
                             <StatCard
                                 label="Total Amount"
-                                value={`$${stats.amount.toLocaleString()}`}
-                                icon={DollarSign}
+                                value={`₹${stats.amount.toLocaleString()}`}
+                                icon={Banknote}
                             />
                             <StatCard
                                 label="Average Value"
-                                value={`$${stats.average.toLocaleString()}`}
+                                value={`₹${stats.average.toLocaleString()}`}
                                 icon={TrendingUp}
                             />
                         </div>

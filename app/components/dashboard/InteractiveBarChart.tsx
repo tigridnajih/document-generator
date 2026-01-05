@@ -24,7 +24,7 @@ const CustomTooltip = ({ active, payload, label, formatter }: any) => {
             <div className="bg-neutral-900/90 backdrop-blur-md border border-neutral-800 p-3 rounded-lg shadow-xl shadow-black/50">
                 <p className="text-neutral-400 text-xs mb-1 font-medium tracking-wide uppercase">{label}</p>
                 <p className="text-white font-bold font-mono text-lg">
-                    {formatter ? formatter(payload[0].value) : `$${Number(payload[0].value).toLocaleString()}`}
+                    {formatter ? formatter(payload[0].value) : `₹${Number(payload[0].value).toLocaleString()}`}
                 </p>
             </div>
         );
@@ -35,7 +35,7 @@ const CustomTooltip = ({ active, payload, label, formatter }: any) => {
 export function InteractiveBarChart({
     data,
     label = "Document Velocity",
-    yAxisFormatter = (value) => `$${value >= 1000 ? `${value / 1000}k` : value}`,
+    yAxisFormatter = (value) => `₹${value >= 1000 ? `${value / 1000}k` : value}`,
     tooltipFormatter
 }: InteractiveBarChartProps) {
     return (
