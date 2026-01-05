@@ -250,7 +250,7 @@ function DashboardContent() {
                                     tooltipFormatter={(val) => `${val} Documents`}
                                 />
                             </div>
-                            <div className="flex flex-col gap-6 h-[400px]">
+                            <div className="flex flex-col gap-6 h-[440px]">
                                 <StatCard
                                     label="Total Documents"
                                     value={stats.count}

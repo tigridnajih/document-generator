@@ -26,25 +26,25 @@ const CustomTooltip = ({ active, payload }: any) => {
 export function DocumentDistributionChart({ data, className }: DocumentDistributionChartProps & { className?: string }) {
     return (
         <div className={cn(
-            "bg-neutral-900/40 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-6 relative overflow-hidden group hover:border-neutral-700/80 transition-all duration-500 flex flex-col h-full",
+            "bg-neutral-900/40 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-5 relative overflow-hidden group hover:border-neutral-700/80 transition-all duration-500 flex flex-col h-full",
             className
         )}>
-            <div className="space-y-1 mb-2">
+            <div className="space-y-0.5 mb-2">
                 <h3 className="text-neutral-200 text-sm font-semibold tracking-tight">
                     Distribution
                 </h3>
-                <p className="text-neutral-500 text-[10px] uppercase tracking-wider font-medium">Document type split</p>
+                <p className="text-neutral-500 text-[9px] uppercase tracking-wider font-medium">Type split</p>
             </div>
 
-            <div className="flex-1 min-h-[140px]">
+            <div className="flex-1 min-h-[120px]">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
                         <Pie
                             data={data}
                             cx="50%"
                             cy="50%"
-                            innerRadius={50}
-                            outerRadius={70}
+                            innerRadius={45}
+                            outerRadius={65}
                             paddingAngle={5}
                             dataKey="value"
                             animationDuration={1000}
@@ -58,14 +58,12 @@ export function DocumentDistributionChart({ data, className }: DocumentDistribut
                 </ResponsiveContainer>
             </div>
 
-            <div className="mt-4 grid grid-cols-1 gap-2">
+            <div className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2 border-t border-neutral-800/40 pt-4">
                 {data.map((entry, index) => (
-                    <div key={entry.name} className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                            <span className="text-[10px] text-neutral-400 font-medium capitalize">{entry.name}s</span>
-                        </div>
-                        <span className="text-[10px] text-neutral-600 font-mono">{entry.value}</span>
+                    <div key={entry.name} className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                        <span className="text-[10px] text-neutral-400 font-medium capitalize whitespace-nowrap">{entry.name}s</span>
+                        <span className="text-[10px] text-neutral-600 font-mono ml-0.5">{entry.value}</span>
                     </div>
                 ))}
             </div>
