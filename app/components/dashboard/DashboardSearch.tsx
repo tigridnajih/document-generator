@@ -42,7 +42,7 @@ export function DashboardSearch() {
         <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-neutral-800/50">
             {/* Search Input */}
             <div className="relative flex-1 group">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 group-focus-within:text-orange-500 transition-colors duration-300" />
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 z-10 group-focus-within:text-orange-500 transition-colors duration-300" />
                 <input
                     type="text"
                     placeholder="Search by client, company or ID..."
@@ -58,7 +58,7 @@ export function DashboardSearch() {
 
             {/* Date Filter */}
             <div className="w-full sm:w-auto sm:min-w-[200px] relative group">
-                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none group-focus-within:text-orange-500 transition-colors duration-300" />
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 z-10 pointer-events-none group-focus-within:text-orange-500 transition-colors duration-300" />
                 <input
                     type="date"
                     defaultValue={dateFrom}

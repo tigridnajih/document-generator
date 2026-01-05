@@ -15,7 +15,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         return (
             <div className="relative w-full group">
                 {startIcon && (
-                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none group-focus-within:text-orange-500/80 transition-colors duration-300">
+                    <div className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 z-10 pointer-events-none group-focus-within:text-orange-500/80 transition-colors duration-300">
                         {startIcon}
                     </div>
                 )}
