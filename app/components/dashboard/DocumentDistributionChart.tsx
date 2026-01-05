@@ -36,36 +36,40 @@ export function DocumentDistributionChart({ data, className }: DocumentDistribut
                 <p className="text-neutral-500 text-[9px] uppercase tracking-wider font-medium">Type split</p>
             </div>
 
-            <div className="flex-1 min-h-[120px]">
-                <ResponsiveContainer width="100%" height="100%">
-                    <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-                        <Pie
-                            data={data}
-                            cx="50%"
-                            cy="50%"
-                            innerRadius={45}
-                            outerRadius={65}
-                            paddingAngle={5}
-                            dataKey="value"
-                            animationDuration={1000}
-                        >
-                            {data.map((entry, index) => (
-                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
-                            ))}
-                        </Pie>
-                        <Tooltip content={<CustomTooltip />} />
-                    </PieChart>
-                </ResponsiveContainer>
-            </div>
+            <div className="flex flex-row items-center gap-4 flex-1">
+                <div className="flex-1 h-[100px] min-w-[100px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                        <PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+                            <Pie
+                                data={data}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={35}
+                                outerRadius={50}
+                                paddingAngle={5}
+                                dataKey="value"
+                                animationDuration={1000}
+                            >
+                                {data.map((entry, index) => (
+                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} stroke="none" />
+                                ))}
+                            </Pie>
+                            <Tooltip content={<CustomTooltip />} />
+                        </PieChart>
+                    </ResponsiveContainer>
+                </div>
 
-            <div className="mt-4 flex flex-wrap justify-center gap-x-6 gap-y-2 border-t border-neutral-800/40 pt-4">
-                {data.map((entry, index) => (
-                    <div key={entry.name} className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                        <span className="text-[10px] text-neutral-400 font-medium capitalize whitespace-nowrap">{entry.name}s</span>
-                        <span className="text-[10px] text-neutral-600 font-mono ml-0.5">{entry.value}</span>
-                    </div>
-                ))}
+                <div className="flex flex-col gap-2.5 min-w-[110px]">
+                    {data.map((entry, index) => (
+                        <div key={entry.name} className="flex items-center justify-between group/legend">
+                            <div className="flex items-center gap-2">
+                                <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
+                                <span className="text-[10px] text-neutral-400 font-medium capitalize group-hover/legend:text-neutral-200 transition-colors">{entry.name}s</span>
+                            </div>
+                            <span className="text-[10px] text-neutral-600 font-mono group-hover/legend:text-neutral-400 transition-colors">{entry.value}</span>
+                        </div>
+                    ))}
+                </div>
             </div>
         </div>
     );

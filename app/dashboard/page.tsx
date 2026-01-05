@@ -39,27 +39,28 @@ function DashboardContent() {
                     .select("*")
                     .order("generated_at", { ascending: false });
 
-                // Filter by Date Range or Time Range
-                if (dateFrom || dateTo) {
-                    if (dateFrom) {
-                        const start = new Date(dateFrom);
-                        start.setHours(0, 0, 0, 0);
-                        query = query.gte("generated_at", start.toISOString());
-                    }
-                    if (dateTo) {
-                        const end = new Date(dateTo);
-                        end.setHours(23, 59, 59, 999);
-                        query = query.lte("generated_at", end.toISOString());
-                    }
-                } else if (range) {
-                    const now = new Date();
-                    let start = new Date();
-                    if (range === "day") start.setDate(now.getDate() - 1); // Fetch today and yesterday
-                    else if (range === "week") start.setDate(now.getDate() - 14); // Fetch last 14 days
-                    else if (range === "month") start.setMonth(now.getMonth() - 2); // Fetch last 2 months
-                    else if (range === "year") start.setFullYear(now.getFullYear() - 2); // Fetch last 2 years
+                const now = new Date();
+                let analyticsStart = new Date();
+                if (range === "day") analyticsStart.setDate(now.getDate() - 1);
+                else if (range === "week") analyticsStart.setDate(now.getDate() - 14);
+                else if (range === "month") analyticsStart.setMonth(now.getMonth() - 2);
+                else if (range === "year") analyticsStart.setFullYear(now.getFullYear() - 2);
 
-                    query = query.gte("generated_at", start.toISOString());
+                let fetchStart = analyticsStart;
+                if (dateFrom) {
+                    const df = new Date(dateFrom);
+                    if (df < fetchStart) fetchStart = df;
+                }
+
+                query = query.gte("generated_at", fetchStart.toISOString());
+
+                if (dateTo) {
+                    const dt = new Date(dateTo);
+                    dt.setHours(23, 59, 59, 999);
+                    // Fetch up to dateTo, but at least up to now for analytics
+                    if (dt > now) {
+                        query = query.lte("generated_at", dt.toISOString());
+                    }
                 }
 
                 // Filter by Search Term (Client Name, Company, Number)
@@ -71,8 +72,6 @@ function DashboardContent() {
 
                 if (error) throw error;
 
-                // Document type filtering is done in memory if it's not 'all'
-                // This allows us to use the same dataset for "All Mode" analytics
                 setDocuments((data as Document[]) ?? []);
             } catch (err: any) {
                 console.error("Supabase Error:", err);
@@ -99,10 +98,50 @@ function DashboardContent() {
     }, [range]);
 
     const currentDocs = useMemo(() => documents.filter(d => new Date(d.generated_at) >= periods.currentStart), [documents, periods]);
-    const previousDocs = useMemo(() => documents.filter(d => new Date(d.generated_at) < periods.currentStart), [documents, periods]);
+    const previousDocs = useMemo(() => {
+        const now = new Date();
+        let limit = new Date(periods.currentStart);
+        if (range === "day") limit.setDate(limit.getDate() - 1);
+        else if (range === "week") limit.setDate(limit.getDate() - 7);
+        else if (range === "month") limit.setMonth(limit.getMonth() - 1);
+        else if (range === "year") limit.setFullYear(limit.getFullYear() - 1);
 
-    // 2. Filter documents by type for the table and specific KPIs
+        return documents.filter(d => {
+            const date = new Date(d.generated_at);
+            return date < periods.currentStart && date >= limit;
+        });
+    }, [documents, periods, range]);
+
+    // 2. Filter documents for the table (Visible Documents) vs Analytics
     const visibleDocuments = useMemo(() => {
+        let filtered = documents;
+
+        // Custom Date Filtering (Table Only)
+        if (dateFrom || dateTo) {
+            filtered = filtered.filter(doc => {
+                const date = new Date(doc.generated_at);
+                if (dateFrom && date < new Date(dateFrom)) return false;
+                if (dateTo) {
+                    const end = new Date(dateTo);
+                    end.setHours(23, 59, 59, 999);
+                    if (date > end) return false;
+                }
+                return true;
+            });
+        } else {
+            // Default: Table follows current range
+            filtered = currentDocs;
+        }
+
+        // Type Filter
+        if (type !== "all") {
+            filtered = filtered.filter(doc => doc.document_type === type);
+        }
+
+        return filtered;
+    }, [documents, currentDocs, type, dateFrom, dateTo]);
+
+    const analyticsDocs = useMemo(() => {
         if (type === "all") return currentDocs;
         return currentDocs.filter(doc => doc.document_type === type);
     }, [currentDocs, type]);
@@ -121,7 +160,7 @@ function DashboardContent() {
             return { count, amount, average };
         };
 
-        const current = calculate(visibleDocuments);
+        const current = calculate(analyticsDocs);
         const previous = calculate(previousVisibleDocuments);
 
         const getTrend = (curr: number, prev: number) => {
@@ -303,7 +342,7 @@ function DashboardContent() {
                                     tooltipFormatter={(val) => `${val} Documents`}
                                 />
                             </div>
-                            <div className="flex flex-col gap-6 h-[440px]">
+                            <div className="flex flex-col gap-6 h-[360px]">
                                 <StatCard
                                     label="Total Documents"
                                     value={stats.count}
@@ -312,7 +351,7 @@ function DashboardContent() {
                                     trendType={stats.trends.count.type}
                                     className="h-fit"
                                 />
-                                <div className="flex-1">
+                                <div className="h-fit">
                                     <DocumentDistributionChart data={distributionData} className="h-full" />
                                 </div>
                             </div>

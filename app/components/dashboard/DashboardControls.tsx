@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, FileCheck, FileSpreadsheet, LayoutGrid } from "lucide-react";
+import { FileText, FileCheck, FileSpreadsheet, LayoutGrid, ChevronDown } from "lucide-react";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { cn } from "@/lib/utils";
@@ -37,7 +37,23 @@ export function DashboardControls() {
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex flex-nowrap space-x-1 bg-neutral-900/50 p-1.5 rounded-xl border border-neutral-800/60 backdrop-blur-sm overflow-x-auto max-w-full scrollbar-hide">
+                {/* Mobile Selector */}
+                <div className="sm:hidden relative group w-full">
+                    <select
+                        value={currentType}
+                        onChange={(e) => handleTypeChange(e.target.value as DocumentType)}
+                        className="w-full appearance-none bg-neutral-900/50 backdrop-blur-md border border-neutral-800/60 rounded-xl px-4 py-3 text-sm text-neutral-200 outline-none focus:ring-2 focus:ring-orange-500/20 focus:border-orange-500/50 transition-all font-medium pr-10"
+                    >
+                        <option value="all">All Documents</option>
+                        <option value="proposal">Proposals</option>
+                        <option value="quotation">Quotations</option>
+                        <option value="invoice">Invoices</option>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500 pointer-events-none group-focus-within:text-orange-500 transition-colors" />
+                </div>
+
+                {/* Desktop Selector */}
+                <div className="hidden sm:flex flex-nowrap space-x-1 bg-neutral-900/50 p-1.5 rounded-xl border border-neutral-800/60 backdrop-blur-sm overflow-x-auto max-w-full scrollbar-hide">
                     {(["all", "proposal", "quotation", "invoice"] as DocumentType[]).map((type) => (
                         <button
                             key={type}
