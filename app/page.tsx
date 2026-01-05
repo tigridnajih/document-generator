@@ -267,7 +267,7 @@ export default function Home() {
         {/* HERO & SELECTION HEADER */}
         <div className="max-w-7xl mx-auto px-6 space-y-12">
           <div className="text-center space-y-4">
-            <h1 className="font-bold tracking-tighter text-4xl sm:text-5xl text-white drop-shadow-sm">
+            <h1 className="font-bold tracking-tighter text-2xl sm:text-4xl md:text-5xl text-white drop-shadow-sm">
               Create New Document
             </h1>
             <p className="text-neutral-500 max-w-lg mx-auto text-sm leading-relaxed font-medium">
