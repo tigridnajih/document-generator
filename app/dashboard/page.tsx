@@ -3,7 +3,7 @@
 import { useEffect, useState, useMemo, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FileText, FileSpreadsheet, Plus, AlertTriangle } from "lucide-react";
+import { FileText, FileSpreadsheet, Plus, AlertTriangle, FileCheck, LayoutGrid, TrendingUp, DollarSign } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 import { InteractiveBarChart } from "@/components/dashboard/InteractiveBarChart";
@@ -11,7 +11,10 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { DocumentTable, Document } from "@/components/dashboard/DocumentTable";
 import { DashboardControls } from "@/components/dashboard/DashboardControls";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
+import { DocumentDistributionChart } from "@/components/dashboard/DocumentDistributionChart";
+import { ClientInsights } from "@/components/dashboard/ClientInsights";
 import { supabase } from "@/lib/supabase";
+import { cn } from "@/lib/utils";
 
 function DashboardContent() {
     const searchParams = useSearchParams();
@@ -22,6 +25,8 @@ function DashboardContent() {
     const q = searchParams.get("q") || "";
     const type = searchParams.get("type") || "all";
     const dateFrom = searchParams.get("dateFrom") || "";
+    const dateTo = searchParams.get("dateTo") || "";
+    const range = searchParams.get("range") || "month";
 
     useEffect(() => {
         const fetchDocuments = async () => {
@@ -34,19 +39,27 @@ function DashboardContent() {
                     .select("*")
                     .order("generated_at", { ascending: false });
 
-                // Filter by Type
-                if (type && type !== "all") {
-                    query = query.eq("document_type", type);
-                }
+                // Filter by Date Range or Time Range
+                if (dateFrom || dateTo) {
+                    if (dateFrom) {
+                        const start = new Date(dateFrom);
+                        start.setHours(0, 0, 0, 0);
+                        query = query.gte("generated_at", start.toISOString());
+                    }
+                    if (dateTo) {
+                        const end = new Date(dateTo);
+                        end.setHours(23, 59, 59, 999);
+                        query = query.lte("generated_at", end.toISOString());
+                    }
+                } else if (range) {
+                    const now = new Date();
+                    let start = new Date();
+                    if (range === "day") start.setHours(0, 0, 0, 0);
+                    else if (range === "week") start.setDate(now.getDate() - 7);
+                    else if (range === "month") start.setMonth(now.getMonth() - 1);
+                    else if (range === "year") start.setFullYear(now.getFullYear() - 1);
 
-                // Filter by Date (Single Date Match)
-                if (dateFrom) {
-                    const startDate = new Date(dateFrom);
-                    startDate.setHours(0, 0, 0, 0);
-                    const endDate = new Date(dateFrom);
-                    endDate.setHours(23, 59, 59, 999);
-
-                    query = query.gte("generated_at", startDate.toISOString()).lte("generated_at", endDate.toISOString());
+                    query = query.gte("generated_at", start.toISOString());
                 }
 
                 // Filter by Search Term (Client Name, Company, Number)
@@ -56,10 +69,10 @@ function DashboardContent() {
 
                 const { data, error } = await query;
 
-                if (error) {
-                    throw error;
-                }
+                if (error) throw error;
 
+                // Document type filtering is done in memory if it's not 'all'
+                // This allows us to use the same dataset for "All Mode" analytics
                 setDocuments((data as Document[]) ?? []);
             } catch (err: any) {
                 console.error("Supabase Error:", err);
@@ -70,21 +83,70 @@ function DashboardContent() {
         };
 
         fetchDocuments();
-    }, [q, type, dateFrom]);
+    }, [q, range, dateFrom, dateTo]);
 
-    // Compute Aggregates for UI
-    const totalCount = documents.length;
-    const totalValue = documents.reduce((sum, doc) => sum + Number(doc.amount || 0), 0);
+    // 1. Filter documents by type for the table and specific KPIs
+    const visibleDocuments = useMemo(() => {
+        if (type === "all") return documents;
+        return documents.filter(doc => doc.document_type === type);
+    }, [documents, type]);
 
-    // Compute Chart Data using useMemo
+    // 2. Compute Aggregates
+    const stats = useMemo(() => {
+        const count = visibleDocuments.length;
+        const amount = visibleDocuments.reduce((sum, doc) => sum + Number(doc.amount || 0), 0);
+        const average = count > 0 ? amount / count : 0;
+        return { count, amount, average };
+    }, [visibleDocuments]);
+
+    // 3. Compute Chart Data
     const chartData = useMemo(() => {
         const chartMap = new Map<string, number>();
-        documents.forEach(doc => {
+        visibleDocuments.forEach(doc => {
             const d = new Date(doc.generated_at);
             const key = `${d.getMonth() + 1}/${d.getDate()}`;
-            chartMap.set(key, (chartMap.get(key) || 0) + Number(doc.amount));
+            const val = type === "all" ? 1 : Number(doc.amount || 0);
+            chartMap.set(key, (chartMap.get(key) || 0) + val);
         });
-        return Array.from(chartMap.entries()).map(([name, value]) => ({ name, value }));
+        return Array.from(chartMap.entries())
+            .map(([name, value]) => ({ name, value }))
+            .slice(-14); // Limit to last 14 data points for clarity
+    }, [visibleDocuments, type]);
+
+    // 4. Compute Distribution (for Pie Chart)
+    const distributionData = useMemo(() => {
+        const counts = { invoice: 0, quotation: 0, proposal: 0 };
+        documents.forEach(doc => {
+            const t = doc.document_type.toLowerCase() as keyof typeof counts;
+            if (counts[t] !== undefined) counts[t]++;
+        });
+        return Object.entries(counts).map(([name, value]) => ({ name, value }));
+    }, [documents]);
+
+    // 5. Compute Client Insights
+    const clientInsightsData = useMemo(() => {
+        const clientMap = new Map<string, number>();
+        documents.forEach(doc => {
+            const name = doc.client_name || "Unknown Client";
+            clientMap.set(name, (clientMap.get(name) || 0) + 1);
+        });
+
+        const sortedClients = Array.from(clientMap.entries())
+            .map(([name, count]) => ({ name, count }))
+            .sort((a, b) => b.count - a.count);
+
+        const totalDocs = documents.length;
+        const topClientCount = sortedClients[0]?.count || 0;
+        const concentration = totalDocs > 0 ? Math.round((topClientCount / totalDocs) * 100) : 0;
+
+        const repeat = sortedClients.filter(c => c.count >= 2).length;
+        const oneTime = sortedClients.filter(c => c.count === 1).length;
+
+        return {
+            topClients: sortedClients.slice(0, 5),
+            concentration,
+            repeatRate: { repeat, oneTime }
+        };
     }, [documents]);
 
 
@@ -154,41 +216,94 @@ function DashboardContent() {
                     <h1 className="font-bold text-3xl sm:text-4xl tracking-tighter text-white">
                         Dashboard <span className="text-neutral-700 font-light mx-2">/</span> <span className="text-neutral-400 font-medium capitalize">{type === 'all' ? 'Overview' : type + 's'}</span>
                     </h1>
-                    {/* Type Filters moved to align with title or just below suitable for layout */}
-                    <div className="self-start sm:self-auto">
+                    <div className="flex flex-wrap items-center gap-4">
+                        {/* Time Range Filter */}
+                        <div className="flex bg-neutral-900/50 p-1 rounded-lg border border-neutral-800/60 transition-all">
+                            {(["day", "week", "month", "year"] as const).map((r) => (
+                                <Link
+                                    key={r}
+                                    href={`?${new URLSearchParams({ ...Object.fromEntries(searchParams.entries()), range: r }).toString()}`}
+                                    className={cn(
+                                        "px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider rounded-md transition-all",
+                                        range === r
+                                            ? "bg-neutral-800 text-white shadow-sm"
+                                            : "text-neutral-500 hover:text-neutral-300"
+                                    )}
+                                >
+                                    {r}
+                                </Link>
+                            ))}
+                        </div>
                         <DashboardControls />
                     </div>
                 </div>
 
                 {/* Analytics Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2">
+                    <div className="lg:col-span-2 space-y-8">
                         <InteractiveBarChart
                             data={chartData}
-                            label={`Document Velocity (${type})`}
+                            label={type === "all" ? "Document Volume" : `${type.charAt(0).toUpperCase() + type.slice(1)} Performance`}
+                            yAxisFormatter={type === "all" ? (val) => val.toString() : undefined}
+                            tooltipFormatter={type === "all" ? (val) => `${val} Documents` : undefined}
                         />
+
+                        {/* Insights only show in 'all' mode */}
+                        {type === "all" && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <DocumentDistributionChart data={distributionData} />
+                                <ClientInsights
+                                    topClients={clientInsightsData.topClients}
+                                    concentration={clientInsightsData.concentration}
+                                    repeatRate={clientInsightsData.repeatRate}
+                                />
+                            </div>
+                        )}
                     </div>
-                    <div className="space-y-6 flex flex-col justify-between h-full">
-                        <StatCard
-                            label="Total Documents"
-                            value={totalCount}
-                            icon={FileText}
-                            trend="+12% vs last month"
-                        />
-                        <StatCard
-                            label="Total Value"
-                            value={`$${totalValue.toLocaleString()}`}
-                            icon={FileSpreadsheet}
-                            trend="+8.5% vs last month"
-                        />
+
+                    <div className="space-y-6">
+                        {type === "all" ? (
+                            <StatCard
+                                label="Total Documents"
+                                value={stats.count}
+                                icon={LayoutGrid}
+                                trend="Across all types"
+                            />
+                        ) : (
+                            <>
+                                <StatCard
+                                    label="Total Documents"
+                                    value={stats.count}
+                                    icon={FileText}
+                                />
+                                <StatCard
+                                    label="Total Amount"
+                                    value={`$${stats.amount.toLocaleString()}`}
+                                    icon={DollarSign}
+                                />
+                                <StatCard
+                                    label="Average Value"
+                                    value={`$${stats.average.toLocaleString()}`}
+                                    icon={TrendingUp}
+                                />
+                                <div className="p-6 bg-orange-500/5 border border-orange-500/10 rounded-2xl">
+                                    <p className="text-xs text-neutral-400 leading-relaxed">
+                                        💡 <span className="text-neutral-300 font-medium capitalize">{type}s</span> account for {Math.round((stats.amount / (documents.reduce((s, d) => s + Number(d.amount), 0) || 1)) * 100)}% of total document value in this period.
+                                    </p>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
 
-                {/* Search & Date Controls (Moved below Graph) */}
-                <div className="space-y-6">
+                {/* Search & Date Controls */}
+                <div className="space-y-6 pt-10">
                     <DashboardSearch />
                     {/* Table */}
-                    <DocumentTable documents={documents} />
+                    <DocumentTable
+                        documents={visibleDocuments}
+                        showAmount={type !== "all"}
+                    />
                 </div>
             </main>
         </div>

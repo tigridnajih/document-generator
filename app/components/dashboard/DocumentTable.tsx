@@ -38,9 +38,10 @@ function getTypeStyle(type: string) {
 
 interface DocumentTableProps {
     documents: Document[];
+    showAmount?: boolean;
 }
 
-export function DocumentTable({ documents }: DocumentTableProps) {
+export function DocumentTable({ documents, showAmount = true }: DocumentTableProps) {
     if (documents.length === 0) {
         return (
             <div className="w-full py-32 flex flex-col items-center justify-center text-neutral-500 space-y-6 border border-dashed border-neutral-800 rounded-2xl bg-neutral-900/20">
@@ -65,7 +66,7 @@ export function DocumentTable({ documents }: DocumentTableProps) {
                             <th className="px-6 py-4 font-medium">Number</th>
                             <th className="px-6 py-4 font-medium">Client</th>
                             <th className="px-6 py-4 font-medium">Date Issued</th>
-                            <th className="px-6 py-4 font-medium text-right">Amount</th>
+                            {showAmount && <th className="px-6 py-4 font-medium text-right">Amount</th>}
                             <th className="px-6 py-4 font-medium text-right">Actions</th>
                         </tr>
                     </thead>
@@ -105,9 +106,11 @@ export function DocumentTable({ documents }: DocumentTableProps) {
                                         </span>
                                     </div>
                                 </td>
-                                <td className="px-6 py-4 text-white font-medium font-mono text-right whitespace-nowrap tabular-nums">
-                                    ${Number(doc.amount).toLocaleString()}
-                                </td>
+                                {showAmount && (
+                                    <td className="px-6 py-4 text-white font-medium font-mono text-right whitespace-nowrap tabular-nums">
+                                        ${Number(doc.amount).toLocaleString()}
+                                    </td>
+                                )}
                                 <td className="px-6 py-4 text-right whitespace-nowrap">
                                     <div className="flex items-center justify-end gap-1">
                                         <Link href={doc.download_url} target="_blank" rel="noopener noreferrer">

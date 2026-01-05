@@ -14,15 +14,17 @@ import {
 interface InteractiveBarChartProps {
     data: { name: string; value: number }[];
     label?: string;
+    yAxisFormatter?: (value: number) => string;
+    tooltipFormatter?: (value: number) => string;
 }
 
-const CustomTooltip = ({ active, payload, label }: any) => {
+const CustomTooltip = ({ active, payload, label, formatter }: any) => {
     if (active && payload && payload.length) {
         return (
             <div className="bg-neutral-900/90 backdrop-blur-md border border-neutral-800 p-3 rounded-lg shadow-xl shadow-black/50">
                 <p className="text-neutral-400 text-xs mb-1 font-medium tracking-wide uppercase">{label}</p>
                 <p className="text-white font-bold font-mono text-lg">
-                    ${Number(payload[0].value).toLocaleString()}
+                    {formatter ? formatter(payload[0].value) : `$${Number(payload[0].value).toLocaleString()}`}
                 </p>
             </div>
         );
@@ -30,7 +32,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
     return null;
 };
 
-export function InteractiveBarChart({ data, label = "Document Velocity" }: InteractiveBarChartProps) {
+export function InteractiveBarChart({
+    data,
+    label = "Document Velocity",
+    yAxisFormatter = (value) => `$${value >= 1000 ? `${value / 1000}k` : value}`,
+    tooltipFormatter
+}: InteractiveBarChartProps) {
     return (
         <div className="w-full h-[400px] bg-neutral-900/40 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-6 relative overflow-hidden group hover:border-neutral-700/80 transition-all duration-500">
             {/* Background Glow */}
@@ -74,12 +81,12 @@ export function InteractiveBarChart({ data, label = "Document Velocity" }: Inter
                             fontSize={11}
                             tickLine={false}
                             axisLine={false}
-                            tickFormatter={(value) => `$${value >= 1000 ? `${value / 1000}k` : value}`}
+                            tickFormatter={yAxisFormatter}
                             dx={-10}
                         />
                         <Tooltip
                             cursor={{ fill: "rgba(255,255,255,0.02)" }}
-                            content={<CustomTooltip />}
+                            content={<CustomTooltip formatter={tooltipFormatter} />}
                         />
                         <Bar
                             dataKey="value"

@@ -5,7 +5,7 @@ import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useCallback, useTransition } from "react";
 import { cn } from "@/lib/utils";
 
-type DocumentType = "proposal" | "quotation" | "invoice";
+type DocumentType = "all" | "proposal" | "quotation" | "invoice";
 
 export function DashboardControls() {
     const searchParams = useSearchParams();
@@ -13,13 +13,12 @@ export function DashboardControls() {
     const pathname = usePathname();
     const [isPending, startTransition] = useTransition();
 
-    const currentType = searchParams.get("type") as DocumentType;
-    // If currentType is null or 'all', no tab is selected. This is fine.
+    const currentType = (searchParams.get("type") as DocumentType) || "all";
 
     const createQueryString = useCallback(
         (name: string, value: string) => {
             const params = new URLSearchParams(searchParams.toString());
-            if (value) {
+            if (value && value !== "all") {
                 params.set(name, value);
             } else {
                 params.delete(name);
@@ -39,7 +38,7 @@ export function DashboardControls() {
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                 <div className="flex space-x-1 bg-neutral-900/50 p-1.5 rounded-xl border border-neutral-800/60 backdrop-blur-sm self-start overflow-hidden">
-                    {(["proposal", "quotation", "invoice"] as DocumentType[]).map((type) => (
+                    {(["all", "proposal", "quotation", "invoice"] as DocumentType[]).map((type) => (
                         <button
                             key={type}
                             onClick={() => handleTypeChange(type)}
@@ -50,6 +49,7 @@ export function DashboardControls() {
                                     : "text-neutral-500 hover:text-neutral-300 hover:bg-neutral-800/50"
                             )}
                         >
+                            {type === "all" && <LayoutGrid className="w-4 h-4" />}
                             {type === "proposal" && <FileText className="w-4 h-4" />}
                             {type === "quotation" && <FileCheck className="w-4 h-4" />}
                             {type === "invoice" && <FileSpreadsheet className="w-4 h-4" />}
