@@ -342,7 +342,7 @@ function DashboardContent() {
                                     tooltipFormatter={(val) => `${val} Documents`}
                                 />
                             </div>
-                            <div className="flex flex-col gap-6 h-[360px]">
+                            <div className="flex flex-col gap-6 h-[400px]">
                                 <StatCard
                                     label="Total Documents"
                                     value={stats.count}
@@ -351,7 +351,7 @@ function DashboardContent() {
                                     trendType={stats.trends.count.type}
                                     className="h-fit"
                                 />
-                                <div className="h-fit">
+                                <div className="flex-1">
                                     <DocumentDistributionChart data={distributionData} className="h-full" />
                                 </div>
                             </div>
