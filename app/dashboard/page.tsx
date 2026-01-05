@@ -239,62 +239,66 @@ function DashboardContent() {
                 </div>
 
                 {/* Analytics Grid */}
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2 space-y-8">
-                        <InteractiveBarChart
-                            data={chartData}
-                            label={type === "all" ? "Document Volume" : `${type.charAt(0).toUpperCase() + type.slice(1)} Performance`}
-                            yAxisFormatter={type === "all" ? (val) => val.toString() : undefined}
-                            tooltipFormatter={type === "all" ? (val) => `${val} Documents` : undefined}
-                        />
-
-                        {/* Insights only show in 'all' mode */}
-                        {type === "all" && (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <DocumentDistributionChart data={distributionData} />
-                                <ClientInsights
-                                    topClients={clientInsightsData.topClients}
-                                    concentration={clientInsightsData.concentration}
-                                    repeatRate={clientInsightsData.repeatRate}
+                {type === "all" ? (
+                    <div className="space-y-8">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                            <div className="lg:col-span-2">
+                                <InteractiveBarChart
+                                    data={chartData}
+                                    label="Document Volume"
+                                    yAxisFormatter={(val) => val.toString()}
+                                    tooltipFormatter={(val) => `${val} Documents`}
                                 />
                             </div>
-                        )}
-                    </div>
-
-                    <div className="space-y-6">
-                        {type === "all" ? (
-                            <StatCard
-                                label="Total Documents"
-                                value={stats.count}
-                                icon={LayoutGrid}
-                                trend="Across all types"
-                            />
-                        ) : (
-                            <>
+                            <div className="flex flex-col gap-6 h-[400px]">
                                 <StatCard
                                     label="Total Documents"
                                     value={stats.count}
-                                    icon={FileText}
+                                    icon={LayoutGrid}
+                                    trend="Across all types"
+                                    className="h-fit"
                                 />
-                                <StatCard
-                                    label="Total Amount"
-                                    value={`$${stats.amount.toLocaleString()}`}
-                                    icon={DollarSign}
-                                />
-                                <StatCard
-                                    label="Average Value"
-                                    value={`$${stats.average.toLocaleString()}`}
-                                    icon={TrendingUp}
-                                />
-                                <div className="p-6 bg-orange-500/5 border border-orange-500/10 rounded-2xl">
-                                    <p className="text-xs text-neutral-400 leading-relaxed">
-                                        💡 <span className="text-neutral-300 font-medium capitalize">{type}s</span> account for {Math.round((stats.amount / (documents.reduce((s, d) => s + Number(d.amount), 0) || 1)) * 100)}% of total document value in this period.
-                                    </p>
+                                <div className="flex-1">
+                                    <DocumentDistributionChart data={distributionData} className="h-full" />
                                 </div>
-                            </>
-                        )}
+                            </div>
+                        </div>
+
+                        <ClientInsights
+                            topClients={clientInsightsData.topClients}
+                            concentration={clientInsightsData.concentration}
+                            repeatRate={clientInsightsData.repeatRate}
+                            className="w-full"
+                        />
                     </div>
-                </div>
+                ) : (
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        <div className="lg:col-span-2">
+                            <InteractiveBarChart
+                                data={chartData}
+                                label={`${type.charAt(0).toUpperCase() + type.slice(1)} Performance`}
+                            />
+                        </div>
+
+                        <div className="space-y-6">
+                            <StatCard
+                                label="Total Documents"
+                                value={stats.count}
+                                icon={FileText}
+                            />
+                            <StatCard
+                                label="Total Amount"
+                                value={`$${stats.amount.toLocaleString()}`}
+                                icon={DollarSign}
+                            />
+                            <StatCard
+                                label="Average Value"
+                                value={`$${stats.average.toLocaleString()}`}
+                                icon={TrendingUp}
+                            />
+                        </div>
+                    </div>
+                )}
 
                 {/* Search & Date Controls */}
                 <div className="space-y-6 pt-10">

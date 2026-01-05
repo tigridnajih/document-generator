@@ -3,12 +3,14 @@
 import { useEffect, useRef } from "react";
 import { LucideIcon } from "lucide-react";
 import { useInView, useMotionValue, useSpring } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface StatCardProps {
     label: string;
     value: string | number;
     icon: LucideIcon;
     trend?: string;
+    className?: string;
 }
 
 function CountUp({ value }: { value: number | string }) {
@@ -38,9 +40,12 @@ function CountUp({ value }: { value: number | string }) {
     return <span ref={ref}>0</span>;
 }
 
-export function StatCard({ label, value, icon: Icon, trend }: StatCardProps) {
+export function StatCard({ label, value, icon: Icon, trend, className }: StatCardProps) {
     return (
-        <div className="relative overflow-hidden bg-neutral-900/40 backdrop-blur-md border border-neutral-800/60 p-6 rounded-2xl flex items-start justify-between group hover:border-orange-500/20 hover:bg-neutral-900/60 transition-all duration-500 hover:shadow-[0_0_40px_-10px_rgba(249,115,22,0.1)]">
+        <div className={cn(
+            "relative overflow-hidden bg-neutral-900/40 backdrop-blur-md border border-neutral-800/60 p-6 rounded-2xl flex items-start justify-between group hover:border-orange-500/20 hover:bg-neutral-900/60 transition-all duration-500 hover:shadow-[0_0_40px_-10px_rgba(249,115,22,0.1)]",
+            className
+        )}>
             {/* Subtle Gradient Overlay on Hover */}
             <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
 
