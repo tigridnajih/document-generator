@@ -416,7 +416,7 @@ function DashboardContent() {
                 )}
 
                 {/* Search & Date Controls */}
-                <div className="space-y-6 pt-10">
+                <div className="space-y-6">
                     <DashboardSearch />
                     {/* Table */}
                     <DocumentTable
