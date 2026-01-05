@@ -54,10 +54,10 @@ function DashboardContent() {
                 } else if (range) {
                     const now = new Date();
                     let start = new Date();
-                    if (range === "day") start.setHours(0, 0, 0, 0);
-                    else if (range === "week") start.setDate(now.getDate() - 7);
-                    else if (range === "month") start.setMonth(now.getMonth() - 1);
-                    else if (range === "year") start.setFullYear(now.getFullYear() - 1);
+                    if (range === "day") start.setDate(now.getDate() - 1); // Fetch today and yesterday
+                    else if (range === "week") start.setDate(now.getDate() - 14); // Fetch last 14 days
+                    else if (range === "month") start.setMonth(now.getMonth() - 2); // Fetch last 2 months
+                    else if (range === "year") start.setFullYear(now.getFullYear() - 2); // Fetch last 2 years
 
                     query = query.gte("generated_at", start.toISOString());
                 }
@@ -85,24 +85,72 @@ function DashboardContent() {
         fetchDocuments();
     }, [q, range, dateFrom, dateTo]);
 
-    // 1. Filter documents by type for the table and specific KPIs
-    const visibleDocuments = useMemo(() => {
-        if (type === "all") return documents;
-        return documents.filter(doc => doc.document_type === type);
-    }, [documents, type]);
+    // 1. Identify Current vs Previous Periods
+    const periods = useMemo(() => {
+        const now = new Date();
+        let currentStart = new Date();
+        if (range === "day") currentStart.setHours(0, 0, 0, 0);
+        else if (range === "week") currentStart.setDate(now.getDate() - 7);
+        else if (range === "month") currentStart.setMonth(now.getMonth() - 1);
+        else if (range === "year") currentStart.setFullYear(now.getFullYear() - 1);
 
-    // 2. Compute Aggregates
+        const labelMap = { day: "yesterday", week: "last week", month: "last month", year: "last year" };
+        return { currentStart, label: `vs ${labelMap[range as keyof typeof labelMap] || 'last period'}` };
+    }, [range]);
+
+    const currentDocs = useMemo(() => documents.filter(d => new Date(d.generated_at) >= periods.currentStart), [documents, periods]);
+    const previousDocs = useMemo(() => documents.filter(d => new Date(d.generated_at) < periods.currentStart), [documents, periods]);
+
+    // 2. Filter documents by type for the table and specific KPIs
+    const visibleDocuments = useMemo(() => {
+        if (type === "all") return currentDocs;
+        return currentDocs.filter(doc => doc.document_type === type);
+    }, [currentDocs, type]);
+
+    const previousVisibleDocuments = useMemo(() => {
+        if (type === "all") return previousDocs;
+        return previousDocs.filter(doc => doc.document_type === type);
+    }, [previousDocs, type]);
+
+    // 3. Compute Aggregates & Trends
     const stats = useMemo(() => {
-        const count = visibleDocuments.length;
-        const amount = visibleDocuments.reduce((sum, doc) => sum + Number(doc.amount || 0), 0);
-        const average = count > 0 ? amount / count : 0;
-        return { count, amount, average };
-    }, [visibleDocuments]);
+        const calculate = (docs: Document[]) => {
+            const count = docs.length;
+            const amount = docs.reduce((sum, doc) => sum + Number(doc.amount || 0), 0);
+            const average = count > 0 ? amount / count : 0;
+            return { count, amount, average };
+        };
+
+        const current = calculate(visibleDocuments);
+        const previous = calculate(previousVisibleDocuments);
+
+        const getTrend = (curr: number, prev: number) => {
+            if (prev === 0) return { value: curr > 0 ? "+100%" : "0%", type: "neutral" as const };
+            const diff = ((curr - prev) / prev) * 100;
+            const sign = diff >= 0 ? "+" : "";
+            return {
+                value: `${sign}${diff.toFixed(1)}% ${periods.label}`,
+                type: (diff > 0 ? "up" : diff < 0 ? "down" : "neutral") as "up" | "down" | "neutral"
+            };
+        };
+
+        return {
+            count: current.count,
+            amount: current.amount,
+            average: current.average,
+            trends: {
+                count: getTrend(current.count, previous.count),
+                amount: getTrend(current.amount, previous.amount),
+                average: getTrend(current.average, previous.average)
+            }
+        };
+    }, [visibleDocuments, previousVisibleDocuments, periods]);
 
     // 3. Compute Chart Data
     const chartData = useMemo(() => {
         const chartMap = new Map<string, number>();
-        visibleDocuments.forEach(doc => {
+        currentDocs.forEach(doc => {
+            if (type !== "all" && doc.document_type !== type) return;
             const d = new Date(doc.generated_at);
             const key = `${d.getMonth() + 1}/${d.getDate()}`;
             const val = type === "all" ? 1 : Number(doc.amount || 0);
@@ -110,23 +158,28 @@ function DashboardContent() {
         });
         return Array.from(chartMap.entries())
             .map(([name, value]) => ({ name, value }))
-            .slice(-14); // Limit to last 14 data points for clarity
-    }, [visibleDocuments, type]);
+            .sort((a, b) => {
+                const [am, ad] = a.name.split('/').map(Number);
+                const [bm, bd] = b.name.split('/').map(Number);
+                return am !== bm ? am - bm : ad - bd;
+            })
+            .slice(-14);
+    }, [currentDocs, type]);
 
     // 4. Compute Distribution (for Pie Chart)
     const distributionData = useMemo(() => {
         const counts = { invoice: 0, quotation: 0, proposal: 0 };
-        documents.forEach(doc => {
+        currentDocs.forEach(doc => {
             const t = doc.document_type.toLowerCase() as keyof typeof counts;
             if (counts[t] !== undefined) counts[t]++;
         });
         return Object.entries(counts).map(([name, value]) => ({ name, value }));
-    }, [documents]);
+    }, [currentDocs]);
 
     // 5. Compute Client Insights
     const clientInsightsData = useMemo(() => {
         const clientMap = new Map<string, number>();
-        documents.forEach(doc => {
+        currentDocs.forEach(doc => {
             const name = doc.client_name || "Unknown Client";
             clientMap.set(name, (clientMap.get(name) || 0) + 1);
         });
@@ -135,7 +188,7 @@ function DashboardContent() {
             .map(([name, count]) => ({ name, count }))
             .sort((a, b) => b.count - a.count);
 
-        const totalDocs = documents.length;
+        const totalDocs = currentDocs.length;
         const topClientCount = sortedClients[0]?.count || 0;
         const concentration = totalDocs > 0 ? Math.round((topClientCount / totalDocs) * 100) : 0;
 
@@ -147,7 +200,7 @@ function DashboardContent() {
             concentration,
             repeatRate: { repeat, oneTime }
         };
-    }, [documents]);
+    }, [currentDocs]);
 
 
     if (loading) {
@@ -255,7 +308,8 @@ function DashboardContent() {
                                     label="Total Documents"
                                     value={stats.count}
                                     icon={LayoutGrid}
-                                    trend="Across all types"
+                                    trend={stats.trends.count.value}
+                                    trendType={stats.trends.count.type}
                                     className="h-fit"
                                 />
                                 <div className="flex-1">
@@ -285,16 +339,22 @@ function DashboardContent() {
                                 label="Total Documents"
                                 value={stats.count}
                                 icon={FileText}
+                                trend={stats.trends.count.value}
+                                trendType={stats.trends.count.type}
                             />
                             <StatCard
                                 label="Total Amount"
                                 value={`₹${stats.amount.toLocaleString()}`}
                                 icon={Banknote}
+                                trend={stats.trends.amount.value}
+                                trendType={stats.trends.amount.type}
                             />
                             <StatCard
                                 label="Average Value"
                                 value={`₹${stats.average.toLocaleString()}`}
                                 icon={TrendingUp}
+                                trend={stats.trends.average.value}
+                                trendType={stats.trends.average.type}
                             />
                         </div>
                     </div>

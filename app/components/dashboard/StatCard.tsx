@@ -10,6 +10,7 @@ interface StatCardProps {
     value: string | number;
     icon: LucideIcon;
     trend?: string;
+    trendType?: 'up' | 'down' | 'neutral';
     className?: string;
 }
 
@@ -40,7 +41,31 @@ function CountUp({ value }: { value: number | string }) {
     return <span ref={ref}>0</span>;
 }
 
-export function StatCard({ label, value, icon: Icon, trend, className }: StatCardProps) {
+export function StatCard({ label, value, icon: Icon, trend, trendType = 'up', className }: StatCardProps) {
+    const trendConfig = {
+        up: {
+            bg: "bg-emerald-500/10",
+            border: "border-emerald-500/20",
+            dot: "bg-emerald-500",
+            ping: "bg-emerald-400",
+            text: "text-emerald-400"
+        },
+        down: {
+            bg: "bg-rose-500/10",
+            border: "border-rose-500/20",
+            dot: "bg-rose-500",
+            ping: "bg-rose-400",
+            text: "text-rose-400"
+        },
+        neutral: {
+            bg: "bg-neutral-500/10",
+            border: "border-neutral-500/20",
+            dot: "bg-neutral-500",
+            ping: "bg-neutral-400",
+            text: "text-neutral-400"
+        }
+    }[trendType];
+
     return (
         <div className={cn(
             "relative overflow-hidden bg-neutral-900/40 backdrop-blur-md border border-neutral-800/60 p-6 rounded-2xl flex items-start justify-between group hover:border-orange-500/20 hover:bg-neutral-900/60 transition-all duration-500 hover:shadow-[0_0_40px_-10px_rgba(249,115,22,0.1)]",
@@ -63,12 +88,12 @@ export function StatCard({ label, value, icon: Icon, trend, className }: StatCar
                 </div>
 
                 {trend && (
-                    <div className="inline-flex items-center gap-1.5 px-2 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20">
+                    <div className={cn("inline-flex items-center gap-1.5 px-2 py-1 rounded-full border", trendConfig.bg, trendConfig.border)}>
                         <span className="relative flex h-1.5 w-1.5">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                            <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500"></span>
+                            <span className={cn("animate-ping absolute inline-flex h-full w-full rounded-full opacity-75", trendConfig.ping)}></span>
+                            <span className={cn("relative inline-flex rounded-full h-1.5 w-1.5", trendConfig.dot)}></span>
                         </span>
-                        <span className="text-[10px] font-medium text-emerald-400 tracking-wide">{trend}</span>
+                        <span className={cn("text-[10px] font-medium tracking-wide", trendConfig.text)}>{trend}</span>
                     </div>
                 )}
             </div>
