@@ -1,8 +1,47 @@
 "use client";
 
+import { useFormContext, useWatch } from "react-hook-form";
+import { DocumentFormData } from "@/lib/types";
+import { motion, AnimatePresence } from "framer-motion";
+import { useState, useEffect, useMemo } from "react";
 import { Section } from "@/components/ui/Section";
 
-// ... (existing formatCurrency and CountUp logic remains identical)
+// Format currency - with consistent 2 decimal places
+const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat("en-IN", {
+        style: "currency",
+        currency: "INR",
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(amount);
+};
+
+// Simple CountUp component for financial precision
+function CountUp({ value }: { value: number }) {
+    const [displayValue, setDisplayValue] = useState(value);
+
+    useEffect(() => {
+        let start = displayValue;
+        const end = value;
+        if (start === end) return;
+
+        const duration = 400;
+        const startTime = performance.now();
+
+        const animate = (currentTime: number) => {
+            const elapsed = currentTime - startTime;
+            const progress = Math.min(elapsed / duration, 1);
+            const ease = 1 - Math.pow(1 - progress, 4);
+            const current = start + (end - start) * ease;
+            setDisplayValue(current);
+            if (progress < 1) requestAnimationFrame(animate);
+        };
+
+        requestAnimationFrame(animate);
+    }, [value]);
+
+    return <span>{formatCurrency(displayValue)}</span>;
+}
 
 export function LiveTotal() {
     const { control } = useFormContext<DocumentFormData>();
