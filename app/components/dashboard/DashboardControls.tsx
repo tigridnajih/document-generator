@@ -37,7 +37,7 @@ export function DashboardControls() {
     return (
         <div className="space-y-6">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="flex space-x-1 bg-neutral-900/50 p-1.5 rounded-xl border border-neutral-800/60 backdrop-blur-sm self-start overflow-hidden">
+                <div className="flex flex-nowrap space-x-1 bg-neutral-900/50 p-1.5 rounded-xl border border-neutral-800/60 backdrop-blur-sm overflow-x-auto max-w-full scrollbar-hide">
                     {(["all", "proposal", "quotation", "invoice"] as DocumentType[]).map((type) => (
                         <button
                             key={type}
