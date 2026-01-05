@@ -11,11 +11,14 @@ import {
     Cell,
 } from "recharts";
 
+import { cn } from "@/lib/utils";
+
 interface InteractiveBarChartProps {
     data: { name: string; value: number }[];
     label?: string;
     yAxisFormatter?: (value: number) => string;
     tooltipFormatter?: (value: number) => string;
+    className?: string;
 }
 
 const CustomTooltip = ({ active, payload, label, formatter }: any) => {
@@ -36,14 +39,18 @@ export function InteractiveBarChart({
     data,
     label = "Document Velocity",
     yAxisFormatter = (value) => `₹${value >= 1000 ? `${value / 1000}k` : value}`,
-    tooltipFormatter
+    tooltipFormatter,
+    className
 }: InteractiveBarChartProps) {
     return (
-        <div className="w-full h-[400px] bg-neutral-900/40 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-6 relative overflow-hidden group hover:border-neutral-700/80 transition-all duration-500">
+        <div className={cn(
+            "w-full h-[400px] bg-neutral-900/40 backdrop-blur-md border border-neutral-800/60 rounded-2xl p-6 relative overflow-hidden group hover:border-neutral-700/80 transition-all duration-500 flex flex-col",
+            className
+        )}>
             {/* Background Glow */}
             <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-orange-500/5 to-transparent rounded-full blur-[100px] -z-10 translate-x-1/3 -translate-y-1/3 pointer-events-none" />
 
-            <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center justify-between mb-8 shrink-0">
                 <div className="space-y-1">
                     <h3 className="text-neutral-200 text-lg font-semibold tracking-tight">
                         {label}
@@ -53,7 +60,7 @@ export function InteractiveBarChart({
                 {/* Optional: Add a subtle action or indicator here */}
             </div>
 
-            <div className="w-full h-[280px]">
+            <div className="w-full flex-1 min-h-0">
                 <ResponsiveContainer width="100%" height="100%">
                     <BarChart data={data} margin={{ top: 0, right: 0, left: -24, bottom: 0 }}>
                         <defs>

@@ -12,6 +12,7 @@ import { DocumentTable, Document } from "@/components/dashboard/DocumentTable";
 import { DashboardControls } from "@/components/dashboard/DashboardControls";
 import { DashboardSearch } from "@/components/dashboard/DashboardSearch";
 import { DocumentDistributionChart } from "@/components/dashboard/DocumentDistributionChart";
+import { LatestDocumentCard } from "@/components/dashboard/LatestDocumentCard";
 import { ClientInsights } from "@/components/dashboard/ClientInsights";
 import { supabase } from "@/lib/supabase";
 import { cn } from "@/lib/utils";
@@ -145,6 +146,12 @@ function DashboardContent() {
         if (type === "all") return currentDocs;
         return currentDocs.filter(doc => doc.document_type === type);
     }, [currentDocs, type]);
+
+    const latestDoc = useMemo(() => {
+        if (type === "all") return undefined;
+        const typeDocs = documents.filter(d => d.document_type === type);
+        return typeDocs[0];
+    }, [documents, type]);
 
     const previousVisibleDocuments = useMemo(() => {
         if (type === "all") return previousDocs;
@@ -366,20 +373,27 @@ function DashboardContent() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div className="lg:col-span-2">
+                        <div className="lg:col-span-2 flex flex-col gap-6">
                             <InteractiveBarChart
                                 data={chartData}
                                 label={`${type.charAt(0).toUpperCase() + type.slice(1)} Performance`}
+                                className="h-[400px]"
+                            />
+                            <LatestDocumentCard
+                                document={latestDoc}
+                                type={type}
+                                className="h-fit"
                             />
                         </div>
 
-                        <div className="space-y-6">
+                        <div className="flex flex-col gap-6">
                             <StatCard
                                 label="Total Documents"
                                 value={stats.count}
                                 icon={FileText}
                                 trend={stats.trends.count.value}
                                 trendType={stats.trends.count.type}
+                                className="flex-1"
                             />
                             <StatCard
                                 label="Total Amount"
@@ -387,6 +401,7 @@ function DashboardContent() {
                                 icon={Banknote}
                                 trend={stats.trends.amount.value}
                                 trendType={stats.trends.amount.type}
+                                className="flex-1"
                             />
                             <StatCard
                                 label="Average Value"
@@ -394,6 +409,7 @@ function DashboardContent() {
                                 icon={TrendingUp}
                                 trend={stats.trends.average.value}
                                 trendType={stats.trends.average.type}
+                                className="flex-1"
                             />
                         </div>
                     </div>
