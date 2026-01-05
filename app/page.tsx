@@ -263,41 +263,44 @@ export default function Home() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-6 py-16 space-y-12 relative z-10">
-        <div className="text-center space-y-4">
-          <h1 className="font-bold tracking-tighter text-4xl sm:text-5xl text-white drop-shadow-sm">
-            Create New Document
-          </h1>
-          <p className="text-neutral-500 max-w-lg mx-auto text-sm leading-relaxed font-medium">
-            Generate professional proposals, quotations, and invoices in seconds.
-          </p>
-        </div>
+      <div className="relative z-10 transition-all duration-1000 py-16 space-y-12">
+        {/* HERO & SELECTION HEADER */}
+        <div className="max-w-7xl mx-auto px-6 space-y-12">
+          <div className="text-center space-y-4">
+            <h1 className="font-bold tracking-tighter text-4xl sm:text-5xl text-white drop-shadow-sm">
+              Create New Document
+            </h1>
+            <p className="text-neutral-500 max-w-lg mx-auto text-sm leading-relaxed font-medium">
+              Generate professional proposals, quotations, and invoices in seconds.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <DocCard
-            label="Proposal"
-            description="Client pitch"
-            type="proposal"
-            currentType={docType}
-            onSelect={setDocType}
-            icon={<FileText className="w-5 h-5" />}
-          />
-          <DocCard
-            label="Quotation"
-            description="Price estimate"
-            type="quotation"
-            currentType={docType}
-            onSelect={setDocType}
-            icon={<FileCheck className="w-5 h-5" />}
-          />
-          <DocCard
-            label="Invoice"
-            description="Bill client"
-            type="invoice"
-            currentType={docType}
-            onSelect={setDocType}
-            icon={<FileSpreadsheet className="w-5 h-5" />}
-          />
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <DocCard
+              label="Proposal"
+              description="Client pitch"
+              type="proposal"
+              currentType={docType}
+              onSelect={setDocType}
+              icon={<FileText className="w-5 h-5" />}
+            />
+            <DocCard
+              label="Quotation"
+              description="Price estimate"
+              type="quotation"
+              currentType={docType}
+              onSelect={setDocType}
+              icon={<FileCheck className="w-5 h-5" />}
+            />
+            <DocCard
+              label="Invoice"
+              description="Bill client"
+              type="invoice"
+              currentType={docType}
+              onSelect={setDocType}
+              icon={<FileSpreadsheet className="w-5 h-5" />}
+            />
+          </div>
         </div>
 
         <FormProvider {...methods}>
@@ -403,7 +406,7 @@ export default function Home() {
               </>
             )}
 
-            <div className="pt-4">
+            <div className="max-w-7xl mx-auto px-6 pt-4">
               <ShineButton
                 type="submit"
                 disabled={isSubmitting}

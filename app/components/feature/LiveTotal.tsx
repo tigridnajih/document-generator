@@ -74,51 +74,55 @@ export function LiveTotal() {
         <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="border-t border-white/5 pt-10 mt-10 space-y-6"
+            className="w-full py-10"
         >
-            <div className="max-w-md ml-auto space-y-4">
-                {/* Calculation Stack */}
-                <div className="space-y-3">
-                    <div className="flex justify-between items-center text-sm">
-                        <span className="text-neutral-500 font-medium">Subtotal</span>
-                        <span className="text-neutral-200 font-mono">{formatCurrency(subTotal)}</span>
-                    </div>
+            <div className="max-w-7xl mx-auto px-6">
+                <div className="border-t border-white/5 pt-10 space-y-6">
+                    <div className="max-w-md ml-auto space-y-4">
+                        {/* Calculation Stack */}
+                        <div className="space-y-3">
+                            <div className="flex justify-between items-center text-sm">
+                                <span className="text-neutral-500 font-medium">Subtotal</span>
+                                <span className="text-neutral-200 font-mono">{formatCurrency(subTotal)}</span>
+                            </div>
 
-                    <AnimatePresence mode="popLayout">
-                        {gstTotals.map((tax, i) => (
-                            <motion.div
-                                key={i}
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: "auto" }}
-                                exit={{ opacity: 0, height: 0 }}
-                                className="flex justify-between items-center text-sm"
-                            >
-                                <span className="text-neutral-500 font-medium">{tax.label}</span>
-                                <span className="text-neutral-300 font-mono">+{formatCurrency(tax.amount)}</span>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-                </div>
-
-                {/* Divider */}
-                <div className="h-[1px] bg-white/10 w-full" />
-
-                {/* Grand Total */}
-                <div className="flex justify-between items-end pt-2">
-                    <span className="text-xs font-bold uppercase tracking-widest text-neutral-500 mb-2">Total Payable</span>
-                    <div className="text-right">
-                        <div className="text-4xl sm:text-5xl font-bold tracking-tight text-white">
-                            <CountUp value={grandTotal} />
+                            <AnimatePresence mode="popLayout">
+                                {gstTotals.map((tax, i) => (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, height: 0 }}
+                                        animate={{ opacity: 1, height: "auto" }}
+                                        exit={{ opacity: 0, height: 0 }}
+                                        className="flex justify-between items-center text-sm"
+                                    >
+                                        <span className="text-neutral-500 font-medium">{tax.label}</span>
+                                        <span className="text-neutral-300 font-mono">+{formatCurrency(tax.amount)}</span>
+                                    </motion.div>
+                                ))}
+                            </AnimatePresence>
                         </div>
+
+                        {/* Divider */}
+                        <div className="h-[1px] bg-white/10 w-full" />
+
+                        {/* Grand Total */}
+                        <div className="flex justify-between items-end pt-2">
+                            <span className="text-xs font-bold uppercase tracking-widest text-neutral-500 mb-2">Total Payable</span>
+                            <div className="text-right">
+                                <div className="text-4xl sm:text-5xl font-bold tracking-tight text-white">
+                                    <CountUp value={grandTotal} />
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Zero State / Helper Info */}
+                        {grandTotal === 0 && (
+                            <p className="text-[10px] text-neutral-600 font-medium text-right italic uppercase tracking-wider">
+                                Awaiting line items for calculation
+                            </p>
+                        )}
                     </div>
                 </div>
-
-                {/* Zero State / Helper Info */}
-                {grandTotal === 0 && (
-                    <p className="text-[10px] text-neutral-600 font-medium text-right italic uppercase tracking-wider">
-                        Awaiting line items for calculation
-                    </p>
-                )}
             </div>
         </motion.div>
     );
