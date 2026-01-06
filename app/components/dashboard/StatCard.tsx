@@ -12,6 +12,7 @@ interface StatCardProps {
     trend?: string;
     trendType?: 'up' | 'down' | 'neutral';
     className?: string;
+    prefix?: string;
 }
 
 function CountUp({ value }: { value: number | string }) {
@@ -29,7 +30,12 @@ function CountUp({ value }: { value: number | string }) {
     useEffect(() => {
         return springValue.on("change", (latest) => {
             if (ref.current && typeof value === "number") {
-                ref.current.textContent = Intl.NumberFormat('en-US').format(Math.floor(latest));
+                // Use 2 decimal places if it's not a whole number or if it's specifically for 'Average'
+                const decimals = latest % 1 === 0 ? 0 : 2;
+                ref.current.textContent = Intl.NumberFormat('en-IN', {
+                    minimumFractionDigits: decimals,
+                    maximumFractionDigits: decimals
+                }).format(latest);
             }
         });
     }, [springValue, value]);
@@ -41,8 +47,9 @@ function CountUp({ value }: { value: number | string }) {
     return <span ref={ref}>0</span>;
 }
 
-export function StatCard({ label, value, icon: Icon, trend, trendType = 'up', className }: StatCardProps) {
+export function StatCard({ label, value, icon: Icon, trend, trendType = 'up', className, prefix }: StatCardProps) {
     const trendConfig = {
+        // ... (existing trendConfig)
         up: {
             bg: "bg-emerald-500/10",
             border: "border-emerald-500/20",
@@ -80,10 +87,10 @@ export function StatCard({ label, value, icon: Icon, trend, trendType = 'up', cl
                         {label}
                     </p>
                     <p className="text-3xl sm:text-4xl font-semibold tracking-tighter text-white flex items-baseline gap-1">
-                        {typeof value === "string" && (value.startsWith("$") || value.startsWith("₹")) && (
-                            <span className="text-xl sm:text-2xl text-neutral-500 font-normal mr-0.5">₹</span>
+                        {prefix && (
+                            <span className="text-xl sm:text-2xl text-neutral-500 font-normal mr-0.5">{prefix}</span>
                         )}
-                        <CountUp value={typeof value === "string" && (value.startsWith("$") || value.startsWith("₹")) ? parseInt(value.replace(/[^0-9]/g, "")) : value} />
+                        <CountUp value={value} />
                     </p>
                 </div>
 

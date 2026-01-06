@@ -302,8 +302,8 @@ function DashboardContent() {
                     </div>
 
                     <Link href="/">
-                        <button className="flex items-center gap-2 text-sm font-medium text-neutral-950 bg-white hover:bg-neutral-200 transition-all px-5 py-2.5 rounded-full shadow-lg shadow-white/5 active:scale-95 duration-200">
-                            <Plus className="w-4 h-4 shrink-0 stroke-[2.5]" />
+                        <button className="flex items-center gap-2 text-xs sm:text-sm font-medium text-neutral-950 bg-white hover:bg-neutral-200 transition-all px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full shadow-lg shadow-white/5 active:scale-95 duration-200">
+                            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 stroke-[2.5]" />
                             <span>New Document</span>
                         </button>
                     </Link>
@@ -397,7 +397,8 @@ function DashboardContent() {
                             />
                             <StatCard
                                 label="Total Amount"
-                                value={`₹${stats.amount.toLocaleString()}`}
+                                value={stats.amount}
+                                prefix="₹"
                                 icon={Banknote}
                                 trend={stats.trends.amount.value}
                                 trendType={stats.trends.amount.type}
@@ -405,7 +406,8 @@ function DashboardContent() {
                             />
                             <StatCard
                                 label="Average Value"
-                                value={`₹${stats.average.toLocaleString()}`}
+                                value={stats.average}
+                                prefix="₹"
                                 icon={TrendingUp}
                                 trend={stats.trends.average.value}
                                 trendType={stats.trends.average.type}
