@@ -37,6 +37,7 @@ export default function Home() {
       clientDetails: {
         clientName: "",
         clientCompany: "",
+        clientGstIn: "",
         clientEmail: "",
       },
       items: [{ name: "", rate: 0, quantity: 1 }],
@@ -61,6 +62,7 @@ export default function Home() {
       const data: Record<string, string | number | string[] | null | undefined> = {
         clientName: values.clientDetails.clientName,
         clientCompany: values.clientDetails.clientCompany,
+        client_gstin: values.clientDetails.clientGstIn,
         clientEmail: values.clientDetails.clientEmail,
         clientLocality: values.clientDetails.clientLocality,
         clientCity: values.clientDetails.clientCity,
@@ -336,11 +338,19 @@ export default function Home() {
                   {errors.clientDetails.clientName.message}
                 </p>
               )}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="relative">
                 <Input
                   {...register("clientDetails.clientCompany")}
                   placeholder="Company Name"
                   startIcon={<Building2 className="w-4 h-4" />}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  {...register("clientDetails.clientGstIn")}
+                  placeholder="Client GSTIN"
+                  startIcon={<FileText className="w-4 h-4" />}
                 />
                 <div>
                   <Input

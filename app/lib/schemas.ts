@@ -4,6 +4,7 @@ export const documentFormSchema = z.object({
     clientDetails: z.object({
         clientName: z.string().min(1, "Client name is required"),
         clientCompany: z.string().optional(),
+        clientGstIn: z.string().optional(),
         clientEmail: z.string().email("Invalid email address").optional().or(z.literal("")),
         clientLocality: z.string().optional(),
         clientCity: z.string().optional(),
