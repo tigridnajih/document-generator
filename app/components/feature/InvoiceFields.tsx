@@ -127,7 +127,7 @@ export function InvoiceFields() {
             <Section
                 title="Tax Configuration"
                 action={
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 sm:gap-4">
                         <label className="flex items-center gap-2 cursor-pointer group">
                             <span className="text-[10px] uppercase tracking-wider font-bold text-neutral-500 group-hover:text-neutral-400 transition-colors">Export</span>
                             <div className="relative">
@@ -139,17 +139,17 @@ export function InvoiceFields() {
                                 <div className="w-8 h-4 bg-neutral-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-orange-500/80 peer-checked:after:bg-white transition-colors border border-neutral-700/50"></div>
                             </div>
                         </label>
-                        <div className="h-4 w-[1px] bg-neutral-800/50"></div>
+                        <div className="h-4 w-[1px] bg-neutral-800/50 hidden sm:block"></div>
                         <button
                             type="button"
                             onClick={() => appendGst({ type: "CGST", rate: 9 })}
                             disabled={isExport}
-                            className={`flex items-center gap-2 px-3 py-1.5 border border-neutral-700/50 rounded-lg text-xs font-medium transition-all shadow-sm ${isExport
-                                ? "bg-neutral-900/50 text-neutral-600 cursor-not-allowed border-neutral-800/50"
-                                : "bg-neutral-800/50 hover:bg-neutral-800 text-neutral-300 hover:text-white"
+                            className={`flex items-center gap-2 px-2.5 py-1.5 sm:px-3 border border-neutral-700/50 rounded-lg text-[10px] sm:text-xs font-medium transition-all shadow-sm ${isExport
+                                    ? "bg-neutral-900/50 text-neutral-600 cursor-not-allowed border-neutral-800/50"
+                                    : "bg-neutral-800/50 hover:bg-neutral-800 text-neutral-300 hover:text-white"
                                 }`}
                         >
-                            <Plus className="w-3.5 h-3.5" /> Add Tax
+                            <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span>Add Tax</span>
                         </button>
                     </div>
                 }
