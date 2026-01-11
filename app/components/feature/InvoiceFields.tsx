@@ -131,7 +131,6 @@ export function InvoiceFields() {
                                         {...register("lut_number")}
                                         placeholder="Enter LUT Number (e.g. AD320224000123)"
                                         startIcon={<FileText className="w-4 h-4" />}
-                                        className="bg-neutral-800/20 ring-1 ring-orange-500/20"
                                     />
                                 </div>
                             </motion.div>
@@ -148,8 +147,8 @@ export function InvoiceFields() {
                         onClick={() => appendGst({ type: "CGST", rate: 9 })}
                         disabled={isExport}
                         className={`flex items-center gap-2 px-2.5 py-1.5 sm:px-3 border border-neutral-700/50 rounded-lg text-[10px] sm:text-xs font-medium transition-all shadow-sm ${isExport
-                                ? "bg-neutral-900/50 text-neutral-600 cursor-not-allowed border-neutral-800/50"
-                                : "bg-neutral-800/50 hover:bg-neutral-800 text-neutral-300 hover:text-white"
+                            ? "bg-neutral-900/50 text-neutral-600 cursor-not-allowed border-neutral-800/50"
+                            : "bg-neutral-800/50 hover:bg-neutral-800 text-neutral-300 hover:text-white"
                             }`}
                     >
                         <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span>Add Tax</span>
