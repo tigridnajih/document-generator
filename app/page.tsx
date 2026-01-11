@@ -41,6 +41,8 @@ export default function Home() {
       },
       items: [{ name: "", rate: 0, quantity: 1 }],
       gstList: [{ type: "CGST", rate: 9 }],
+      export_invoice: false,
+      lut_number: "",
     },
   });
 
@@ -66,6 +68,8 @@ export default function Home() {
         clientState: values.clientDetails.clientState,
         invoiceNumber: values.invoiceDetails?.invoiceNumber,
         invoiceDate: values.invoiceDetails?.invoiceDate,
+        export_invoice: values.export_invoice ? "true" : "false",
+        lut_number: values.export_invoice ? values.lut_number : "",
       };
 
       // Manually index items as item_1_name, item_1_rate, etc.
@@ -121,7 +125,7 @@ export default function Home() {
       let igstPrice = 0;
 
       // Map GST list to specific keys and calculate prices
-      if (values.gstList && values.gstList.length > 0) {
+      if (!values.export_invoice && values.gstList && values.gstList.length > 0) {
         values.gstList.forEach((gst) => {
           const rate = Number(gst.rate) || 0;
           const taxAmount = (subTotal * rate) / 100;

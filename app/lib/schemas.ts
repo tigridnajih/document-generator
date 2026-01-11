@@ -27,6 +27,8 @@ export const documentFormSchema = z.object({
             rate: z.coerce.number().min(0),
         })
     ).optional(),
+    export_invoice: z.boolean().optional(),
+    lut_number: z.string().optional(),
 });
 
 export type DocumentFormValues = z.infer<typeof documentFormSchema>;
