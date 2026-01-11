@@ -101,57 +101,59 @@ export function InvoiceFields() {
                 </div>
             </Section>
 
-            <AnimatePresence>
-                {isExport && (
-                    <motion.div
-                        initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                        animate={{ opacity: 1, height: "auto", marginBottom: 24 }}
-                        exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                        className="overflow-hidden"
-                    >
-                        <Section title="Export Details">
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <Input
-                                    {...register("lut_number")}
-                                    placeholder="Enter LUT Number (e.g. AD320224000123)"
-                                    startIcon={<FileText className="w-4 h-4" />}
-                                    className="bg-neutral-800/20 ring-1 ring-orange-500/20"
-                                />
-                                <div className="hidden sm:block" />
-                            </div>
-                        </Section>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <Section title="Export Invoice">
+                <div className="space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-1">
+                        <div className="space-y-1">
+                            <h3 className="text-sm font-medium text-white">Enable Export Invoice</h3>
+                            <p className="text-xs text-neutral-500">Enable this for export invoices (LUT Bond). Tax will be disabled.</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                {...register("export_invoice")}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600 peer-checked:after:bg-white border border-neutral-700/50"></div>
+                        </label>
+                    </div>
+
+                    <AnimatePresence>
+                        {isExport && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="overflow-hidden"
+                            >
+                                <div className="pt-2">
+                                    <Input
+                                        {...register("lut_number")}
+                                        placeholder="Enter LUT Number (e.g. AD320224000123)"
+                                        startIcon={<FileText className="w-4 h-4" />}
+                                        className="bg-neutral-800/20 ring-1 ring-orange-500/20"
+                                    />
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </Section>
 
             <Section
                 title="Tax Configuration"
                 action={
-                    <div className="flex items-center gap-2 sm:gap-4">
-                        <label className="flex items-center gap-2 cursor-pointer group">
-                            <span className="text-[10px] uppercase tracking-wider font-bold text-neutral-500 group-hover:text-neutral-400 transition-colors">Export</span>
-                            <div className="relative">
-                                <input
-                                    type="checkbox"
-                                    {...register("export_invoice")}
-                                    className="sr-only peer"
-                                />
-                                <div className="w-8 h-4 bg-neutral-800 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:bg-orange-500/80 peer-checked:after:bg-white transition-colors border border-neutral-700/50"></div>
-                            </div>
-                        </label>
-                        <div className="h-4 w-[1px] bg-neutral-800/50 hidden sm:block"></div>
-                        <button
-                            type="button"
-                            onClick={() => appendGst({ type: "CGST", rate: 9 })}
-                            disabled={isExport}
-                            className={`flex items-center gap-2 px-2.5 py-1.5 sm:px-3 border border-neutral-700/50 rounded-lg text-[10px] sm:text-xs font-medium transition-all shadow-sm ${isExport
-                                    ? "bg-neutral-900/50 text-neutral-600 cursor-not-allowed border-neutral-800/50"
-                                    : "bg-neutral-800/50 hover:bg-neutral-800 text-neutral-300 hover:text-white"
-                                }`}
-                        >
-                            <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span>Add Tax</span>
-                        </button>
-                    </div>
+                    <button
+                        type="button"
+                        onClick={() => appendGst({ type: "CGST", rate: 9 })}
+                        disabled={isExport}
+                        className={`flex items-center gap-2 px-2.5 py-1.5 sm:px-3 border border-neutral-700/50 rounded-lg text-[10px] sm:text-xs font-medium transition-all shadow-sm ${isExport
+                                ? "bg-neutral-900/50 text-neutral-600 cursor-not-allowed border-neutral-800/50"
+                                : "bg-neutral-800/50 hover:bg-neutral-800 text-neutral-300 hover:text-white"
+                            }`}
+                    >
+                        <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span>Add Tax</span>
+                    </button>
                 }
             >
                 <div className={`space-y-4 transition-all duration-300 ${isExport ? "opacity-40 grayscale pointer-events-none" : ""}`}>
