@@ -120,7 +120,7 @@ export default function LoginPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading || !username || !password}
-                                className="w-full h-[50px] flex items-center justify-center bg-white text-neutral-950 text-[15px] font-semibold rounded-xl transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+                                className="w-full h-[50px] flex items-center justify-center bg-white text-neutral-950 text-[15px] font-semibold rounded-xl transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:active:scale-100"
                             >
                                 {isLoading ? (
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
