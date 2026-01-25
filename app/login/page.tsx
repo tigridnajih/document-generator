@@ -75,60 +75,44 @@ export default function LoginPage() {
                         </p>
                     </div>
 
-                    {/* Single Form Card - Minimalist (No card bg/border) */}
+                    {/* Ultra-Minimalist Form (No card, No labels, No borders) */}
                     <div className="p-0 sm:p-4">
-                        <form onSubmit={handleSubmit} className="space-y-8">
+                        <form onSubmit={handleSubmit} className="space-y-4">
 
 
                             {/* Username Field */}
-                            <div className="space-y-4">
-                                <label className="text-sm font-semibold text-white ml-0.5" htmlFor="username">
-                                    Username
-                                </label>
-
-
-
-                                <div className="relative group/input">
-                                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 opacity-30 group-focus-within/input:opacity-80 transition-opacity">
-                                        <User className="w-[16px] h-[16px] text-white" />
-                                    </div>
-                                    <input
-                                        id="username"
-                                        type="text"
-                                        value={username}
-                                        onChange={(e) => setUsername(e.target.value)}
-                                        required
-                                        autoFocus
-                                        className="w-full h-[52px] pl-11 pr-4 bg-neutral-900 border border-neutral-800 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-white/10 focus:border-neutral-700 transition-all font-sans"
-                                        placeholder="Username"
-                                        disabled={isLoading}
-                                    />
+                            <div className="relative group/input">
+                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 opacity-30 group-focus-within/input:opacity-80 transition-opacity">
+                                    <User className="w-[16px] h-[16px] text-white" />
                                 </div>
+                                <input
+                                    id="username"
+                                    type="text"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    required
+                                    autoFocus
+                                    className="w-full h-[52px] pl-11 pr-4 bg-neutral-900 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-white/10 transition-all font-sans"
+                                    placeholder="Username"
+                                    disabled={isLoading}
+                                />
                             </div>
 
                             {/* Password Field */}
-                            <div className="space-y-4">
-                                <label className="text-sm font-semibold text-white ml-0.5" htmlFor="password">
-                                    Password
-                                </label>
-
-
-
-                                <div className="relative group/input">
-                                    <div className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 opacity-30 group-focus-within/input:opacity-80 transition-opacity">
-                                        <Lock className="w-[16px] h-[16px] text-white" />
-                                    </div>
-                                    <input
-                                        id="password"
-                                        type="password"
-                                        value={password}
-                                        onChange={(e) => setPassword(e.target.value)}
-                                        required
-                                        className="w-full h-[52px] pl-11 pr-4 bg-neutral-900 border border-neutral-800 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-white/10 focus:border-neutral-700 transition-all font-sans"
-                                        placeholder="Password"
-                                        disabled={isLoading}
-                                    />
+                            <div className="relative group/input">
+                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 opacity-30 group-focus-within/input:opacity-80 transition-opacity">
+                                    <Lock className="w-[16px] h-[16px] text-white" />
                                 </div>
+                                <input
+                                    id="password"
+                                    type="password"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    required
+                                    className="w-full h-[52px] pl-11 pr-4 bg-neutral-900 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-white/10 transition-all font-sans"
+                                    placeholder="Password"
+                                    disabled={isLoading}
+                                />
                             </div>
 
 
@@ -136,7 +120,7 @@ export default function LoginPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading || !username || !password}
-                                className="w-full h-[50px] flex items-center justify-center bg-tigrid-orange text-white text-[15px] font-semibold rounded-xl transition-all duration-200 hover:brightness-110 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
+                                className="w-full h-[50px] flex items-center justify-center bg-white text-neutral-950 text-[15px] font-semibold rounded-xl transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100"
                             >
                                 {isLoading ? (
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
