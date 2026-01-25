@@ -81,9 +81,11 @@ export default function LoginPage() {
 
                             {/* Username Field */}
                             <div className="space-y-3">
-                                <label className="text-xs font-semibold text-neutral-400 uppercase tracking-widest ml-0.5" htmlFor="username">
+                                <label className="text-xs font-semibold text-white ml-0.5" htmlFor="username">
                                     Username
                                 </label>
+
+
                                 <div className="relative group/input">
                                     <div className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 opacity-30 group-focus-within/input:opacity-80 transition-opacity">
                                         <User className="w-[16px] h-[16px] text-white" />
@@ -104,9 +106,11 @@ export default function LoginPage() {
 
                             {/* Password Field */}
                             <div className="space-y-3">
-                                <label className="text-xs font-semibold text-neutral-400 uppercase tracking-widest ml-0.5" htmlFor="password">
+                                <label className="text-xs font-semibold text-white ml-0.5" htmlFor="password">
                                     Password
                                 </label>
+
+
                                 <div className="relative group/input">
                                     <div className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 opacity-30 group-focus-within/input:opacity-80 transition-opacity">
                                         <Lock className="w-[16px] h-[16px] text-white" />
@@ -124,22 +128,6 @@ export default function LoginPage() {
                                 </div>
                             </div>
 
-                            {/* Utility Row */}
-                            <div className="flex items-center px-0.5">
-                                <label className="flex items-center gap-2 group cursor-pointer">
-                                    <div className="relative flex items-center justify-center">
-                                        <input
-                                            type="checkbox"
-                                            id="remember"
-                                            className="peer appearance-none w-4 h-4 rounded border border-neutral-800 bg-neutral-900 checked:bg-tigrid-orange checked:border-tigrid-orange transition-all cursor-pointer"
-                                        />
-                                        <svg className="absolute w-2.5 h-2.5 text-white opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="4">
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    </div>
-                                    <span className="text-[12px] text-neutral-400 font-medium group-hover:text-neutral-300 transition-colors">Remember me</span>
-                                </label>
-                            </div>
 
                             {/* Submit Button */}
                             <button
