@@ -65,16 +65,13 @@ export default function LoginPage() {
 
                 <div className="w-full max-w-[400px] animate-in fade-in zoom-in-95 duration-500">
 
-                    {/* Header: Enterprise Hierarchy */}
-                    <div className="mb-8 px-2">
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="text-[13px] font-medium tracking-[0.05em] text-tigrid-orange uppercase">TiGRID</span>
-                        </div>
-                        <h1 className="text-[22px] font-semibold text-white tracking-tight mb-1">
+                    {/* Header: Workspace Aligned Hierarchy */}
+                    <div className="mb-12 text-center space-y-4">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-white drop-shadow-sm">
                             Login
                         </h1>
-                        <p className="text-[13px] text-neutral-400">
-                            Access your documents to continue.
+                        <p className="text-neutral-500 max-w-sm mx-auto text-sm leading-relaxed font-medium">
+                            Enter your credentials to access the document generator.
                         </p>
                     </div>
 
@@ -83,8 +80,8 @@ export default function LoginPage() {
                         <form onSubmit={handleSubmit} className="space-y-6">
 
                             {/* Username Field */}
-                            <div className="space-y-2">
-                                <label className="text-[13px] font-medium text-neutral-300 ml-0.5" htmlFor="username">
+                            <div className="space-y-3">
+                                <label className="text-xs font-semibold text-neutral-400 uppercase tracking-widest ml-0.5" htmlFor="username">
                                     Username
                                 </label>
                                 <div className="relative group/input">
@@ -98,16 +95,16 @@ export default function LoginPage() {
                                         onChange={(e) => setUsername(e.target.value)}
                                         required
                                         autoFocus
-                                        className="w-full h-[48px] pl-11 pr-4 bg-[#111111] border border-neutral-800 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-white/10 focus:border-neutral-700 transition-all font-sans"
-                                        placeholder="e.g. nidheesh"
+                                        className="w-full h-[52px] pl-11 pr-4 bg-neutral-900 border border-neutral-800 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-white/10 focus:border-neutral-700 transition-all font-sans"
+                                        placeholder="Username"
                                         disabled={isLoading}
                                     />
                                 </div>
                             </div>
 
                             {/* Password Field */}
-                            <div className="space-y-2">
-                                <label className="text-[13px] font-medium text-neutral-300 ml-0.5" htmlFor="password">
+                            <div className="space-y-3">
+                                <label className="text-xs font-semibold text-neutral-400 uppercase tracking-widest ml-0.5" htmlFor="password">
                                     Password
                                 </label>
                                 <div className="relative group/input">
@@ -120,15 +117,15 @@ export default function LoginPage() {
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
                                         required
-                                        className="w-full h-[48px] pl-11 pr-4 bg-[#111111] border border-neutral-800 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-white/10 focus:border-neutral-700 transition-all font-sans"
-                                        placeholder="••••••••"
+                                        className="w-full h-[52px] pl-11 pr-4 bg-neutral-900 border border-neutral-800 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-white/10 focus:border-neutral-700 transition-all font-sans"
+                                        placeholder="Password"
                                         disabled={isLoading}
                                     />
                                 </div>
                             </div>
 
                             {/* Utility Row */}
-                            <div className="flex items-center justify-between px-0.5">
+                            <div className="flex items-center px-0.5">
                                 <label className="flex items-center gap-2 group cursor-pointer">
                                     <div className="relative flex items-center justify-center">
                                         <input
@@ -142,9 +139,6 @@ export default function LoginPage() {
                                     </div>
                                     <span className="text-[12px] text-neutral-400 font-medium group-hover:text-neutral-300 transition-colors">Remember me</span>
                                 </label>
-                                <button type="button" className="text-[12px] text-neutral-500 font-medium hover:text-neutral-300 transition-colors">
-                                    Forgot password?
-                                </button>
                             </div>
 
                             {/* Submit Button */}
@@ -165,7 +159,7 @@ export default function LoginPage() {
                     {/* Legal/Footer */}
                     <div className="mt-8 text-center px-4">
                         <p className="text-[12px] text-neutral-600 font-medium leading-relaxed">
-                            Authorized access only. By logging in, you agree to our Terms of Service.
+                            Authorized access only.
                         </p>
                     </div>
                 </div>
