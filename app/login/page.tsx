@@ -75,15 +75,17 @@ export default function LoginPage() {
                         </p>
                     </div>
 
-                    {/* Single Form Card */}
-                    <div className="bg-[#0A0A0A]/60 backdrop-blur-xl rounded-2xl p-8 border border-white/5 shadow-[0_8px_30px_rgb(0,0,0,0.12)]">
-                        <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Single Form Card - Minimalist (No card bg/border) */}
+                    <div className="p-0 sm:p-4">
+                        <form onSubmit={handleSubmit} className="space-y-8">
+
 
                             {/* Username Field */}
-                            <div className="space-y-3">
-                                <label className="text-xs font-semibold text-white ml-0.5" htmlFor="username">
+                            <div className="space-y-4">
+                                <label className="text-sm font-semibold text-white ml-0.5" htmlFor="username">
                                     Username
                                 </label>
+
 
 
                                 <div className="relative group/input">
@@ -105,10 +107,11 @@ export default function LoginPage() {
                             </div>
 
                             {/* Password Field */}
-                            <div className="space-y-3">
-                                <label className="text-xs font-semibold text-white ml-0.5" htmlFor="password">
+                            <div className="space-y-4">
+                                <label className="text-sm font-semibold text-white ml-0.5" htmlFor="password">
                                     Password
                                 </label>
+
 
 
                                 <div className="relative group/input">
