@@ -39,10 +39,13 @@ export default function Home() {
       clientDetails: {
         clientName: "",
         clientCompany: "",
+        clientGstIn: "",
         clientEmail: "",
       },
       items: [{ name: "", rate: 0, quantity: 1 }],
       gstList: [{ type: "CGST", rate: 9 }],
+      export_invoice: false,
+      lut_number: "",
     },
   });
 
@@ -66,6 +69,7 @@ export default function Home() {
         username: username, // Add username to payload
         clientName: values.clientDetails.clientName,
         clientCompany: values.clientDetails.clientCompany,
+        client_gstin: values.clientDetails.clientGstIn,
         clientEmail: values.clientDetails.clientEmail,
         clientLocality: values.clientDetails.clientLocality,
         clientCity: values.clientDetails.clientCity,
@@ -73,6 +77,8 @@ export default function Home() {
         clientState: values.clientDetails.clientState,
         invoiceNumber: values.invoiceDetails?.invoiceNumber,
         invoiceDate: values.invoiceDetails?.invoiceDate,
+        export_invoice: values.export_invoice ? "true" : "false",
+        lut_number: values.export_invoice ? values.lut_number : "",
       };
 
       // Manually index items as item_1_name, item_1_rate, etc.
@@ -128,7 +134,7 @@ export default function Home() {
       let igstPrice = 0;
 
       // Map GST list to specific keys and calculate prices
-      if (values.gstList && values.gstList.length > 0) {
+      if (!values.export_invoice && values.gstList && values.gstList.length > 0) {
         values.gstList.forEach((gst) => {
           const rate = Number(gst.rate) || 0;
           const taxAmount = (subTotal * rate) / 100;
@@ -337,12 +343,78 @@ export default function Home() {
               viewUrl={successData?.viewUrl}
               docType={docType}
             />
+<<<<<<< HEAD
             <form
               onSubmit={handleSubmit(onSubmit)}
               className="relative space-y-10 transition-all duration-300"
             >
               <Section title="Client Information">
                 <div className="relative group/first-field">
+=======
+            <DocCard
+              label="Quotation"
+              description="Price estimate"
+              type="quotation"
+              currentType={docType}
+              onSelect={setDocType}
+              icon={<FileCheck className="w-5 h-5" />}
+            />
+            <DocCard
+              label="Invoice"
+              description="Bill client"
+              type="invoice"
+              currentType={docType}
+              onSelect={setDocType}
+              icon={<FileSpreadsheet className="w-5 h-5" />}
+            />
+          </div>
+        </div>
+
+        <FormProvider {...methods}>
+          <VoiceManager />
+          <DocumentSuccessModal
+            isOpen={showSuccessModal}
+            onClose={() => setShowSuccessModal(false)}
+            fileName={successData?.fileName || ""}
+            downloadUrl={successData?.downloadUrl || ""}
+            viewUrl={successData?.viewUrl}
+            docType={docType}
+          />
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="relative space-y-10 transition-all duration-300"
+          >
+            <Section title="Client Information">
+              <div className="relative group/first-field">
+                <Input
+                  {...register("clientDetails.clientName")}
+                  placeholder="Client Name"
+                  startIcon={<User className="w-4 h-4" />}
+                  autoFocus
+                  className="bg-neutral-800/20 ring-1 ring-white/10"
+                />
+              </div>
+              {errors.clientDetails?.clientName && (
+                <p className="text-red-500 text-xs mt-1 ml-2">
+                  {errors.clientDetails.clientName.message}
+                </p>
+              )}
+              <div className="relative">
+                <Input
+                  {...register("clientDetails.clientCompany")}
+                  placeholder="Company Name"
+                  startIcon={<Building2 className="w-4 h-4" />}
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <Input
+                  {...register("clientDetails.clientGstIn")}
+                  placeholder="Client GSTIN"
+                  startIcon={<FileText className="w-4 h-4" />}
+                />
+                <div>
+>>>>>>> 0ca5aacf2c6cdf8ef471908a8a1e299a305b13d2
                   <Input
                     {...register("clientDetails.clientName")}
                     placeholder="Client Name"

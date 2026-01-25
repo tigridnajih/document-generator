@@ -5,10 +5,11 @@ import { Input } from "@/components/ui/Input";
 import { Section } from "@/components/ui/Section";
 import { DocumentFormData } from "@/lib/types";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, Plus, Tag, IndianRupee, Hash, Percent } from "lucide-react";
+import { Trash2, Plus, Tag, IndianRupee, Hash, Percent, FileText } from "lucide-react";
 
 export function InvoiceFields() {
-    const { register, control } = useFormContext<DocumentFormData>();
+    const { register, control, watch } = useFormContext<DocumentFormData>();
+    const isExport = watch("export_invoice");
 
     const {
         fields: itemFields,
@@ -100,19 +101,61 @@ export function InvoiceFields() {
                 </div>
             </Section>
 
+            <Section title="Export Invoice">
+                <div className="space-y-6">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-1">
+                        <div className="space-y-1">
+                            <h3 className="text-sm font-medium text-white">Enable Export Invoice</h3>
+                            <p className="text-xs text-neutral-500">Enable this for export invoices (LUT Bond). Tax will be disabled.</p>
+                        </div>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                {...register("export_invoice")}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600 peer-checked:after:bg-white border border-neutral-700/50"></div>
+                        </label>
+                    </div>
+
+                    <AnimatePresence>
+                        {isExport && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="overflow-hidden"
+                            >
+                                <div className="pt-2">
+                                    <Input
+                                        {...register("lut_number")}
+                                        placeholder="Enter LUT Number (e.g. AD320224000123)"
+                                        startIcon={<FileText className="w-4 h-4" />}
+                                    />
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </Section>
+
             <Section
                 title="Tax Configuration"
                 action={
                     <button
                         type="button"
                         onClick={() => appendGst({ type: "CGST", rate: 9 })}
-                        className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800/50 hover:bg-neutral-800 border border-neutral-700/50 rounded-lg text-xs font-medium text-neutral-300 hover:text-white transition-all shadow-sm"
+                        disabled={isExport}
+                        className={`flex items-center gap-2 px-2.5 py-1.5 sm:px-3 border border-neutral-700/50 rounded-lg text-[10px] sm:text-xs font-medium transition-all shadow-sm ${isExport
+                            ? "bg-neutral-900/50 text-neutral-600 cursor-not-allowed border-neutral-800/50"
+                            : "bg-neutral-800/50 hover:bg-neutral-800 text-neutral-300 hover:text-white"
+                            }`}
                     >
-                        <Plus className="w-3.5 h-3.5" /> Add Tax
+                        <Plus className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span>Add Tax</span>
                     </button>
                 }
             >
-                <div className="space-y-4">
+                <div className={`space-y-4 transition-all duration-300 ${isExport ? "opacity-40 grayscale pointer-events-none" : ""}`}>
                     <AnimatePresence mode="popLayout">
                         {gstFields.map((field, index) => (
                             <motion.div
