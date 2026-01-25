@@ -61,17 +61,17 @@ export default function LoginPage() {
             </div>
 
             {/* Content Container */}
-            <div className="relative z-10 min-h-screen flex flex-col md:flex-row items-center justify-center px-6 py-12 max-w-7xl mx-auto gap-12 md:gap-24">
+            <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-12">
 
-                {/* Left Side: Welcome Text */}
-                <div className="flex-1 text-left animate-in fade-in slide-in-from-left-8 duration-1000">
-                    <h1 className="text-6xl md:text-7xl font-bold tracking-tight text-white mb-6 leading-[1.1]">
-                        Document Generator
-                    </h1>
-                </div>
+                <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-8 duration-1000">
+                    {/* Header: Document Generator */}
+                    <div className="mb-10 text-center">
+                        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-2 font-sans">
+                            Document Generator
+                        </h1>
+                    </div>
 
-                {/* Right Side: Login Card */}
-                <div className="w-full max-w-md animate-in fade-in slide-in-from-right-8 duration-1000 delay-200">
+                    {/* Login Card */}
                     <div className="relative bg-black/40 backdrop-blur-3xl rounded-[32px] p-10 md:p-12 border border-white/5 shadow-2xl">
                         <div className="mb-10 text-center">
                             <h2 className="text-3xl font-bold tracking-tight text-white font-sans lowercase">login</h2>
@@ -88,7 +88,7 @@ export default function LoginPage() {
                                     onChange={(e) => setUsername(e.target.value)}
                                     required
                                     autoFocus
-                                    className="w-full px-6 py-4 bg-neutral-900/50 border border-neutral-800 text-white placeholder-neutral-500 rounded-2xl focus:outline-none focus:ring-1 focus:ring-tigrid-orange/50 focus:border-tigrid-orange/50 transition-all duration-300 font-medium"
+                                    className="w-full px-6 py-4 bg-neutral-900/50 border border-neutral-800 text-white placeholder-neutral-500 rounded-2xl focus:outline-none focus:ring-1 focus:ring-tigrid-orange/50 focus:border-tigrid-orange/50 transition-all duration-300 font-medium font-sans"
                                     placeholder="Username"
                                     disabled={isLoading}
                                 />
@@ -103,14 +103,14 @@ export default function LoginPage() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
-                                    className="w-full px-6 py-4 bg-neutral-900/50 border border-neutral-800 text-white placeholder-neutral-500 rounded-2xl focus:outline-none focus:ring-1 focus:ring-tigrid-orange/50 focus:border-tigrid-orange/50 transition-all duration-300 font-medium"
+                                    className="w-full px-6 py-4 bg-neutral-900/50 border border-neutral-800 text-white placeholder-neutral-500 rounded-2xl focus:outline-none focus:ring-1 focus:ring-tigrid-orange/50 focus:border-tigrid-orange/50 transition-all duration-300 font-medium font-sans"
                                     placeholder="Password"
                                     disabled={isLoading}
                                 />
                             </div>
 
                             {/* Options */}
-                            <div className="flex items-center gap-2 text-sm text-neutral-400">
+                            <div className="flex items-center gap-2 text-sm text-neutral-400 font-sans">
                                 <input type="checkbox" id="remember" className="w-4 h-4 rounded border-neutral-800 bg-neutral-900 accent-tigrid-orange cursor-pointer" />
                                 <label htmlFor="remember" className="cursor-pointer hover:text-neutral-300 transition-colors">Remember me</label>
                             </div>
@@ -125,13 +125,13 @@ export default function LoginPage() {
                                     {isLoading ? (
                                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                                     ) : (
-                                        <span className="text-xl font-black italic tracking-wider uppercase">Login</span>
+                                        <span className="text-xl font-black tracking-wider uppercase font-sans">Login</span>
                                     )}
                                 </div>
                             </button>
 
                             <div className="text-center">
-                                <button type="button" className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors underline-offset-4 hover:underline">Forgot Password?</button>
+                                <button type="button" className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors underline-offset-4 hover:underline font-sans">Forgot Password?</button>
                             </div>
                         </form>
                     </div>
