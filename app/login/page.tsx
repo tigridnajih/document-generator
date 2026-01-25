@@ -2,8 +2,8 @@
 
 import { useState, FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { User, Lock, LogIn } from "lucide-react";
+
 import { login } from "@/lib/auth";
 import { toast } from "sonner";
 
@@ -33,50 +33,54 @@ export default function LoginPage() {
     };
 
     return (
-        <main className="min-h-screen bg-neutral-950 text-white relative overflow-hidden font-sans selection:bg-orange-500/30">
-            {/* Simple Background */}
-            <div className="fixed top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
-                <div className="absolute top-0 right-0 w-full h-full bg-[radial-gradient(circle_at_top_right,rgba(38,38,38,0.2),transparent_50%)]" />
-                <div className="absolute bottom-0 left-0 w-full h-full bg-[radial-gradient(circle_at_bottom_left,rgba(38,38,38,0.1),transparent_50%)]" />
+        <main className="min-h-screen bg-[#000000] text-white relative overflow-hidden font-sans selection:bg-tigrid-orange/30">
+            {/* Noise Overlay */}
+            <div className="noise-overlay" />
+
+            {/* Premium Background Gradient */}
+            <div className="fixed inset-0 z-0 pointer-events-none">
+                <div className="absolute inset-0 bg-gradient-to-b from-[#0A0A0A] to-[#000000]" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-[500px] bg-tigrid-orange/5 blur-[160px] opacity-40" />
             </div>
 
             {/* Login Container */}
             <div className="relative z-10 min-h-screen flex flex-col items-center justify-center px-6 py-12">
-                {/* Logo */}
-                <div className="mb-10 text-center">
-                    <div className="relative inline-block mb-8">
-                        <Image
-                            src="/logo.png"
-                            alt="Tigrid Logo"
-                            width={160}
-                            height={42}
-                            className="h-10 w-auto object-contain brightness-110"
-                            priority
-                        />
+                {/* Header Section */}
+                <div className="mb-10 text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
+                    <div className="flex items-center justify-center gap-2 mb-8 group cursor-default">
+                        <span className="text-4xl font-black tracking-tighter text-white uppercase italic">
+                            TiGR<span className="text-tigrid-orange">I</span>D
+                        </span>
                     </div>
-                    <h1 className="font-bold tracking-tight text-4xl text-white mb-3">
+                    <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-4">
                         Document Generator
                     </h1>
-                    <p className="text-neutral-500 text-base font-medium">Sign in to continue</p>
+                    <p className="text-neutral-500 text-lg font-medium max-w-sm mx-auto">
+                        Sign in to continue
+                    </p>
                 </div>
 
                 {/* Login Card */}
-                <div className="w-full max-w-md">
-                    <div className="relative">
+                <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-200">
+                    <div className="relative group/card">
+                        {/* Subtle Border Gradient Effect */}
+                        <div className="absolute -inset-[1px] bg-gradient-to-b from-neutral-800 to-transparent rounded-[22px] z-0 opacity-50 group-hover/card:opacity-100 transition-opacity duration-500" />
 
-                        {/* Card Content */}
-                        <div className="relative bg-neutral-900/40 border border-neutral-800/80 rounded-2xl p-10 shadow-xl">
-                            <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Card Content - Glassmorphic */}
+                        <div className="relative z-10 bg-neutral-900/40 backdrop-blur-2xl rounded-[20px] p-10 md:p-12 shadow-2xl border border-white/5">
+                            <form onSubmit={handleSubmit} className="space-y-8">
                                 {/* Username Field */}
-                                <div className="space-y-2">
+                                <div className="space-y-2.5">
                                     <label
                                         htmlFor="username"
-                                        className="text-sm font-medium text-neutral-400 block"
+                                        className="text-[13px] font-semibold text-neutral-400 tracking-wide uppercase ml-1"
                                     >
                                         Username
                                     </label>
-                                    <div className="relative">
-                                        <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                                    <div className="relative group/input">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20">
+                                            <User className="w-[18px] h-[18px] text-neutral-500 group-focus-within/input:text-tigrid-orange transition-colors duration-300" />
+                                        </div>
                                         <input
                                             id="username"
                                             type="text"
@@ -84,7 +88,7 @@ export default function LoginPage() {
                                             onChange={(e) => setUsername(e.target.value)}
                                             required
                                             autoFocus
-                                            className="w-full pl-12 pr-4 py-4 bg-neutral-950/50 border border-neutral-800 text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500/30 focus:border-orange-500/30 transition-all font-medium"
+                                            className="w-full pl-12 pr-4 py-4 bg-[#050505] border border-neutral-800 text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-tigrid-orange/40 focus:border-tigrid-orange/40 transition-all duration-300 font-medium shadow-inner"
                                             placeholder="Enter your username"
                                             disabled={isLoading}
                                         />
@@ -92,22 +96,24 @@ export default function LoginPage() {
                                 </div>
 
                                 {/* Password Field */}
-                                <div className="space-y-2">
+                                <div className="space-y-2.5">
                                     <label
                                         htmlFor="password"
-                                        className="text-sm font-medium text-neutral-400 block"
+                                        className="text-[13px] font-semibold text-neutral-400 tracking-wide uppercase ml-1"
                                     >
                                         Password
                                     </label>
-                                    <div className="relative">
-                                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-500" />
+                                    <div className="relative group/input">
+                                        <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20">
+                                            <Lock className="w-[18px] h-[18px] text-neutral-500 group-focus-within/input:text-tigrid-orange transition-colors duration-300" />
+                                        </div>
                                         <input
                                             id="password"
                                             type="password"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             required
-                                            className="w-full pl-12 pr-4 py-4 bg-neutral-950/50 border border-neutral-800 text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-orange-500/30 focus:border-orange-500/30 transition-all font-medium"
+                                            className="w-full pl-12 pr-4 py-4 bg-[#050505] border border-neutral-800 text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-tigrid-orange/40 focus:border-tigrid-orange/40 transition-all duration-300 font-medium shadow-inner"
                                             placeholder="Enter your password"
                                             disabled={isLoading}
                                         />
@@ -118,27 +124,28 @@ export default function LoginPage() {
                                 <button
                                     type="submit"
                                     disabled={isLoading}
-                                    className="w-full relative group/btn overflow-hidden rounded-xl bg-[#ff6000] text-white font-bold py-4 px-6 transition-all duration-300 hover:bg-[#ff7b24] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-orange-950/20"
+                                    className="w-full h-14 relative group/btn overflow-hidden rounded-full bg-tigrid-orange text-white font-bold transition-all duration-300 hover:shadow-[0_0_25px_rgba(255,96,0,0.3)] hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
-                                    <div className="flex items-center justify-center gap-2">
+                                    <div className="flex items-center justify-center gap-2 relative z-10 px-6">
                                         {isLoading ? (
                                             <>
-                                                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                                                <span>Signing in...</span>
+                                                <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                                <span className="text-lg">Signing in...</span>
                                             </>
                                         ) : (
                                             <>
-                                                <LogIn className="w-5 h-5" />
+                                                <LogIn className="w-5 h-5 group-hover/btn:-translate-x-1 transition-transform duration-300" />
                                                 <span className="text-lg">Sign In</span>
                                             </>
                                         )}
                                     </div>
+                                    <div className="absolute inset-0 bg-white/10 opacity-0 group-hover/btn:opacity-100 transition-opacity duration-300" />
                                 </button>
                             </form>
 
-                            {/* Info Text */}
-                            <div className="mt-6 pt-6 border-t border-neutral-800/60">
-                                <p className="text-xs text-neutral-500 text-center">
+                            {/* Microcopy */}
+                            <div className="mt-8 pt-6 border-t border-white/5">
+                                <p className="text-[11px] text-neutral-600 text-center font-medium tracking-widest uppercase">
                                     Access is restricted to authorized users only
                                 </p>
                             </div>
@@ -147,9 +154,9 @@ export default function LoginPage() {
                 </div>
 
                 {/* Footer */}
-                <div className="mt-12 text-center">
-                    <p className="text-xs text-neutral-600">
-                        © 2026 Tigrid Technologies. All rights reserved.
+                <div className="mt-16 text-center opacity-40 hover:opacity-100 transition-opacity duration-500">
+                    <p className="text-[12px] text-neutral-500 font-medium tracking-tight">
+                        &copy; {new Date().getFullYear()} Tigrid Technologies. All rights reserved.
                     </p>
                 </div>
             </div>
