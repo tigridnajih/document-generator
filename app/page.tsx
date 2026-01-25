@@ -343,78 +343,12 @@ export default function Home() {
               viewUrl={successData?.viewUrl}
               docType={docType}
             />
-<<<<<<< HEAD
             <form
               onSubmit={handleSubmit(onSubmit)}
               className="relative space-y-10 transition-all duration-300"
             >
               <Section title="Client Information">
                 <div className="relative group/first-field">
-=======
-            <DocCard
-              label="Quotation"
-              description="Price estimate"
-              type="quotation"
-              currentType={docType}
-              onSelect={setDocType}
-              icon={<FileCheck className="w-5 h-5" />}
-            />
-            <DocCard
-              label="Invoice"
-              description="Bill client"
-              type="invoice"
-              currentType={docType}
-              onSelect={setDocType}
-              icon={<FileSpreadsheet className="w-5 h-5" />}
-            />
-          </div>
-        </div>
-
-        <FormProvider {...methods}>
-          <VoiceManager />
-          <DocumentSuccessModal
-            isOpen={showSuccessModal}
-            onClose={() => setShowSuccessModal(false)}
-            fileName={successData?.fileName || ""}
-            downloadUrl={successData?.downloadUrl || ""}
-            viewUrl={successData?.viewUrl}
-            docType={docType}
-          />
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="relative space-y-10 transition-all duration-300"
-          >
-            <Section title="Client Information">
-              <div className="relative group/first-field">
-                <Input
-                  {...register("clientDetails.clientName")}
-                  placeholder="Client Name"
-                  startIcon={<User className="w-4 h-4" />}
-                  autoFocus
-                  className="bg-neutral-800/20 ring-1 ring-white/10"
-                />
-              </div>
-              {errors.clientDetails?.clientName && (
-                <p className="text-red-500 text-xs mt-1 ml-2">
-                  {errors.clientDetails.clientName.message}
-                </p>
-              )}
-              <div className="relative">
-                <Input
-                  {...register("clientDetails.clientCompany")}
-                  placeholder="Company Name"
-                  startIcon={<Building2 className="w-4 h-4" />}
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <Input
-                  {...register("clientDetails.clientGstIn")}
-                  placeholder="Client GSTIN"
-                  startIcon={<FileText className="w-4 h-4" />}
-                />
-                <div>
->>>>>>> 0ca5aacf2c6cdf8ef471908a8a1e299a305b13d2
                   <Input
                     {...register("clientDetails.clientName")}
                     placeholder="Client Name"
@@ -428,11 +362,19 @@ export default function Home() {
                     {errors.clientDetails.clientName.message}
                   </p>
                 )}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="relative">
                   <Input
                     {...register("clientDetails.clientCompany")}
                     placeholder="Company Name"
                     startIcon={<Building2 className="w-4 h-4" />}
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Input
+                    {...register("clientDetails.clientGstIn")}
+                    placeholder="Client GSTIN"
+                    startIcon={<FileText className="w-4 h-4" />}
                   />
                   <div>
                     <Input
