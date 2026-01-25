@@ -3,7 +3,10 @@
 import { useEffect, useState, useMemo, Suspense } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FileText, FileSpreadsheet, Plus, AlertTriangle, FileCheck, LayoutGrid, TrendingUp, Banknote } from "lucide-react";
+import { FileText, FileSpreadsheet, Plus, AlertTriangle, FileCheck, LayoutGrid, TrendingUp, Banknote, User, LogOut } from "lucide-react";
+
+import { AuthProvider } from "@/components/auth/AuthProvider";
+import { getUser, logout } from "@/lib/auth";
 import { useSearchParams } from "next/navigation";
 
 import { InteractiveBarChart } from "@/components/dashboard/InteractiveBarChart";
@@ -301,12 +304,28 @@ function DashboardContent() {
                         </Link>
                     </div>
 
-                    <Link href="/">
-                        <button className="flex items-center gap-2 text-xs sm:text-sm font-medium text-neutral-950 bg-white hover:bg-neutral-200 transition-all px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full shadow-lg shadow-white/5 active:scale-95 duration-200">
-                            <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 stroke-[2.5]" />
-                            <span>New Document</span>
+                    <div className="flex items-center gap-3">
+                        <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-neutral-900/50 border border-neutral-800/60 rounded-full">
+                            <User className="w-3.5 h-3.5 text-orange-500" />
+                            <span className="text-xs font-medium text-neutral-300">{getUser()?.username || "User"}</span>
+                        </div>
+                        <Link href="/">
+                            <button className="flex items-center gap-2 text-xs sm:text-sm font-medium text-neutral-950 bg-white hover:bg-neutral-200 transition-all px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full shadow-lg shadow-white/5 active:scale-95 duration-200">
+                                <Plus className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 stroke-[2.5]" />
+                                <span>New Document</span>
+                            </button>
+                        </Link>
+                        <button
+                            onClick={() => {
+                                logout();
+                                window.location.href = "/login";
+                            }}
+                            className="flex items-center gap-2 text-xs sm:text-sm font-medium text-neutral-400 hover:text-white transition-all px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full border border-neutral-800/60 hover:border-neutral-700 active:scale-[0.98] active:translate-y-[1px] duration-200"
+                        >
+                            <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                            <span className="hidden sm:inline">Logout</span>
                         </button>
-                    </Link>
+                    </div>
                 </div>
             </header>
 
@@ -433,15 +452,17 @@ function DashboardContent() {
 
 export default function Dashboard() {
     return (
-        <Suspense fallback={
-            <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center text-white">
-                <div className="animate-pulse flex flex-col items-center gap-4">
-                    <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
-                    <p className="text-neutral-400">Loading dashboard...</p>
+        <AuthProvider>
+            <Suspense fallback={
+                <div className="min-h-screen bg-neutral-950 flex flex-col items-center justify-center text-white">
+                    <div className="animate-pulse flex flex-col items-center gap-4">
+                        <div className="w-12 h-12 border-4 border-orange-500 border-t-transparent rounded-full animate-spin"></div>
+                        <p className="text-neutral-400">Loading dashboard...</p>
+                    </div>
                 </div>
-            </div>
-        }>
-            <DashboardContent />
-        </Suspense>
+            }>
+                <DashboardContent />
+            </Suspense>
+        </AuthProvider>
     );
 }
