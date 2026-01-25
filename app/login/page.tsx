@@ -48,14 +48,14 @@ export default function LoginPage() {
                 <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-orange-950/20 blur-[150px] rounded-full" />
             </div>
 
-            {/* Top Left Logo */}
-            <div className="fixed top-8 left-8 z-20 animate-in fade-in slide-in-from-top-4 duration-700">
+            {/* Top Left Logo - Aligned with website header */}
+            <div className="fixed top-6 left-6 z-20 animate-in fade-in slide-in-from-top-4 duration-700">
                 <Image
                     src="/logo.png"
                     alt="TiGRID Logo"
-                    width={140}
-                    height={36}
-                    className="h-8 w-auto object-contain brightness-110"
+                    width={100}
+                    height={26}
+                    className="h-6.5 w-auto object-contain brightness-110"
                     priority
                 />
             </div>
@@ -66,7 +66,7 @@ export default function LoginPage() {
                 <div className="w-full max-w-md animate-in fade-in slide-in-from-bottom-8 duration-1000">
                     {/* Header: Document Generator */}
                     <div className="mb-10 text-center">
-                        <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-white mb-2 font-sans">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tight text-white mb-2 font-sans whitespace-nowrap overflow-hidden text-ellipsis">
                             Document Generator
                         </h1>
                     </div>
@@ -81,32 +81,42 @@ export default function LoginPage() {
                             {/* Username Field */}
                             <div className="space-y-2">
                                 <label className="hidden" htmlFor="username">Username</label>
-                                <input
-                                    id="username"
-                                    type="text"
-                                    value={username}
-                                    onChange={(e) => setUsername(e.target.value)}
-                                    required
-                                    autoFocus
-                                    className="w-full px-6 py-4 bg-neutral-900/50 border border-neutral-800 text-white placeholder-neutral-500 rounded-2xl focus:outline-none focus:ring-1 focus:ring-tigrid-orange/50 focus:border-tigrid-orange/50 transition-all duration-300 font-medium font-sans"
-                                    placeholder="Username"
-                                    disabled={isLoading}
-                                />
+                                <div className="relative group/input">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20 opacity-50 group-focus-within/input:opacity-100 transition-opacity">
+                                        <User className="w-[18px] h-[18px] text-neutral-500 group-focus-within/input:text-tigrid-orange transition-colors" />
+                                    </div>
+                                    <input
+                                        id="username"
+                                        type="text"
+                                        value={username}
+                                        onChange={(e) => setUsername(e.target.value)}
+                                        required
+                                        autoFocus
+                                        className="w-full pl-12 pr-6 py-4 bg-neutral-900/50 border border-neutral-800 text-white placeholder-neutral-500 rounded-2xl focus:outline-none focus:ring-1 focus:ring-tigrid-orange/50 focus:border-tigrid-orange/50 transition-all duration-300 font-medium font-sans"
+                                        placeholder="Username"
+                                        disabled={isLoading}
+                                    />
+                                </div>
                             </div>
 
                             {/* Password Field */}
                             <div className="space-y-2">
                                 <label className="hidden" htmlFor="password">Password</label>
-                                <input
-                                    id="password"
-                                    type="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                    className="w-full px-6 py-4 bg-neutral-900/50 border border-neutral-800 text-white placeholder-neutral-500 rounded-2xl focus:outline-none focus:ring-1 focus:ring-tigrid-orange/50 focus:border-tigrid-orange/50 transition-all duration-300 font-medium font-sans"
-                                    placeholder="Password"
-                                    disabled={isLoading}
-                                />
+                                <div className="relative group/input">
+                                    <div className="absolute left-4 top-1/2 -translate-y-1/2 z-20 opacity-50 group-focus-within/input:opacity-100 transition-opacity">
+                                        <Lock className="w-[18px] h-[18px] text-neutral-500 group-focus-within/input:text-tigrid-orange transition-colors" />
+                                    </div>
+                                    <input
+                                        id="password"
+                                        type="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                        className="w-full pl-12 pr-6 py-4 bg-neutral-900/50 border border-neutral-800 text-white placeholder-neutral-500 rounded-2xl focus:outline-none focus:ring-1 focus:ring-tigrid-orange/50 focus:border-tigrid-orange/50 transition-all duration-300 font-medium font-sans"
+                                        placeholder="Password"
+                                        disabled={isLoading}
+                                    />
+                                </div>
                             </div>
 
                             {/* Options */}
@@ -119,20 +129,16 @@ export default function LoginPage() {
                             <button
                                 type="submit"
                                 disabled={isLoading}
-                                className="w-full h-14 relative group/btn overflow-hidden rounded-full bg-gradient-to-r from-orange-600 to-orange-500 text-white font-bold transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,100,0,0.4)] active:scale-[0.98] disabled:opacity-50"
+                                className="w-full h-14 relative group/btn overflow-hidden rounded-full bg-gradient-to-r from-orange-600 to-orange-500 text-white font-semibold transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,100,0,0.4)] active:scale-[0.98] disabled:opacity-50"
                             >
                                 <div className="flex items-center justify-center gap-2 relative z-10 px-6">
                                     {isLoading ? (
                                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                                     ) : (
-                                        <span className="text-xl font-black tracking-wider uppercase font-sans">Login</span>
+                                        <span className="text-xl tracking-tight font-sans">Login</span>
                                     )}
                                 </div>
                             </button>
-
-                            <div className="text-center">
-                                <button type="button" className="text-xs text-neutral-500 hover:text-neutral-300 transition-colors underline-offset-4 hover:underline font-sans">Forgot Password?</button>
-                            </div>
                         </form>
                     </div>
                 </div>
