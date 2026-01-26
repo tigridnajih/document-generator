@@ -39,6 +39,10 @@ export function ProposalFields() {
                                 {...register("scopeOfWork.introduction")}
                                 placeholder="Introduction"
                                 className="w-full bg-neutral-950/40 backdrop-blur-md border border-neutral-800/50 rounded-xl px-11 py-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500/30 text-white placeholder:text-neutral-500 min-h-[100px] transition-all"
+                                data-voice-enabled="true"
+                                data-field-name="scopeOfWork.introduction"
+                                data-field-type="textarea"
+                                data-field-placeholder="Introduction"
                             />
                             <Info className="absolute left-4 top-4 w-4 h-4 text-neutral-500" />
                         </div>
@@ -48,6 +52,10 @@ export function ProposalFields() {
                                 {...register("scopeOfWork.objectives")}
                                 placeholder="Project Objectives"
                                 className="w-full bg-neutral-950/40 backdrop-blur-md border border-neutral-800/50 rounded-xl px-11 py-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500/30 text-white placeholder:text-neutral-500 min-h-[100px] transition-all"
+                                data-voice-enabled="true"
+                                data-field-name="scopeOfWork.objectives"
+                                data-field-type="textarea"
+                                data-field-placeholder="Project Objectives"
                             />
                             <Target className="absolute left-4 top-4 w-4 h-4 text-neutral-500" />
                         </div>
@@ -57,6 +65,10 @@ export function ProposalFields() {
                                 {...register("scopeOfWork.keyFeatures")}
                                 placeholder="Key Features"
                                 className="w-full bg-neutral-950/40 backdrop-blur-md border border-neutral-800/50 rounded-xl px-11 py-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500/30 text-white placeholder:text-neutral-500 min-h-[100px] transition-all"
+                                data-voice-enabled="true"
+                                data-field-name="scopeOfWork.keyFeatures"
+                                data-field-type="textarea"
+                                data-field-placeholder="Key Features"
                             />
                             <Star className="absolute left-4 top-4 w-4 h-4 text-neutral-500" />
                         </div>

@@ -52,6 +52,14 @@ export function VoiceManager() {
     const [transcript, setTranscript] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
 
+    // New state for field-specific voice input
+    const [focusedField, setFocusedField] = useState<{
+        name: string;
+        type: string;
+        placeholder: string;
+    } | null>(null);
+    const [voiceMode, setVoiceMode] = useState<'bulk' | 'field'>('field');
+
     const recognitionRef = useRef<SpeechRecognition | null>(null);
     const isListeningRef = useRef(false); // Helper ref for immediate logic
 
@@ -136,13 +144,33 @@ export function VoiceManager() {
                 return;
             }
 
+            // Detect focused field
+            const activeElement = document.activeElement as HTMLElement;
+            const isVoiceEnabled = activeElement?.getAttribute('data-voice-enabled') === 'true';
+
+            if (isVoiceEnabled) {
+                // Field mode - fill specific field
+                const fieldInfo = {
+                    name: activeElement.getAttribute('data-field-name') || activeElement.getAttribute('name') || '',
+                    type: activeElement.getAttribute('data-field-type') || activeElement.getAttribute('type') || 'text',
+                    placeholder: activeElement.getAttribute('data-field-placeholder') || activeElement.getAttribute('placeholder') || ''
+                };
+                setFocusedField(fieldInfo);
+                setVoiceMode('field');
+                toast.info(`Recording for: ${fieldInfo.placeholder || fieldInfo.name || 'field'}`);
+            } else {
+                // Bulk mode - extract all data
+                setFocusedField(null);
+                setVoiceMode('bulk');
+                toast.info("Listening for all fields...");
+            }
+
             setTranscript("");
             setShowPermissionHelp(false);
             try {
                 isListeningRef.current = true;
                 setIsListening(true);
                 recognitionRef.current.start();
-                toast.info("Listening... Speak now.");
             } catch (err) {
                 console.error(err);
                 toast.error("Failed to start recording");
@@ -154,52 +182,117 @@ export function VoiceManager() {
     const handleProceed = async (finalText: string) => {
         setIsProcessing(true);
         try {
-            const response = await fetch("/api/extract", {
+            // STEP 1: Try to detect field name from the transcript itself
+            const detectResponse = await fetch("/api/detect-field", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ text: finalText }),
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || "Extraction failed");
+            let targetField = focusedField;
+            let textToProcess = finalText;
+            let detectedFromVoice = false;
+
+            if (detectResponse.ok) {
+                const detection = await detectResponse.json();
+                if (detection.detected && detection.fieldPath) {
+                    // User spoke the field name! Use that instead of focused field
+                    targetField = {
+                        name: detection.fieldPath,
+                        type: detection.fieldType || 'text',
+                        placeholder: detection.fieldPlaceholder || detection.fieldName
+                    };
+                    textToProcess = detection.remainingText;
+                    detectedFromVoice = true;
+                    console.log(`Voice-directed field detected: ${detection.fieldName} → ${detection.fieldPath}`);
+                }
             }
 
-            const { data } = await response.json();
-
-            let updatedCount = 0;
-            const processFields = (obj: any, prefix: string = "") => {
-                Object.keys(obj).forEach(key => {
-                    const value = obj[key];
-
-                    if (value !== null && value !== undefined && value !== "") {
-                        if (typeof value === 'object' && !Array.isArray(value)) {
-                            // Recursively process nested objects (like clientDetails)
-                            processFields(value, prefix ? `${prefix}.${key}` : key);
-                        } else {
-                            // Directly set fields or arrays (items/gstList)
-                            const fieldPath = prefix ? `${prefix}.${key}` : key;
-                            setValue(fieldPath as any, value, {
-                                shouldValidate: true,
-                                shouldDirty: true,
-                                shouldTouch: true
-                            });
-                            updatedCount++;
-                        }
-                    }
+            // STEP 2: Determine mode based on detection or focused field
+            if (targetField) {
+                // Field mode (either from voice direction or cursor focus)
+                const response = await fetch("/api/format-field", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        text: textToProcess,
+                        fieldName: targetField.name,
+                        fieldType: targetField.type,
+                        placeholder: targetField.placeholder
+                    }),
                 });
-            };
 
-            processFields(data);
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Formatting failed");
+                }
 
-            if (updatedCount > 0) {
-                toast.success(`Updated ${updatedCount} fields successfully`);
+                const { formattedValue } = await response.json();
+
+                // Set the value in the target field
+                if (targetField.name) {
+                    setValue(targetField.name as any, formattedValue, {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                        shouldTouch: true
+                    });
+
+                    if (detectedFromVoice) {
+                        toast.success(`Updated ${targetField.placeholder} (voice-directed)`);
+                    } else {
+                        toast.success(`Updated ${targetField.placeholder}`);
+                    }
+                }
             } else {
-                toast.info("No matching fields found in transcript");
+                // STEP 3: Bulk mode - extract data for all fields (existing behavior)
+                const response = await fetch("/api/extract", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: finalText }),
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Extraction failed");
+                }
+
+                const { data } = await response.json();
+
+                let updatedCount = 0;
+                const processFields = (obj: any, prefix: string = "") => {
+                    Object.keys(obj).forEach(key => {
+                        const value = obj[key];
+
+                        if (value !== null && value !== undefined && value !== "") {
+                            if (typeof value === 'object' && !Array.isArray(value)) {
+                                // Recursively process nested objects (like clientDetails)
+                                processFields(value, prefix ? `${prefix}.${key}` : key);
+                            } else {
+                                // Directly set fields or arrays (items/gstList)
+                                const fieldPath = prefix ? `${prefix}.${key}` : key;
+                                setValue(fieldPath as any, value, {
+                                    shouldValidate: true,
+                                    shouldDirty: true,
+                                    shouldTouch: true
+                                });
+                                updatedCount++;
+                            }
+                        }
+                    });
+                };
+
+                processFields(data);
+
+                if (updatedCount > 0) {
+                    toast.success(`Updated ${updatedCount} fields successfully`);
+                } else {
+                    toast.info("No matching fields found in transcript");
+                }
             }
 
             setShowModal(false);
             setTranscript("");
+            setFocusedField(null);
         } catch (err: any) {
             console.error(err);
             toast.error(err.message || "Failed to process command");
@@ -218,6 +311,8 @@ export function VoiceManager() {
                 isProcessing={isProcessing}
                 onClose={() => setShowModal(false)}
                 onProceed={handleProceed}
+                fieldContext={focusedField}
+                mode={voiceMode}
             />
 
             {showPermissionHelp && (

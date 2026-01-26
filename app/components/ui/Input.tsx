@@ -26,6 +26,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                         startIcon ? "pl-11" : "",
                         className
                     )}
+                    data-voice-enabled="true"
+                    data-field-name={props.name || ""}
+                    data-field-type={props.type || "text"}
+                    data-field-placeholder={props.placeholder || ""}
                     {...props}
                 />
             </div>

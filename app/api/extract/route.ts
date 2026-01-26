@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import Groq from "groq-sdk";
+import OpenAI from "openai";
 
-const groq = new Groq({
-    apiKey: process.env.GROQ_API_KEY || "",
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY || "",
 });
 
 const systemPrompt = `
@@ -28,7 +28,7 @@ STRICT EXTRACTION RULES:
 `;
 
 export async function POST(req: Request) {
-    console.log("Debug [Extract]: GROQ_API_KEY loaded?", !!process.env.GROQ_API_KEY);
+    console.log("Debug [Extract]: OPENAI_API_KEY loaded?", !!process.env.OPENAI_API_KEY);
 
     try {
         const body = await req.json();
@@ -38,23 +38,23 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "No text provided" }, { status: 400 });
         }
 
-        if (!process.env.GROQ_API_KEY) {
-            return NextResponse.json({ error: "Groq API Key not configured" }, { status: 500 });
+        if (!process.env.OPENAI_API_KEY) {
+            return NextResponse.json({ error: "OpenAI API Key not configured" }, { status: 500 });
         }
 
-        const completion = await groq.chat.completions.create({
+        const completion = await openai.chat.completions.create({
             messages: [
                 { role: "system", content: systemPrompt },
                 { role: "user", content: `Extract data from this transcript: "${text}"` },
             ],
-            model: "llama-3.3-70b-versatile", // Fast and good enough for extraction
+            model: "gpt-4o-mini",
             temperature: 0,
             response_format: { type: "json_object" },
         });
 
         const content = completion.choices[0]?.message?.content;
         if (!content) {
-            throw new Error("No content from Groq");
+            throw new Error("No content from OpenAI");
         }
 
         const extractedData = JSON.parse(content);

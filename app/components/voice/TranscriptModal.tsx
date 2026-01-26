@@ -10,6 +10,12 @@ interface TranscriptModalProps {
     isProcessing: boolean;
     onClose: () => void;
     onProceed: (finalText: string) => void;
+    fieldContext?: {
+        name: string;
+        type: string;
+        placeholder: string;
+    } | null;
+    mode?: 'bulk' | 'field';
 }
 
 export function TranscriptModal({
@@ -18,6 +24,8 @@ export function TranscriptModal({
     isProcessing,
     onClose,
     onProceed,
+    fieldContext,
+    mode = 'bulk',
 }: TranscriptModalProps) {
     const [text, setText] = useState(transcript);
 
@@ -31,7 +39,21 @@ export function TranscriptModal({
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fade-in_0.2s_ease-out]">
             <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-lg shadow-2xl overflow-hidden p-6 space-y-6">
                 <div className="flex items-center justify-between">
-                    <h3 className="text-xl font-bold text-white">Review Transcript</h3>
+                    <div className="space-y-1">
+                        <h3 className="text-xl font-bold text-white">Review Transcript</h3>
+                        {mode === 'field' && fieldContext && (
+                            <p className="text-xs text-orange-400 flex items-center gap-1.5">
+                                <span className="inline-block w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse"></span>
+                                Filling: {fieldContext.placeholder || fieldContext.name || 'field'}
+                            </p>
+                        )}
+                        {mode === 'bulk' && (
+                            <p className="text-xs text-blue-400 flex items-center gap-1.5">
+                                <span className="inline-block w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span>
+                                Extracting data for all fields
+                            </p>
+                        )}
+                    </div>
                     <button
                         onClick={onClose}
                         disabled={isProcessing}
@@ -43,7 +65,9 @@ export function TranscriptModal({
 
                 <div className="space-y-2">
                     <label className="text-sm text-neutral-400">
-                        Edit the text if needed before extraction:
+                        {mode === 'field'
+                            ? `Edit the text for "${fieldContext?.placeholder || fieldContext?.name || 'field'}" if needed:`
+                            : 'Edit the text if needed before extraction:'}
                     </label>
                     <textarea
                         value={text}
