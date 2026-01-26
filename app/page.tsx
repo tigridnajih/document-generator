@@ -15,6 +15,7 @@ import { Section } from "@/components/ui/Section";
 import { DocCard } from "@/components/ui/DocCard";
 import { ShineButton } from "@/components/ui/ShineButton";
 import { InvoiceFields } from "@/components/feature/InvoiceFields";
+import { ProposalFields } from "@/components/feature/ProposalFields";
 import { LiveTotal } from "@/components/feature/LiveTotal";
 import { VoiceManager } from "@/components/voice/VoiceManager";
 import { DocumentSuccessModal } from "@/components/voice/DocumentSuccessModal";
@@ -41,7 +42,17 @@ export default function Home() {
         clientCompany: "",
         clientGstIn: "",
         clientEmail: "",
+        projectNumber: "",
+        date: new Date().toISOString().split('T')[0],
       },
+      scopeOfWork: {
+        introduction: "",
+        objectives: "",
+        keyFeatures: "",
+        timelineEnabled: false,
+        timeline: [],
+      },
+      estimation: [],
       items: [{ name: "", rate: 0, quantity: 1 }],
       gstList: [{ type: "CGST", rate: 9 }],
       export_invoice: false,
@@ -71,6 +82,8 @@ export default function Home() {
         clientCompany: values.clientDetails.clientCompany,
         client_gstin: values.clientDetails.clientGstIn,
         clientEmail: values.clientDetails.clientEmail,
+        project_number: values.clientDetails.projectNumber,
+        date: values.clientDetails.date,
         clientLocality: values.clientDetails.clientLocality,
         clientCity: values.clientDetails.clientCity,
         clientPincode: values.clientDetails.clientPincode,
@@ -80,6 +93,33 @@ export default function Home() {
         export_invoice: values.export_invoice ? "true" : "false",
         lut_number: values.export_invoice ? values.lut_number : "",
       };
+
+      // Add Proposal specific fields to payload
+      if (docType === "proposal") {
+        data["introduction"] = values.scopeOfWork?.introduction;
+        data["project_objectives"] = values.scopeOfWork?.objectives;
+        data["key_features"] = values.scopeOfWork?.keyFeatures;
+
+        if (values.scopeOfWork?.timelineEnabled && values.scopeOfWork.timeline) {
+          values.scopeOfWork.timeline.forEach((item, i) => {
+            const index = i + 1;
+            data[`timeline_${index}_phase`] = item.phase;
+            data[`timeline_${index}_duration`] = String(item.duration);
+            data[`timeline_${index}_unit`] = item.unit;
+            data[`timeline_${index}_deliverables`] = item.deliverables;
+          });
+        }
+
+        if (values.estimation) {
+          values.estimation.forEach((item, i) => {
+            const index = i + 1;
+            data[`estimation_${index}_description`] = item.description;
+            data[`estimation_${index}_rate`] = String(item.rate);
+            data[`estimation_${index}_qty`] = String(item.qty);
+            data[`estimation_${index}_total`] = String((item.rate || 0) * (item.qty || 0));
+          });
+        }
+      }
 
       // Manually index items as item_1_name, item_1_rate, etc.
       values.items.forEach((item, i) => {
@@ -371,24 +411,43 @@ export default function Home() {
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <Input
-                    {...register("clientDetails.clientGstIn")}
-                    placeholder="Client GSTIN"
-                    startIcon={<FileText className="w-4 h-4" />}
-                  />
-                  <div>
-                    <Input
-                      {...register("clientDetails.clientEmail")}
-                      placeholder="Email Address"
-                      type="email"
-                      startIcon={<Mail className="w-4 h-4" />}
-                    />
-                    {errors.clientDetails?.clientEmail && (
-                      <p className="text-red-500 text-xs mt-1 ml-2">
-                        {errors.clientDetails.clientEmail.message}
-                      </p>
-                    )}
-                  </div>
+                  {docType !== "proposal" ? (
+                    <>
+                      <Input
+                        {...register("clientDetails.clientGstIn")}
+                        placeholder="Client GSTIN"
+                        startIcon={<FileText className="w-4 h-4" />}
+                      />
+                      <div>
+                        <Input
+                          {...register("clientDetails.clientEmail")}
+                          placeholder="Email Address"
+                          type="email"
+                          startIcon={<Mail className="w-4 h-4" />}
+                        />
+                        {errors.clientDetails?.clientEmail && (
+                          <p className="text-red-500 text-xs mt-1 ml-2">
+                            {errors.clientDetails.clientEmail.message}
+                          </p>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <Input
+                        {...register("clientDetails.projectNumber")}
+                        placeholder="Project Number"
+                        startIcon={<Hash className="w-4 h-4" />}
+                      />
+                      <Input
+                        {...register("clientDetails.date")}
+                        placeholder="Date"
+                        type="date"
+                        startIcon={<Calendar className="w-4 h-4" />}
+                        className="[color-scheme:dark]"
+                      />
+                    </>
+                  )}
                 </div>
 
                 {docType === "invoice" && (
@@ -443,6 +502,8 @@ export default function Home() {
                   <LiveTotal />
                 </>
               )}
+
+              {docType === "proposal" && <ProposalFields />}
 
               <div className="max-w-7xl mx-auto px-6 pt-4">
                 <ShineButton

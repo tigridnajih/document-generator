@@ -6,6 +6,8 @@ export const documentFormSchema = z.object({
         clientCompany: z.string().optional(),
         clientGstIn: z.string().optional(),
         clientEmail: z.string().email("Invalid email address").optional().or(z.literal("")),
+        projectNumber: z.string().optional(),
+        date: z.string().optional(),
         clientLocality: z.string().optional(),
         clientCity: z.string().optional(),
         clientPincode: z.string().or(z.number()).optional(),
@@ -15,6 +17,28 @@ export const documentFormSchema = z.object({
         invoiceNumber: z.string().optional(),
         invoiceDate: z.string().optional(),
     }).optional(),
+    scopeOfWork: z.object({
+        introduction: z.string().optional(),
+        objectives: z.string().optional(),
+        keyFeatures: z.string().optional(),
+        timelineEnabled: z.boolean().default(false),
+        timeline: z.array(
+            z.object({
+                phase: z.string().optional(),
+                duration: z.coerce.number().optional(),
+                unit: z.enum(["Days", "Weeks"]).default("Days"),
+                deliverables: z.string().optional(),
+            })
+        ).optional(),
+    }).optional(),
+    estimation: z.array(
+        z.object({
+            description: z.string().optional(),
+            rate: z.coerce.number().optional(),
+            qty: z.coerce.number().optional(),
+            total: z.coerce.number().optional(),
+        })
+    ).optional(),
     items: z.array(
         z.object({
             name: z.string().min(1, "Item name is required"),
