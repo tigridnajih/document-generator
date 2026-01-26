@@ -13,6 +13,7 @@ STRICT EXTRACTION RULES:
 1. Extract these fields:
     - clientDetails: { clientName, clientCompany, clientEmail, clientLocality, clientCity, clientPincode, clientState }
     - invoiceDetails: { invoiceNumber, invoiceDate }
+    - scopeOfWork: { introduction, objectives, keyFeatures }
     - items: array of { name, rate, quantity }
     - gstList: array of { type (CGST/SGST/IGST), rate }
 
@@ -22,7 +23,7 @@ STRICT EXTRACTION RULES:
     - PROPER NAMES: Transliterate to English script.
 
 3. Return JSON ONLY.
-    - Format: { "clientDetails": { ... }, "invoiceDetails": { ... }, "items": [ ... ], "gstList": [ ... ] }
+    - Format: { "clientDetails": { ... }, "invoiceDetails": { ... }, "scopeOfWork": { ... }, "items": [ ... ], "gstList": [ ... ] }
     - If a field is not mentioned, exclude it or set it to null.
     - Do not return markdown code blocks. Just the raw JSON.
 `;

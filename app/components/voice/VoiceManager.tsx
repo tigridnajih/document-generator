@@ -62,8 +62,19 @@ export function VoiceManager() {
 
     const recognitionRef = useRef<SpeechRecognition | null>(null);
     const isListeningRef = useRef(false); // Helper ref for immediate logic
+    const lastFocusedFieldRef = useRef<HTMLElement | null>(null);
 
     useEffect(() => {
+        // Track focus shifts to capture the target field even if focus moves to the mic button
+        const handleFocusIn = (e: FocusEvent) => {
+            const element = e.target as HTMLElement;
+            if (element?.getAttribute('data-voice-enabled') === 'true') {
+                lastFocusedFieldRef.current = element;
+            }
+        };
+
+        document.addEventListener('focusin', handleFocusIn);
+
         // Initialize SpeechRecognition
         const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (SpeechRecognition) {
@@ -99,6 +110,10 @@ export function VoiceManager() {
                 stopRecordingState();
             };
         }
+
+        return () => {
+            document.removeEventListener('focusin', handleFocusIn);
+        };
     }, []);
 
     const stopRecordingState = () => {
@@ -144,16 +159,20 @@ export function VoiceManager() {
                 return;
             }
 
-            // Detect focused field
+            // Detect focused field using our tracking ref or activeElement
             const activeElement = document.activeElement as HTMLElement;
-            const isVoiceEnabled = activeElement?.getAttribute('data-voice-enabled') === 'true';
+            const targetElement = (activeElement?.getAttribute('data-voice-enabled') === 'true')
+                ? activeElement
+                : lastFocusedFieldRef.current;
 
-            if (isVoiceEnabled) {
+            const isVoiceEnabled = targetElement?.getAttribute('data-voice-enabled') === 'true';
+
+            if (isVoiceEnabled && targetElement) {
                 // Field mode - fill specific field
                 const fieldInfo = {
-                    name: activeElement.getAttribute('data-field-name') || activeElement.getAttribute('name') || '',
-                    type: activeElement.getAttribute('data-field-type') || activeElement.getAttribute('type') || 'text',
-                    placeholder: activeElement.getAttribute('data-field-placeholder') || activeElement.getAttribute('placeholder') || ''
+                    name: targetElement.getAttribute('data-field-name') || targetElement.getAttribute('name') || '',
+                    type: targetElement.getAttribute('data-field-type') || targetElement.getAttribute('type') || 'text',
+                    placeholder: targetElement.getAttribute('data-field-placeholder') || targetElement.getAttribute('placeholder') || ''
                 };
                 setFocusedField(fieldInfo);
                 setVoiceMode('field');
@@ -263,12 +282,21 @@ export function VoiceManager() {
                     Object.keys(obj).forEach(key => {
                         const value = obj[key];
 
-                        if (value !== null && value !== undefined && value !== "") {
+                        if (value !== null && value !== undefined) {
                             if (typeof value === 'object' && !Array.isArray(value)) {
                                 // Recursively process nested objects (like clientDetails)
                                 processFields(value, prefix ? `${prefix}.${key}` : key);
-                            } else {
-                                // Directly set fields or arrays (items/gstList)
+                            } else if (typeof value === 'string' && value.trim() !== "") {
+                                // Directly set non-empty string fields
+                                const fieldPath = prefix ? `${prefix}.${key}` : key;
+                                setValue(fieldPath as any, value.trim(), {
+                                    shouldValidate: true,
+                                    shouldDirty: true,
+                                    shouldTouch: true
+                                });
+                                updatedCount++;
+                            } else if (typeof value === 'number') {
+                                // Handle numeric fields
                                 const fieldPath = prefix ? `${prefix}.${key}` : key;
                                 setValue(fieldPath as any, value, {
                                     shouldValidate: true,
