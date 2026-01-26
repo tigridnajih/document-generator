@@ -6,44 +6,6 @@ import { toast } from "sonner";
 import { VoiceMicrophone } from "./VoiceMicrophone";
 import { TranscriptModal } from "./TranscriptModal";
 
-// Define strict types for window.SpeechRecognition
-type SpeechRecognitionEvent = Event & {
-    results: {
-        [index: number]: {
-            [index: number]: {
-                transcript: string;
-            };
-        };
-        length: number;
-    };
-};
-
-type SpeechRecognitionErrorEvent = Event & {
-    error: string;
-    message?: string;
-};
-
-interface SpeechRecognition extends EventTarget {
-    continuous: boolean;
-    interimResults: boolean;
-    start: () => void;
-    stop: () => void;
-    onresult: ((event: SpeechRecognitionEvent) => void) | null;
-    onerror: ((event: SpeechRecognitionErrorEvent) => void) | null;
-    onend: (() => void) | null;
-}
-
-interface SpeechRecognitionConstructor {
-    new(): SpeechRecognition;
-}
-
-declare global {
-    interface Window {
-        SpeechRecognition?: SpeechRecognitionConstructor;
-        webkitSpeechRecognition?: SpeechRecognitionConstructor;
-    }
-}
-
 export function VoiceManager() {
     const { setValue } = useFormContext();
     const [isListening, setIsListening] = useState(false);
@@ -60,10 +22,11 @@ export function VoiceManager() {
     } | null>(null);
     const [voiceMode, setVoiceMode] = useState<'bulk' | 'field'>('field');
 
-    const recognitionRef = useRef<SpeechRecognition | null>(null);
-    const isListeningRef = useRef(false); // Helper ref for immediate logic
+    // MediaRecorder Refs
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
     const lastFocusedFieldRef = useRef<HTMLElement | null>(null);
-    const transcriptRef = useRef(""); // Use a ref to capture the latest transcript for processing
+    const streamRef = useRef<MediaStream | null>(null);
 
     useEffect(() => {
         // Track focus shifts to capture the target field even if focus moves to the mic button
@@ -75,86 +38,157 @@ export function VoiceManager() {
         };
 
         document.addEventListener('focusin', handleFocusIn);
-
-        // Initialize SpeechRecognition
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-        if (SpeechRecognition) {
-            recognitionRef.current = new SpeechRecognition();
-            recognitionRef.current.continuous = true;
-            recognitionRef.current.interimResults = true;
-
-            recognitionRef.current.onresult = (event: SpeechRecognitionEvent) => {
-                // ZOMBIE FIX: strict check
-                if (!isListeningRef.current) return;
-
-                let finalTranscript = "";
-                for (let i = 0; i < event.results.length; i++) {
-                    const result = event.results[i];
-                    if (result && result[0]) {
-                        finalTranscript += result[0].transcript;
-                    }
-                }
-                setTranscript(finalTranscript);
-                transcriptRef.current = finalTranscript;
-            };
-
-            recognitionRef.current.onerror = (event: SpeechRecognitionErrorEvent) => {
-                console.error("Speech Recognition Error:", event.error);
-                if (event.error === "not-allowed") {
-                    setShowPermissionHelp(true);
-                    toast.error("Microphone blocked.");
-                }
-                stopRecordingState();
-            };
-
-            recognitionRef.current.onend = () => {
-                // Auto-stop logic if needed
-                if (isListeningRef.current) {
-                    stopRecordingState();
-                }
-            };
-        }
-
         return () => {
             document.removeEventListener('focusin', handleFocusIn);
+            if (streamRef.current) {
+                streamRef.current.getTracks().forEach(track => track.stop());
+            }
         };
     }, []);
 
     const stopRecordingState = () => {
-        isListeningRef.current = false;
         setIsListening(false);
-
         // SaaS Polish: Remove visual pulse from any field
         document.querySelectorAll('.voice-field-active').forEach(el => {
             el.classList.remove('voice-field-active');
         });
     };
 
-    const checkMicrophoneAccess = async () => {
+    const processAudio = async (audioBlob: Blob) => {
+        setIsProcessing(true);
+        const processingToast = toast.loading(focusedField ? "Processing your input..." : "Analyzing voice data...");
+
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            stream.getTracks().forEach((track) => track.stop());
-            return { success: true };
-        } catch (error: any) {
-            return {
-                success: false,
-                errorName: error.name || "UnknownError",
-            };
+            const formData = new FormData();
+            formData.append("audio", audioBlob, "recording.webm");
+            if (focusedField) {
+                formData.append("focusedField", JSON.stringify(focusedField));
+            }
+
+            const response = await fetch("/api/voice-action", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Whisper processing failed");
+            }
+
+            const { updates, summary, transcript: returnedTranscript } = await response.json();
+
+            setTranscript(returnedTranscript);
+
+            // Determine if we should show the modal or auto-fill
+            if (voiceMode === 'field' && focusedField) {
+                // AUTO-PROCEED for single fields (Ultra SaaS UX)
+                const fieldPaths = Object.keys(updates);
+                fieldPaths.forEach(path => {
+                    setValue(path as any, updates[path], {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                        shouldTouch: true
+                    });
+                });
+                toast.dismiss(processingToast);
+                toast.success(summary || `Updated ${focusedField.placeholder}`);
+            } else {
+                // Show modal for bulk mode or if multiple fields were detected
+                toast.dismiss(processingToast);
+                // We need to wait for the transcript to be set before showing modal
+                // so handleProceed can use the latest value if they edit it
+                setShowModal(true);
+            }
+        } catch (err: any) {
+            console.error(err);
+            toast.dismiss(processingToast);
+            toast.error(err.message || "Failed to process voice action");
+        } finally {
+            setIsProcessing(false);
         }
     };
 
-    const handleProceed = async (finalText: string) => {
+    const toggleListening = useCallback(async () => {
+        if (isListening) {
+            // STOP RECORDING
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+                mediaRecorderRef.current.stop();
+            }
+            stopRecordingState();
+        } else {
+            // START RECORDING
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                streamRef.current = stream;
+
+                // Detect focused field
+                const activeElement = document.activeElement as HTMLElement;
+                const targetElement = (activeElement?.getAttribute('data-voice-enabled') === 'true')
+                    ? activeElement
+                    : lastFocusedFieldRef.current;
+
+                const isVoiceEnabled = targetElement?.getAttribute('data-voice-enabled') === 'true';
+
+                if (isVoiceEnabled && targetElement) {
+                    const fieldInfo = {
+                        name: targetElement.getAttribute('data-field-name') || targetElement.getAttribute('name') || '',
+                        type: targetElement.getAttribute('data-field-type') || targetElement.getAttribute('type') || 'text',
+                        placeholder: targetElement.getAttribute('data-field-placeholder') || targetElement.getAttribute('placeholder') || ''
+                    };
+                    setFocusedField(fieldInfo);
+                    setVoiceMode('field');
+                    targetElement.classList.add('voice-field-active');
+                    toast.info(`Recording for: ${fieldInfo.placeholder || fieldInfo.name}`);
+                } else {
+                    setFocusedField(null);
+                    setVoiceMode('bulk');
+                    toast.info("Listening for multiple fields...");
+                }
+
+                audioChunksRef.current = [];
+                const mediaRecorder = new MediaRecorder(stream, {
+                    mimeType: MediaRecorder.isTypeSupported('audio/webm') ? 'audio/webm' : 'audio/ogg'
+                });
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunksRef.current.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const audioBlob = new Blob(audioChunksRef.current, { type: audioChunksRef.current[0].type });
+                    processAudio(audioBlob);
+                    // Cleanup tracks
+                    stream.getTracks().forEach(track => track.stop());
+                };
+
+                mediaRecorderRef.current = mediaRecorder;
+                mediaRecorder.start();
+                setIsListening(true);
+            } catch (err: any) {
+                console.error("Microphone Access Error:", err);
+                if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+                    setShowPermissionHelp(true);
+                } else {
+                    toast.error("Could not access microphone.");
+                }
+            }
+        }
+    }, [isListening, voiceMode, focusedField]);
+
+    const handleManualProceed = async (finalText: string) => {
+        // This is called from the TranscriptModal
         if (!finalText.trim()) return;
 
         setIsProcessing(true);
         try {
-            // Unified Voice-Action API: Handles intelligence (direct-fill vs extraction) in one call
             const response = await fetch("/api/voice-action", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     transcript: finalText,
-                    focusedField: focusedField // Pass current context (name, placeholder, type)
+                    focusedField: focusedField
                 }),
             });
 
@@ -165,27 +199,22 @@ export function VoiceManager() {
 
             const { updates, summary } = await response.json();
 
-            // Apply all updates returned by the AI
             const fieldPaths = Object.keys(updates);
             if (fieldPaths.length > 0) {
                 fieldPaths.forEach(path => {
-                    const value = updates[path];
-                    setValue(path as any, value, {
+                    setValue(path as any, updates[path], {
                         shouldValidate: true,
                         shouldDirty: true,
                         shouldTouch: true
                     });
                 });
-
-                // SaaS Polish: Show intelligent summary
                 toast.success(summary || `Updated ${fieldPaths.length} fields`);
             } else {
-                toast.info("No actionable data found in transcript");
+                toast.info("No actionable data found");
             }
 
             setShowModal(false);
             setTranscript("");
-            transcriptRef.current = "";
             setFocusedField(null);
         } catch (err: any) {
             console.error(err);
@@ -194,83 +223,6 @@ export function VoiceManager() {
             setIsProcessing(false);
         }
     };
-
-    const toggleListening = useCallback(async () => {
-        if (!recognitionRef.current) {
-            toast.error("Voice input is not supported in this browser.");
-            return;
-        }
-
-        if (isListening) {
-            // STOP COMMAND
-            stopRecordingState();
-            recognitionRef.current.stop();
-
-            // SaaS Grade UX: If in field mode, auto-proceed. Otherwise show modal for review.
-            setTimeout(() => {
-                const finalTranscript = transcriptRef.current;
-                if (!finalTranscript.trim()) return;
-
-                if (voiceMode === 'field' && focusedField) {
-                    handleProceed(finalTranscript);
-                } else {
-                    setShowModal(true);
-                }
-            }, 300);
-        } else {
-            // START COMMAND
-            const result = await checkMicrophoneAccess();
-
-            if (!result.success) {
-                if (result.errorName === "NotAllowedError" || result.errorName === "PermissionDeniedError") {
-                    setShowPermissionHelp(true);
-                } else {
-                    toast.error("Microphone check failed.");
-                }
-                return;
-            }
-
-            // Detect focused field
-            const activeElement = document.activeElement as HTMLElement;
-            const targetElement = (activeElement?.getAttribute('data-voice-enabled') === 'true')
-                ? activeElement
-                : lastFocusedFieldRef.current;
-
-            const isVoiceEnabled = targetElement?.getAttribute('data-voice-enabled') === 'true';
-
-            if (isVoiceEnabled && targetElement) {
-                const fieldInfo = {
-                    name: targetElement.getAttribute('data-field-name') || targetElement.getAttribute('name') || '',
-                    type: targetElement.getAttribute('data-field-type') || targetElement.getAttribute('type') || 'text',
-                    placeholder: targetElement.getAttribute('data-field-placeholder') || targetElement.getAttribute('placeholder') || ''
-                };
-                setFocusedField(fieldInfo);
-                setVoiceMode('field');
-
-                // SaaS Polish: Add visual pulse to the field
-                targetElement.classList.add('voice-field-active');
-
-                toast.info(`Recording for: ${fieldInfo.placeholder || fieldInfo.name}`);
-            } else {
-                setFocusedField(null);
-                setVoiceMode('bulk');
-                toast.info("Listening for all fields...");
-            }
-
-            setTranscript("");
-            transcriptRef.current = "";
-            setShowPermissionHelp(false);
-            try {
-                isListeningRef.current = true;
-                setIsListening(true);
-                recognitionRef.current.start();
-            } catch (err) {
-                console.error(err);
-                toast.error("Failed to start recording");
-                stopRecordingState();
-            }
-        }
-    }, [isListening, focusedField, voiceMode]);
 
     return (
         <>
@@ -281,7 +233,7 @@ export function VoiceManager() {
                 transcript={transcript}
                 isProcessing={isProcessing}
                 onClose={() => setShowModal(false)}
-                onProceed={handleProceed}
+                onProceed={handleManualProceed}
                 fieldContext={focusedField}
                 mode={voiceMode}
             />

@@ -40,8 +40,34 @@ INVOICE ITEMS (Array):
 
 export async function POST(req: Request) {
     try {
-        const body = await req.json();
-        const { transcript, focusedField } = body;
+        let transcript = "";
+        let focusedField = null;
+
+        const contentType = req.headers.get("content-type") || "";
+
+        if (contentType.includes("multipart/form-data")) {
+            // CASE 1: Audio file upload
+            const formData = await req.formData();
+            const audioFile = formData.get("audio") as Blob;
+            const focusedFieldStr = formData.get("focusedField") as string;
+            focusedField = focusedFieldStr ? JSON.parse(focusedFieldStr) : null;
+
+            if (!audioFile) {
+                return NextResponse.json({ error: "No audio provided" }, { status: 400 });
+            }
+
+            // Transcribe with Whisper
+            const transcription = await openai.audio.transcriptions.create({
+                file: new File([audioFile], "audio.webm", { type: "audio/webm" }),
+                model: "whisper-1",
+            });
+            transcript = transcription.text;
+        } else {
+            // CASE 2: Manual text submission (JSON)
+            const body = await req.json();
+            transcript = body.transcript;
+            focusedField = body.focusedField;
+        }
 
         if (!transcript) {
             return NextResponse.json({ error: "No transcript provided" }, { status: 400 });
@@ -51,6 +77,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "OpenAI API Key not configured" }, { status: 500 });
         }
 
+        // STEP 2: Process with GPT-4o-mini (Semantic Extraction)
         const systemPrompt = `
 You are a high-grade SaaS voice intelligence engine. Your task is to extract structured data from a transcript and map it to form fields.
 
@@ -64,16 +91,12 @@ EXTRACTION RULES:
 1. ANALYSIS FIRST: Determine if the user is providing a single value for the focused field OR if the transcript contains multiple data points (compound command).
 2. DIRECT FILL: If the user JUST spoke a value for the focused field (e.g., focused on name, said "John"), return that value mapped to the focused field path.
 3. ROW-AWARE SPLITTING (CRITICAL): If the user is focused on a field within a row (like estimation.0.description) and mentions other row attributes (rate, price, qty, quantity), ALWAYS split them.
-   - Example 1: Focused on estimation.0.description. Said "Web development rate 5000 quantity 2".
-   - Result: { "updates": { "estimation.0.description": "Web Development", "estimation.0.rate": 5000, "estimation.0.qty": 2 } }
-   - Example 2: Focused on items.1.name. Said "Server setup price five hundred".
-   - Result: { "updates": { "items.1.name": "Server Setup", "items.1.rate": 500 } }
 4. INDEX PERSISTENCE: When extracting for a row, always use the index from the focused field.
 5. SEMANTIC MAPPING: Understand synonyms ("price"/"cost" -> "rate", "qty"/"amount" -> "quantity").
 6. CLEANING: Fix spelling, proper capitalization, and convert numbers to digits. 
 7. FORMATTING: Return RAW JSON only. Map paths as keys and formatted values as values.
 8. NO QUOTES: Do NOT wrap values in extra quotes.
-9. MULTI-FIELD: If unrelated fields are mentioned (e.g., "set name to Alex and rate to 500"), map them to their global paths.
+9. MULTI-FIELD: If unrelated fields are mentioned, map them to their global paths.
 
 RESPONSE FORMAT (JSON):
 {
@@ -113,6 +136,7 @@ RESPONSE FORMAT (JSON):
 
         return NextResponse.json({
             success: true,
+            transcript: transcript,
             updates: result.updates || {},
             summary: result.summary || "Processed voice input"
         });
