@@ -133,7 +133,10 @@ Output (formatted text):`;
 }
 
 export async function POST(req: Request) {
-    console.log("Debug [Format-Field]: OPENAI_API_KEY loaded?", !!process.env.OPENAI_API_KEY);
+    const rawKey = process.env.OPENAI_API_KEY || "";
+    console.log("Debug [Format-Field]: Key Loaded?", !!rawKey);
+    console.log("Debug [Format-Field]: Key Prefix:", rawKey.substring(0, 10) + "...");
+    console.log("Debug [Format-Field]: Key Suffix:", "..." + rawKey.substring(rawKey.length - 4));
 
     try {
         const body = await req.json();
