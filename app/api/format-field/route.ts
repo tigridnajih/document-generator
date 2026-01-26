@@ -23,6 +23,7 @@ Rules:
 2. If the input is already a number, return it as-is
 3. If no number is mentioned, return "0"
 4. Round to 2 decimal places if needed
+5. Do NOT wrap the output in quotes
 
 Input: "{{INPUT}}"
 Output (number only):`;
@@ -41,6 +42,7 @@ Rules:
 1. Return ONLY the date in YYYY-MM-DD format
 2. If already in correct format, return as-is
 3. If unclear, use today's date
+4. Do NOT wrap the output in quotes
 
 Today's date: ${new Date().toISOString().split('T')[0]}
 
@@ -61,6 +63,7 @@ Rules:
 3. Replace "underscore" with "_"
 4. Convert to lowercase
 5. Remove all spaces
+6. Do NOT wrap the output in quotes
 
 Input: "{{INPUT}}"
 Output (email only):`;
@@ -78,6 +81,7 @@ Rules:
 5. Use proper punctuation
 6. Format as complete sentences or bullet points if multiple items mentioned
 7. Maintain the core meaning and intent
+8. Do NOT wrap the output in quotes
 
 Input: "{{INPUT}}"
 Output (formatted professional text):`;
@@ -96,6 +100,7 @@ Rules:
 2. Fix common spelling errors (e.g., "mikrosoft" → "Microsoft")
 3. Keep acronyms uppercase (e.g., "ibm" → "IBM")
 4. Remove extra spaces
+5. Do NOT wrap the output in quotes
 
 Input: "{{INPUT}}"
 Output (properly formatted name):`;
@@ -113,6 +118,7 @@ Rules:
 1. Capitalize properly
 2. Fix spelling errors
 3. Use standard names (e.g., "Bengaluru" can be "Bangalore" if commonly used)
+4. Do NOT wrap the output in quotes
 
 Input: "{{INPUT}}"
 Output (formatted location):`;
@@ -127,6 +133,7 @@ Rules:
 3. Remove extra spaces
 4. Keep it concise
 5. Maintain the original meaning
+6. Do NOT wrap the output in quotes
 
 Input: "{{INPUT}}"
 Output (formatted text):`;
@@ -168,10 +175,13 @@ export async function POST(req: Request) {
             max_tokens: 500,
         });
 
-        const content = completion.choices[0]?.message?.content?.trim();
+        let content = completion.choices[0]?.message?.content?.trim() || "";
         if (!content) {
             throw new Error("No content from OpenAI");
         }
+
+        // Clean up the response: strip surrounding quotes
+        content = content.replace(/^["']|["']$/g, '');
 
         return NextResponse.json({ success: true, formattedValue: content });
     } catch (error: any) {
