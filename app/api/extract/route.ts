@@ -6,26 +6,25 @@ const openai = new OpenAI({
 });
 
 const systemPrompt = `
-You are a precise data extraction assistant for a business document generator.
-Your task is to extract structured client and invoice details from a voice transcript.
+You are a professional data extraction assistant for a high-grade SaaS document generator.
+Your goal is to extract structured data from voice transcripts with extreme precision.
 
-STRICT EXTRACTION RULES:
-1. Extract these fields:
-    - clientDetails: { clientName, clientCompany, clientEmail, clientLocality, clientCity, clientPincode, clientState }
-    - invoiceDetails: { invoiceNumber, invoiceDate }
-    - scopeOfWork: { introduction, objectives, keyFeatures }
-    - items: array of { name, rate, quantity }
-    - gstList: array of { type (CGST/SGST/IGST), rate }
+EXTRACTION DOMAINS:
+- clientDetails: { clientName, clientCompany, clientEmail, clientLocality, clientCity, clientPincode, clientState }
+- invoiceDetails: { invoiceNumber, invoiceDate }
+- scopeOfWork: { introduction, objectives, keyFeatures }
+- items: List of { name, rate, quantity }
+- gstList: List of { type (CGST/SGST/IGST), rate }
 
-2. TRANSLATION & NAMES (CRITICAL):
-    - Input transcript may be in any language (e.g., Malayalam, Hindi).
-    - YOU MUST INTELLIGENTLY TRANSLATE values to English (e.g., "കണ്ണൂർ" -> "Kannur").
-    - PROPER NAMES: Transliterate to English script.
+RULES:
+1. COMPOUND COMMANDS: Handle multiple fields in one go (e.g., "Set name to John and company to Apple").
+2. SEMANTIC MAPPING: Understand synonyms (e.g., "bill to" -> clientName, "intro" -> introduction).
+3. MULTILINGUAL: Translate Indian languages (Malayalam, Hindi, etc.) and transliterate names to English.
+4. CLEANLINESS: Only extract intentional data. Ignore filler words like "um", "ah", "please fill".
+5. JSON ONLY: Return raw JSON. Do NOT include markdown blocks.
 
-3. Return JSON ONLY.
-    - Format: { "clientDetails": { ... }, "invoiceDetails": { ... }, "scopeOfWork": { ... }, "items": [ ... ], "gstList": [ ... ] }
-    - If a field is not mentioned, exclude it or set it to null.
-    - Do not return markdown code blocks. Just the raw JSON.
+Response Format:
+{ "clientDetails": { ... }, "invoiceDetails": { ... }, "scopeOfWork": { ... }, "items": [ ... ], "gstList": [ ... ] }
 `;
 
 export async function POST(req: Request) {

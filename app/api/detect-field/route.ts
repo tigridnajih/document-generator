@@ -1,121 +1,31 @@
 import { NextResponse } from "next/server";
+import OpenAI from "openai";
 
-// Field mapping: maps common spoken names to actual field paths
-const FIELD_MAPPINGS: Record<string, { path: string; type: string; placeholder: string }> = {
-    // Client Information
-    "client name": { path: "clientDetails.clientName", type: "text", placeholder: "Client Name" },
-    "name": { path: "clientDetails.clientName", type: "text", placeholder: "Client Name" },
-    "client company": { path: "clientDetails.clientCompany", type: "text", placeholder: "Company Name" },
-    "company": { path: "clientDetails.clientCompany", type: "text", placeholder: "Company Name" },
-    "company name": { path: "clientDetails.clientCompany", type: "text", placeholder: "Company Name" },
-    "email": { path: "clientDetails.clientEmail", type: "email", placeholder: "Email Address" },
-    "client email": { path: "clientDetails.clientEmail", type: "email", placeholder: "Email Address" },
-    "gstin": { path: "clientDetails.clientGstIn", type: "text", placeholder: "Client GSTIN" },
-    "gst number": { path: "clientDetails.clientGstIn", type: "text", placeholder: "Client GSTIN" },
-    "project number": { path: "clientDetails.projectNumber", type: "text", placeholder: "Project Number" },
-    "date": { path: "clientDetails.date", type: "date", placeholder: "Date" },
-    "locality": { path: "clientDetails.clientLocality", type: "text", placeholder: "Locality" },
-    "city": { path: "clientDetails.clientCity", type: "text", placeholder: "City" },
-    "pincode": { path: "clientDetails.clientPincode", type: "number", placeholder: "Pincode" },
-    "pin code": { path: "clientDetails.clientPincode", type: "number", placeholder: "Pincode" },
-    "state": { path: "clientDetails.clientState", type: "text", placeholder: "State" },
+const openai = new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY || "",
+});
 
-    // Invoice Details
-    "invoice number": { path: "invoiceDetails.invoiceNumber", type: "text", placeholder: "Invoice Number" },
-    "invoice date": { path: "invoiceDetails.invoiceDate", type: "date", placeholder: "Invoice Date" },
-
-    // Proposal Fields
-    "introduction": { path: "scopeOfWork.introduction", type: "textarea", placeholder: "Introduction" },
-    "intro": { path: "scopeOfWork.introduction", type: "textarea", placeholder: "Introduction" },
-    "objectives": { path: "scopeOfWork.objectives", type: "textarea", placeholder: "Project Objectives" },
-    "project objectives": { path: "scopeOfWork.objectives", type: "textarea", placeholder: "Project Objectives" },
-    "key features": { path: "scopeOfWork.keyFeatures", type: "textarea", placeholder: "Key Features" },
-    "features": { path: "scopeOfWork.keyFeatures", type: "textarea", placeholder: "Key Features" },
-
-    // Common item fields (first item)
-    "item name": { path: "items.0.name", type: "text", placeholder: "Item Name" },
-    "item description": { path: "items.0.name", type: "text", placeholder: "Item Name" },
-    "rate": { path: "items.0.rate", type: "number", placeholder: "Rate" },
-    "price": { path: "items.0.rate", type: "number", placeholder: "Rate" },
-    "quantity": { path: "items.0.quantity", type: "number", placeholder: "Quantity" },
-    "qty": { path: "items.0.quantity", type: "number", placeholder: "Quantity" },
-};
-
-// Common field name patterns to detect
-const FIELD_PATTERNS = [
-    "client name",
-    "company name",
-    "company",
-    "email",
-    "introduction",
-    "objectives",
-    "features",
-    "rate",
-    "price",
-    "quantity",
-    "invoice number",
-    "invoice date",
-    "project number",
-    "gstin",
-    "gst number",
-    "locality",
-    "city",
-    "pincode",
-    "pin code",
-    "state",
-    "date",
-    "name",
-];
-
-function detectFieldFromTranscript(transcript: string): {
-    fieldName: string | null;
-    remainingText: string;
-    fieldInfo: { path: string; type: string; placeholder: string } | null;
-} {
-    const lowerTranscript = transcript.toLowerCase().trim();
-
-    // Try to match field patterns at the start of the transcript
-    for (const pattern of FIELD_PATTERNS) {
-        // Check if transcript starts with the pattern
-        if (lowerTranscript.startsWith(pattern)) {
-            const fieldInfo = FIELD_MAPPINGS[pattern];
-            if (fieldInfo) {
-                // Extract the remaining text after the field name
-                let remainingText = transcript.substring(pattern.length).trim();
-
-                // Remove common separators like "is", ":", "-", etc.
-                remainingText = remainingText.replace(/^(is|:|=|-|–)\s*/i, "").trim();
-
-                return {
-                    fieldName: pattern,
-                    remainingText,
-                    fieldInfo,
-                };
-            }
-        }
-
-        // Also check for pattern followed by common separators
-        const patternWithSeparator = new RegExp(`^${pattern}\\s+(is|:|=|-|–)\\s+`, 'i');
-        const match = lowerTranscript.match(patternWithSeparator);
-        if (match) {
-            const fieldInfo = FIELD_MAPPINGS[pattern];
-            if (fieldInfo) {
-                const remainingText = transcript.substring(match[0].length).trim();
-                return {
-                    fieldName: pattern,
-                    remainingText,
-                    fieldInfo,
-                };
-            }
-        }
-    }
-
-    return {
-        fieldName: null,
-        remainingText: transcript,
-        fieldInfo: null,
-    };
-}
+const FIELD_SCHEMA = `
+AVAILABLE FIELDS:
+- clientDetails.clientName (Client Name)
+- clientDetails.clientCompany (Company Name)
+- clientDetails.clientEmail (Email Address)
+- clientDetails.clientGstIn (Client GSTIN)
+- clientDetails.projectNumber (Project Number)
+- clientDetails.date (Date)
+- clientDetails.clientLocality (Locality)
+- clientDetails.clientCity (City)
+- clientDetails.clientPincode (Pincode)
+- clientDetails.clientState (State)
+- invoiceDetails.invoiceNumber (Invoice Number)
+- invoiceDetails.invoiceDate (Invoice Date)
+- scopeOfWork.introduction (Introduction)
+- scopeOfWork.objectives (Project Objectives)
+- scopeOfWork.keyFeatures (Key Features)
+- items.0.name (Item Name/Description)
+- items.0.rate (Rate/Price)
+- items.0.quantity (Quantity/Qty)
+`;
 
 export async function POST(req: Request) {
     try {
@@ -126,16 +36,49 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "No text provided" }, { status: 400 });
         }
 
-        const result = detectFieldFromTranscript(text);
+        if (!process.env.OPENAI_API_KEY) {
+            return NextResponse.json({ error: "OpenAI API Key not configured" }, { status: 500 });
+        }
+
+        const completion = await openai.chat.completions.create({
+            messages: [
+                {
+                    role: "system",
+                    content: `You are a semantic field detector. Analyze the user's transcript and determine if they are trying to fill a specific field by speaking its name first.
+
+${FIELD_SCHEMA}
+
+RULES:
+1. If the transcript starts with a field name or its synonym (e.g., "address" for "locality"), identify the field.
+2. Return a JSON object with:
+   - detected: boolean
+   - fieldPath: string (e.g., "clientDetails.clientName")
+   - fieldType: string ("text", "number", "email", "date", or "textarea")
+   - fieldPlaceholder: string (the user-friendly name)
+   - remainingText: the actual value spoken after the field name
+3. If no field name is detected at the start, return { "detected": false }.
+4. Be smart about synonyms: "bill to" -> clientName, "tax id" -> clientGstIn, "cost" -> items.0.rate, etc.
+5. If the user just says a value without a field name, return { "detected": false }.
+
+Return RAW JSON only.`
+                },
+                { role: "user", content: `Transcript: "${text}"` },
+            ],
+            model: "gpt-4o-mini",
+            temperature: 0,
+            response_format: { type: "json_object" },
+        });
+
+        const content = completion.choices[0]?.message?.content;
+        if (!content) {
+            throw new Error("No content from OpenAI");
+        }
+
+        const result = JSON.parse(content);
 
         return NextResponse.json({
             success: true,
-            detected: result.fieldName !== null,
-            fieldName: result.fieldName,
-            fieldPath: result.fieldInfo?.path || null,
-            fieldType: result.fieldInfo?.type || null,
-            fieldPlaceholder: result.fieldInfo?.placeholder || null,
-            remainingText: result.remainingText,
+            ...result
         });
     } catch (error: any) {
         console.error("Detect-Field error details:", error);
