@@ -148,117 +148,39 @@ export function VoiceManager() {
 
         setIsProcessing(true);
         try {
-            // STEP 1: Try to detect field name from the transcript itself
-            const detectResponse = await fetch("/api/detect-field", {
+            // Unified Voice-Action API: Handles intelligence (direct-fill vs extraction) in one call
+            const response = await fetch("/api/voice-action", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: finalText }),
+                body: JSON.stringify({
+                    transcript: finalText,
+                    focusedField: focusedField // Pass current context (name, placeholder, type)
+                }),
             });
 
-            let targetField = focusedField;
-            let textToProcess = finalText;
-            let detectedFromVoice = false;
-
-            if (detectResponse.ok) {
-                const detection = await detectResponse.json();
-                if (detection.detected && detection.fieldPath) {
-                    // User spoke the field name! Use that instead of focused field
-                    targetField = {
-                        name: detection.fieldPath,
-                        type: detection.fieldType || 'text',
-                        placeholder: detection.fieldPlaceholder || detection.fieldName
-                    };
-                    textToProcess = detection.remainingText;
-                    detectedFromVoice = true;
-                }
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || "Action failed");
             }
 
-            // STEP 2: Determine mode based on detection or focused field
-            if (targetField) {
-                // Field mode (either from voice direction or cursor focus)
-                const response = await fetch("/api/format-field", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        text: textToProcess,
-                        fieldName: targetField.name,
-                        fieldType: targetField.type,
-                        placeholder: targetField.placeholder
-                    }),
-                });
+            const { updates, summary } = await response.json();
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || "Formatting failed");
-                }
-
-                const { formattedValue } = await response.json();
-
-                // Set the value in the target field
-                if (targetField.name) {
-                    setValue(targetField.name as any, formattedValue, {
+            // Apply all updates returned by the AI
+            const fieldPaths = Object.keys(updates);
+            if (fieldPaths.length > 0) {
+                fieldPaths.forEach(path => {
+                    const value = updates[path];
+                    setValue(path as any, value, {
                         shouldValidate: true,
                         shouldDirty: true,
                         shouldTouch: true
                     });
-
-                    if (detectedFromVoice) {
-                        toast.success(`Updated ${targetField.placeholder} (voice)`);
-                    } else {
-                        toast.success(`Updated ${targetField.placeholder}`);
-                    }
-                }
-            } else {
-                // STEP 3: Bulk mode - extract data for all fields
-                const response = await fetch("/api/extract", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text: finalText }),
                 });
 
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(errorData.error || "Extraction failed");
-                }
-
-                const { data } = await response.json();
-
-                let updatedCount = 0;
-                const processFields = (obj: any, prefix: string = "") => {
-                    Object.keys(obj).forEach(key => {
-                        const value = obj[key];
-
-                        if (value !== null && value !== undefined) {
-                            if (typeof value === 'object' && !Array.isArray(value)) {
-                                processFields(value, prefix ? `${prefix}.${key}` : key);
-                            } else if (typeof value === 'string' && value.trim() !== "") {
-                                const fieldPath = prefix ? `${prefix}.${key}` : key;
-                                setValue(fieldPath as any, value.trim(), {
-                                    shouldValidate: true,
-                                    shouldDirty: true,
-                                    shouldTouch: true
-                                });
-                                updatedCount++;
-                            } else if (typeof value === 'number') {
-                                const fieldPath = prefix ? `${prefix}.${key}` : key;
-                                setValue(fieldPath as any, value, {
-                                    shouldValidate: true,
-                                    shouldDirty: true,
-                                    shouldTouch: true
-                                });
-                                updatedCount++;
-                            }
-                        }
-                    });
-                };
-
-                processFields(data);
-
-                if (updatedCount > 0) {
-                    toast.success(`Updated ${updatedCount} fields successfully`);
-                } else {
-                    toast.info("No matching fields found");
-                }
+                // SaaS Polish: Show intelligent summary
+                toast.success(summary || `Updated ${fieldPaths.length} fields`);
+            } else {
+                toast.info("No actionable data found in transcript");
             }
 
             setShowModal(false);
@@ -267,7 +189,7 @@ export function VoiceManager() {
             setFocusedField(null);
         } catch (err: any) {
             console.error(err);
-            toast.error(err.message || "Failed to process command");
+            toast.error(err.message || "Failed to process voice action");
         } finally {
             setIsProcessing(false);
         }
@@ -281,8 +203,7 @@ export function VoiceManager() {
 
         if (isListening) {
             // STOP COMMAND
-            isListeningRef.current = false;
-            setIsListening(false);
+            stopRecordingState();
             recognitionRef.current.stop();
 
             // SaaS Grade UX: If in field mode, auto-proceed. Otherwise show modal for review.
