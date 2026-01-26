@@ -7,12 +7,18 @@ import { VoiceMicrophone } from "./VoiceMicrophone";
 import { TranscriptModal } from "./TranscriptModal";
 
 export function VoiceManager() {
-    const { setValue } = useFormContext();
+    const { setValue, watch, getValues } = useFormContext();
     const [isListening, setIsListening] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [showPermissionHelp, setShowPermissionHelp] = useState(false);
     const [transcript, setTranscript] = useState("");
     const [isProcessing, setIsProcessing] = useState(false);
+
+    // Track array lengths for dynamic addition
+    const items = watch("items") || [];
+    const estimation = watch("estimation") || [];
+    const timeline = watch("scopeOfWork.timeline") || [];
+    const gstList = watch("gstList") || [];
 
     // New state for field-specific voice input
     const [focusedField, setFocusedField] = useState<{
@@ -27,6 +33,51 @@ export function VoiceManager() {
     const audioChunksRef = useRef<Blob[]>([]);
     const lastFocusedFieldRef = useRef<HTMLElement | null>(null);
     const streamRef = useRef<MediaStream | null>(null);
+
+    const applyUpdates = (updates: Record<string, any>) => {
+        const fieldPaths = Object.keys(updates);
+        if (fieldPaths.length === 0) return false;
+
+        fieldPaths.forEach(path => {
+            const value = updates[path];
+
+            // Check if we need to expand arrays (e.g., items.2 or estimation.5)
+            const arrayMatch = path.match(/^(items|estimation|scopeOfWork\.timeline|gstList)\.(\d+)/);
+            if (arrayMatch) {
+                const arrayPath = arrayMatch[1];
+                const index = parseInt(arrayMatch[2]);
+                const currentArr = watch(arrayPath) || [];
+
+                if (index >= currentArr.length) {
+                    // Create new empty rows until we reach the targeted index
+                    const newRowsNeeded = index - currentArr.length + 1;
+                    const updatedArr = [...currentArr];
+                    for (let i = 0; i < newRowsNeeded; i++) {
+                        // Default structures for new rows
+                        if (arrayPath === 'items') updatedArr.push({ name: "", rate: 0, quantity: 1 });
+                        else if (arrayPath === 'estimation') updatedArr.push({ description: "", rate: 0, qty: 1 });
+                        else if (arrayPath === 'scopeOfWork.timeline') updatedArr.push({ phase: "", duration: 0, unit: "Days" });
+                        else if (arrayPath === 'gstList') updatedArr.push({ type: "CGST", rate: 9 });
+                    }
+                    setValue(arrayPath, updatedArr, { shouldValidate: true });
+                }
+            }
+
+            setValue(path as any, value, {
+                shouldValidate: true,
+                shouldDirty: true,
+                shouldTouch: true
+            });
+        });
+        return true;
+    };
+
+    const getArrayContext = () => ({
+        items: items.length,
+        estimation: estimation.length,
+        timeline: timeline.length,
+        gstList: gstList.length
+    });
 
     useEffect(() => {
         // Track focus shifts to capture the target field even if focus moves to the mic button
@@ -56,11 +107,14 @@ export function VoiceManager() {
 
     const processAudio = async (audioBlob: Blob) => {
         setIsProcessing(true);
-        const processingToast = toast.loading(focusedField ? "Processing your input..." : "Analyzing voice data...");
+        const processingToast = toast.loading("Whisper is transcribing...");
 
         try {
             const formData = new FormData();
             formData.append("audio", audioBlob, "recording.webm");
+            formData.append("arrayContext", JSON.stringify(getArrayContext()));
+            formData.append("currentValues", JSON.stringify(getValues())); // High-Grade Context
+
             if (focusedField) {
                 formData.append("focusedField", JSON.stringify(focusedField));
             }
@@ -81,22 +135,11 @@ export function VoiceManager() {
 
             // Determine if we should show the modal or auto-fill
             if (voiceMode === 'field' && focusedField) {
-                // AUTO-PROCEED for single fields (Ultra SaaS UX)
-                const fieldPaths = Object.keys(updates);
-                fieldPaths.forEach(path => {
-                    setValue(path as any, updates[path], {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                        shouldTouch: true
-                    });
-                });
+                const success = applyUpdates(updates);
                 toast.dismiss(processingToast);
-                toast.success(summary || `Updated ${focusedField.placeholder}`);
+                if (success) toast.success(summary || "Updated successfully");
             } else {
-                // Show modal for bulk mode or if multiple fields were detected
                 toast.dismiss(processingToast);
-                // We need to wait for the transcript to be set before showing modal
-                // so handleProceed can use the latest value if they edit it
                 setShowModal(true);
             }
         } catch (err: any) {
@@ -175,7 +218,7 @@ export function VoiceManager() {
                 }
             }
         }
-    }, [isListening, voiceMode, focusedField]);
+    }, [isListening, voiceMode, focusedField, items.length, estimation.length, timeline.length, gstList.length]);
 
     const handleManualProceed = async (finalText: string) => {
         // This is called from the TranscriptModal
@@ -188,7 +231,9 @@ export function VoiceManager() {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     transcript: finalText,
-                    focusedField: focusedField
+                    focusedField: focusedField,
+                    arrayContext: getArrayContext(),
+                    currentValues: getValues()
                 }),
             });
 
@@ -198,17 +243,10 @@ export function VoiceManager() {
             }
 
             const { updates, summary } = await response.json();
+            const success = applyUpdates(updates);
 
-            const fieldPaths = Object.keys(updates);
-            if (fieldPaths.length > 0) {
-                fieldPaths.forEach(path => {
-                    setValue(path as any, updates[path], {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                        shouldTouch: true
-                    });
-                });
-                toast.success(summary || `Updated ${fieldPaths.length} fields`);
+            if (success) {
+                toast.success(summary || "Updated successfully");
             } else {
                 toast.info("No actionable data found");
             }
@@ -240,7 +278,7 @@ export function VoiceManager() {
 
             {showPermissionHelp && (
                 <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-[fade-in_0.2s_ease-out]">
-                    <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-md shadow-2xl p-6 text-center space-y-6">
+                    <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-md shadow-2xl p-6 text-center space-y-6">
                         <div className="w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mx-auto">
                             <div className="w-8 h-8 text-red-500">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" x2="12" y1="19" y2="22" /></svg>

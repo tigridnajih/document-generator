@@ -44,6 +44,14 @@ export default function Home() {
         clientEmail: "",
         projectNumber: "",
         date: new Date().toISOString().split('T')[0],
+        clientLocality: "",
+        clientCity: "",
+        clientPincode: "",
+        clientState: "",
+      },
+      invoiceDetails: {
+        invoiceNumber: "",
+        invoiceDate: new Date().toISOString().split('T')[0],
       },
       scopeOfWork: {
         introduction: "",
@@ -450,7 +458,7 @@ export default function Home() {
                   )}
                 </div>
 
-                {docType === "invoice" && (
+                {(docType === "invoice" || docType === "quotation") && (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 animate-[fade-in_0.3s_ease-out]">
                     <Input
                       {...register("clientDetails.clientLocality")}
@@ -477,7 +485,7 @@ export default function Home() {
                 )}
               </Section>
 
-              {docType === "invoice" && (
+              {(docType === "invoice" || docType === "quotation") && (
                 <Section title="Invoice Details" className="animate-[fade-in_0.4s_ease-out]">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <Input
@@ -496,7 +504,7 @@ export default function Home() {
                 </Section>
               )}
 
-              {docType === "invoice" && (
+              {(docType === "invoice" || docType === "quotation") && (
                 <>
                   <InvoiceFields />
                   <LiveTotal />

@@ -42,6 +42,8 @@ export async function POST(req: Request) {
     try {
         let transcript = "";
         let focusedField = null;
+        let arrayContext: Record<string, number> = {};
+        let currentValues: Record<string, any> = {};
 
         const contentType = req.headers.get("content-type") || "";
 
@@ -51,6 +53,12 @@ export async function POST(req: Request) {
             const audioFile = formData.get("audio") as Blob;
             const focusedFieldStr = formData.get("focusedField") as string;
             focusedField = focusedFieldStr ? JSON.parse(focusedFieldStr) : null;
+
+            const arrayContextStr = formData.get("arrayContext") as string;
+            arrayContext = arrayContextStr ? JSON.parse(arrayContextStr) : {};
+
+            const currentValuesStr = formData.get("currentValues") as string;
+            currentValues = currentValuesStr ? JSON.parse(currentValuesStr) : {};
 
             if (!audioFile) {
                 return NextResponse.json({ error: "No audio provided" }, { status: 400 });
@@ -63,10 +71,12 @@ export async function POST(req: Request) {
             });
             transcript = transcription.text;
         } else {
-            // CASE 2: Manual text submission (JSON)
+            // CASE 2: Manual text submission (JSON / Retrying)
             const body = await req.json();
             transcript = body.transcript;
             focusedField = body.focusedField;
+            arrayContext = body.arrayContext || {};
+            currentValues = body.currentValues || {};
         }
 
         if (!transcript) {
@@ -77,34 +87,37 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "OpenAI API Key not configured" }, { status: 500 });
         }
 
-        // STEP 2: Process with GPT-4o-mini (Semantic Extraction)
+        // STEP 2: Process with GPT-4o-mini (Semantic Extraction + Multilingual NLU)
         const systemPrompt = `
-You are a high-grade SaaS voice intelligence engine. Your task is to extract structured data from a transcript and map it to form fields.
+You are an Ultra-Production SaaS voice engine for a professional proposal generator.
 
 FORM SCHEMA:
 ${FIELD_SCHEMA}
 
-FOCUSED FIELD CONTEXT:
-${focusedField ? `User is currently focused on: ${focusedField.name} (${focusedField.placeholder})` : 'No field is currently focused.'}
+CONTEXT:
+- Focused Field: ${focusedField ? `${focusedField.name} (${focusedField.placeholder})` : 'None'}
+- Current Values: ${JSON.stringify(currentValues)}
+- Array Lengths: ${JSON.stringify(arrayContext)}
+- Today: ${new Date().toISOString().split('T')[0]}
 
-EXTRACTION RULES:
-1. ANALYSIS FIRST: Determine if the user is providing a single value for the focused field OR if the transcript contains multiple data points (compound command).
-2. DIRECT FILL: If the user JUST spoke a value for the focused field (e.g., focused on name, said "John"), return that value mapped to the focused field path.
-3. ROW-AWARE SPLITTING (CRITICAL): If the user is focused on a field within a row (like estimation.0.description) and mentions other row attributes (rate, price, qty, quantity), ALWAYS split them.
-4. INDEX PERSISTENCE: When extracting for a row, always use the index from the focused field.
-5. SEMANTIC MAPPING: Understand synonyms ("price"/"cost" -> "rate", "qty"/"amount" -> "quantity").
-6. CLEANING: Fix spelling, proper capitalization, and convert numbers to digits. 
-7. FORMATTING: Return RAW JSON only. Map paths as keys and formatted values as values.
-8. NO QUOTES: Do NOT wrap values in extra quotes.
-9. MULTI-FIELD: If unrelated fields are mentioned, map them to their global paths.
+LANGUAGES:
+- Support English, Malayalam, Tamil, Hindi, Telugu, Kannada, Arabic.
+- Names/Places: Transliterate phonetically to English script (e.g. "കണ്ണൂർ" -> "Kannur").
+- Intent: Translate non-English actions into English field updates.
+
+CORE LOGIC:
+1. APPEND VS REPLACE:
+   - "Add to...", "Also include...", "Mention..." -> Append to existing value in CURRENT VALUES.
+   - "Set...", "Change...", "Replace..." -> Overwrite existing value.
+2. DYNAMIC ROW ADDITION: If user says "add", "new", or "another" row, use array context lengths as new indices.
+3. ROW-AWARE SPLITTING: Map multiple row attributes (rate, qty) to the same index.
+4. FORMATTING: Return RAW JSON only. Map paths to values. No extra quotes.
+5. DATES: Always YYYY-MM-DD.
 
 RESPONSE FORMAT (JSON):
 {
-  "updates": {
-    "fieldPath1": "value1",
-    "fieldPath2": 123
-  },
-  "summary": "Short success message (e.g., 'Updated row details' or 'Set Client Name')"
+  "updates": { "field.path": "New or Appended Value" },
+  "summary": "Short user-facing summary (e.g. 'Appended to objectives')"
 }
 `;
 
