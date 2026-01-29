@@ -5,10 +5,13 @@ import { Input } from "@/components/ui/Input";
 import { Section } from "@/components/ui/Section";
 import { DocumentFormData } from "@/lib/types";
 import { motion, AnimatePresence } from "framer-motion";
-import { Trash2, Plus, Info, Target, Star, Calendar, IndianRupee, Tag, Hash, Layout } from "lucide-react";
+import { Trash2, Plus, Calendar, IndianRupee, Tag, Hash, Layout } from "lucide-react";
+
+import { Controller } from "react-hook-form";
+import { ScopeOfWorkEditor } from "../scope-of-work/ScopeOfWorkEditor";
 
 export function ProposalFields() {
-    const { register, control, watch, setValue } = useFormContext<DocumentFormData>();
+    const { register, control, watch } = useFormContext<DocumentFormData>();
     const timelineEnabled = watch("scopeOfWork.timelineEnabled");
 
     const {
@@ -33,45 +36,20 @@ export function ProposalFields() {
         <div className="space-y-10">
             <Section title="Scope of Work">
                 <div className="space-y-6">
+                    {/* Integrated Dynamic Editor */}
                     <div className="space-y-4">
-                        <div className="relative">
-                            <textarea
-                                {...register("scopeOfWork.introduction")}
-                                placeholder="Introduction"
-                                className="w-full bg-neutral-950/40 backdrop-blur-md border border-neutral-800/50 rounded-xl px-11 py-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500/30 text-white placeholder:text-neutral-500 min-h-[100px] transition-all"
-                                data-voice-enabled="true"
-                                data-field-name="scopeOfWork.introduction"
-                                data-field-type="textarea"
-                                data-field-placeholder="Introduction"
-                            />
-                            <Info className="absolute left-4 top-4 w-4 h-4 text-neutral-500" />
-                        </div>
-
-                        <div className="relative">
-                            <textarea
-                                {...register("scopeOfWork.objectives")}
-                                placeholder="Project Objectives"
-                                className="w-full bg-neutral-950/40 backdrop-blur-md border border-neutral-800/50 rounded-xl px-11 py-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500/30 text-white placeholder:text-neutral-500 min-h-[100px] transition-all"
-                                data-voice-enabled="true"
-                                data-field-name="scopeOfWork.objectives"
-                                data-field-type="textarea"
-                                data-field-placeholder="Project Objectives"
-                            />
-                            <Target className="absolute left-4 top-4 w-4 h-4 text-neutral-500" />
-                        </div>
-
-                        <div className="relative">
-                            <textarea
-                                {...register("scopeOfWork.keyFeatures")}
-                                placeholder="Key Features"
-                                className="w-full bg-neutral-950/40 backdrop-blur-md border border-neutral-800/50 rounded-xl px-11 py-3.5 text-sm focus:outline-none focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500/30 text-white placeholder:text-neutral-500 min-h-[100px] transition-all"
-                                data-voice-enabled="true"
-                                data-field-name="scopeOfWork.keyFeatures"
-                                data-field-type="textarea"
-                                data-field-placeholder="Key Features"
-                            />
-                            <Star className="absolute left-4 top-4 w-4 h-4 text-neutral-500" />
-                        </div>
+                        <Controller
+                            control={control}
+                            name="scopeOfWork.sections"
+                            render={({ field }) => (
+                                <ScopeOfWorkEditor
+                                    initialData={{ scopeOfWork: field.value || [] }}
+                                    onChange={(data) => {
+                                        field.onChange(data.scopeOfWork);
+                                    }}
+                                />
+                            )}
+                        />
                     </div>
 
                     <div className="space-y-4 border-t border-neutral-800/50 pt-6">

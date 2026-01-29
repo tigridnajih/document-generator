@@ -23,6 +23,7 @@ import { DocType } from "@/lib/types";
 import { API_URL } from "@/lib/constants";
 import { documentFormSchema, DocumentFormValues } from "@/lib/schemas";
 
+
 export default function Home() {
   const [docType, setDocType] = useState<DocType>("proposal");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -32,6 +33,8 @@ export default function Home() {
     downloadUrl: string;
     viewUrl?: string;
   } | null>(null);
+
+
 
   // Initialize form
   const methods = useForm({
@@ -54,9 +57,7 @@ export default function Home() {
         invoiceDate: new Date().toISOString().split('T')[0],
       },
       scopeOfWork: {
-        introduction: "",
-        objectives: "",
-        keyFeatures: "",
+        sections: [],
         timelineEnabled: false,
         timeline: [],
       },
@@ -104,9 +105,10 @@ export default function Home() {
 
       // Add Proposal specific fields to payload
       if (docType === "proposal") {
-        data["introduction"] = values.scopeOfWork?.introduction;
-        data["project_objectives"] = values.scopeOfWork?.objectives;
-        data["key_features"] = values.scopeOfWork?.keyFeatures;
+        // Check if sections exist and is an array
+        if (values.scopeOfWork?.sections && Array.isArray(values.scopeOfWork.sections)) {
+          data["scope_of_work_json"] = JSON.stringify(values.scopeOfWork.sections);
+        }
 
         if (values.scopeOfWork?.timelineEnabled && values.scopeOfWork.timeline) {
           values.scopeOfWork.timeline.forEach((item, i) => {
@@ -231,7 +233,7 @@ export default function Home() {
 
       if (!res.ok) throw new Error("Request failed");
 
-      let result = await res.json();
+      const result = await res.json();
       console.log("Raw API Response:", result);
 
       // Handle n8n response structure (can be array or object, possibly nested)
@@ -240,7 +242,7 @@ export default function Home() {
       // If it's an array, look for an item that is an actual evaluated result (no {{ expression }})
       if (Array.isArray(result)) {
         const evaluatedItem = result.find(
-          (item) => {
+          (item: { downloadUrl?: string; downloadUrl1?: string }) => {
             const dUrl = item.downloadUrl || item.downloadUrl1;
             return dUrl && !dUrl.includes("{{");
           }
@@ -255,9 +257,9 @@ export default function Home() {
         toast.dismiss(loadingToast);
 
         // Sanitize URLs (n8n sometimes adds "- " or whitespace)
-        const sanitizeUrl = (url: any) => {
+        const sanitizeUrl = (url: unknown) => {
           if (typeof url !== "string") return "";
-          let sanitized = url.trim().replace(/^- /, "");
+          const sanitized = url.trim().replace(/^- /, "");
           // If the URL still starts with {{, it's an unevaluated n8n expression
           return sanitized.startsWith("{{") || sanitized.startsWith("={{") ? "" : sanitized;
         };
@@ -282,9 +284,10 @@ export default function Home() {
         console.error("Response check failed:", result);
         throw new Error("The server responded but did not provide a document URL.");
       }
-    } catch (err: any) {
+    } catch (err: unknown) {
       toast.dismiss(loadingToast);
-      toast.error(`Failed to generate document: ${err.message || "Unknown error"}`);
+      const errorMessage = err instanceof Error ? err.message : "Unknown error";
+      toast.error(`Failed to generate document: ${errorMessage}`);
       console.error("Submission Error:", err);
     } finally {
       setIsSubmitting(false);
@@ -512,6 +515,11 @@ export default function Home() {
               )}
 
               {docType === "proposal" && <ProposalFields />}
+
+              {docType === "proposal" && (
+                <div className="py-6 border-t border-neutral-800/50">
+                </div>
+              )}
 
               <div className="max-w-7xl mx-auto px-6 pt-4">
                 <ShineButton

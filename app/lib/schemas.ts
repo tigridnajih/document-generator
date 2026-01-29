@@ -18,9 +18,14 @@ export const documentFormSchema = z.object({
         invoiceDate: z.string().optional(),
     }).optional(),
     scopeOfWork: z.object({
-        introduction: z.string().optional(),
-        objectives: z.string().optional(),
-        keyFeatures: z.string().optional(),
+        sections: z.array(z.object({
+            title: z.string(),
+            items: z.array(z.object({
+                subTitle: z.string().optional(),
+                contentType: z.enum(["paragraph", "bullets"]),
+                content: z.union([z.string(), z.array(z.string())])
+            }))
+        })).optional(),
         timelineEnabled: z.boolean().default(false),
         timeline: z.array(
             z.object({
