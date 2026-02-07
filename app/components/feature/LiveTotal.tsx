@@ -43,17 +43,27 @@ function CountUp({ value }: { value: number }) {
     return <span>{formatCurrency(displayValue)}</span>;
 }
 
-export function LiveTotal() {
+interface LiveTotalProps {
+    docType?: "proposal" | "quotation" | "invoice";
+}
+
+export function LiveTotal({ docType }: LiveTotalProps) {
     const { control } = useFormContext<DocumentFormData>();
 
     const items = useWatch({ control, name: "items" }) || [];
+    const estimation = useWatch({ control, name: "estimation" }) || [];
     const gstList = useWatch({ control, name: "gstList" }) || [];
 
     const subTotal = useMemo(() => {
-        return items.reduce((sum, item) => {
-            return sum + (Number(item.rate) || 0) * (Number(item.quantity) || 0);
-        }, 0);
-    }, [items]);
+        // If it's a proposal, we primarily use estimation. For others, we use items.
+        // However, we sum both to be safe in case user switched tabs and filled both.
+        const itemsTotal = items.reduce((sum, item) => sum + (Number(item.rate) || 0) * (Number(item.quantity) || 0), 0);
+        const estimationTotal = estimation.reduce((sum, item) => sum + (Number(item.rate) || 0) * (Number(item.qty) || 0), 0);
+
+        // Logical pick based on docType
+        if (docType === "proposal") return estimationTotal || itemsTotal;
+        return itemsTotal || estimationTotal;
+    }, [items, estimation, docType]);
 
     const gstTotals = useMemo(() => {
         return gstList.map(gst => ({
@@ -68,10 +78,10 @@ export function LiveTotal() {
 
     const grandTotal = useMemo(() => subTotal + totalTax, [subTotal, totalTax]);
 
-    if (items.length === 0) return null;
+    if (items.length === 0 && estimation.length === 0) return null;
 
     return (
-        <Section title="Payment Summary">
+        <Section title="Dashboard Summary">
             <div className="space-y-4">
                 {/* Calculation Stack */}
                 <div className="space-y-4">
