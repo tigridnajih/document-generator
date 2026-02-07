@@ -66,11 +66,12 @@ export function LiveTotal({ docType }: LiveTotalProps) {
     }, [items, estimation, docType]);
 
     const gstTotals = useMemo(() => {
+        if (docType === "proposal") return [];
         return gstList.map(gst => ({
             label: `${gst.type} (${gst.rate}%)`,
             amount: (subTotal * (Number(gst.rate) || 0)) / 100
         }));
-    }, [subTotal, gstList]);
+    }, [subTotal, gstList, docType]);
 
     const totalTax = useMemo(() => {
         return gstTotals.reduce((sum, tax) => sum + tax.amount, 0);
@@ -81,7 +82,7 @@ export function LiveTotal({ docType }: LiveTotalProps) {
     if (items.length === 0 && estimation.length === 0) return null;
 
     return (
-        <Section title="Dashboard Summary">
+        <Section title="Total Summary">
             <div className="space-y-4">
                 {/* Calculation Stack */}
                 <div className="space-y-4">
@@ -91,7 +92,7 @@ export function LiveTotal({ docType }: LiveTotalProps) {
                     </div>
 
                     <AnimatePresence mode="popLayout">
-                        {gstTotals.map((tax, i) => (
+                        {gstTotals.length > 0 && gstTotals.map((tax, i) => (
                             <motion.div
                                 key={i}
                                 initial={{ opacity: 0, height: 0 }}
