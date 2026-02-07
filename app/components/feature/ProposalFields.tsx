@@ -52,107 +52,110 @@ export function ProposalFields() {
                         />
                     </div>
 
-                    <div className="space-y-4 border-t border-neutral-800/50 pt-6">
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-1">
-                                <h3 className="text-sm font-medium text-white flex items-center gap-2">
-                                    <Calendar className="w-4 h-4 text-orange-500" />
-                                    Project Timeline
-                                </h3>
-                                <p className="text-xs text-neutral-500">Enable to specify project phases and durations.</p>
-                            </div>
-                            <label className="relative inline-flex items-center cursor-pointer">
-                                <input
-                                    type="checkbox"
-                                    {...register("scopeOfWork.timelineEnabled")}
-                                    className="sr-only peer"
-                                />
-                                <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600 peer-checked:after:bg-white border border-neutral-700/50"></div>
-                            </label>
+                </div>
+            </Section>
+
+            <Section title="Project Timeline">
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <div className="space-y-1">
+                            <h3 className="text-sm font-medium text-white flex items-center gap-2">
+                                <Calendar className="w-4 h-4 text-orange-500" />
+                                Timeline Control
+                            </h3>
+                            <p className="text-xs text-neutral-500">Enable to specify project phases and durations.</p>
                         </div>
-
-                        <AnimatePresence>
-                            {timelineEnabled && (
-                                <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    className="overflow-hidden space-y-4"
-                                >
-                                    <div className="flex justify-end">
-                                        <button
-                                            type="button"
-                                            onClick={() => appendTimeline({ phase: "", duration: 0, unit: "Days", deliverables: "" })}
-                                            className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800/50 hover:bg-neutral-800 border border-neutral-700/50 rounded-lg text-xs font-medium text-neutral-300 hover:text-white transition-all shadow-sm"
-                                        >
-                                            <Plus className="w-3.5 h-3.5" /> Add Phase
-                                        </button>
-                                    </div>
-
-                                    <div className="space-y-3">
-                                        {timelineFields.map((field, index) => (
-                                            <motion.div
-                                                key={field.id}
-                                                initial={{ opacity: 0, y: 10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, scale: 0.95 }}
-                                                className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-start p-4 bg-neutral-900/30 border border-neutral-800/50 rounded-xl group relative"
-                                            >
-                                                <div className="sm:col-span-4">
-                                                    <Input
-                                                        {...register(`scopeOfWork.timeline.${index}.phase`)}
-                                                        placeholder="Phase (e.g. Design)"
-                                                        className="bg-transparent"
-                                                    />
-                                                </div>
-                                                <div className="sm:col-span-2">
-                                                    <Input
-                                                        {...register(`scopeOfWork.timeline.${index}.duration`, { valueAsNumber: true })}
-                                                        placeholder="Duration"
-                                                        type="number"
-                                                        className="bg-transparent"
-                                                    />
-                                                </div>
-                                                <div className="sm:col-span-2 relative">
-                                                    <select
-                                                        {...register(`scopeOfWork.timeline.${index}.unit`)}
-                                                        className="w-full bg-neutral-950/40 border border-neutral-800/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-orange-500/30 text-white appearance-none cursor-pointer"
-                                                    >
-                                                        <option value="Days">Days</option>
-                                                        <option value="Weeks">Weeks</option>
-                                                    </select>
-                                                    <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none">
-                                                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                                                    </div>
-                                                </div>
-                                                <div className="sm:col-span-3">
-                                                    <Input
-                                                        {...register(`scopeOfWork.timeline.${index}.deliverables`)}
-                                                        placeholder="Deliverables"
-                                                        className="bg-transparent"
-                                                    />
-                                                </div>
-                                                <div className="sm:col-span-1 flex justify-end">
-                                                    <button
-                                                        type="button"
-                                                        onClick={() => removeTimeline(index)}
-                                                        className="p-2 text-neutral-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors sm:opacity-0 sm:group-hover:opacity-100"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
-                                                </div>
-                                            </motion.div>
-                                        ))}
-                                        {timelineFields.length === 0 && (
-                                            <div className="text-center py-6 text-neutral-600 border border-dashed border-neutral-800 rounded-xl text-xs">
-                                                No phases added to timeline
-                                            </div>
-                                        )}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
+                        <label className="relative inline-flex items-center cursor-pointer">
+                            <input
+                                type="checkbox"
+                                {...register("scopeOfWork.timelineEnabled")}
+                                className="sr-only peer"
+                            />
+                            <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600 peer-checked:after:bg-white border border-neutral-700/50"></div>
+                        </label>
                     </div>
+
+                    <AnimatePresence>
+                        {timelineEnabled && (
+                            <motion.div
+                                initial={{ opacity: 0, height: 0 }}
+                                animate={{ opacity: 1, height: "auto" }}
+                                exit={{ opacity: 0, height: 0 }}
+                                className="overflow-hidden space-y-4"
+                            >
+                                <div className="flex justify-end">
+                                    <button
+                                        type="button"
+                                        onClick={() => appendTimeline({ phase: "", duration: 0, unit: "Days", deliverables: "" })}
+                                        className="flex items-center gap-2 px-3 py-1.5 bg-neutral-800/50 hover:bg-neutral-800 border border-neutral-700/50 rounded-lg text-xs font-medium text-neutral-300 hover:text-white transition-all shadow-sm"
+                                    >
+                                        <Plus className="w-3.5 h-3.5" /> Add Phase
+                                    </button>
+                                </div>
+
+                                <div className="space-y-3">
+                                    {timelineFields.map((field, index) => (
+                                        <motion.div
+                                            key={field.id}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, scale: 0.95 }}
+                                            className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-start p-4 bg-neutral-900/30 border border-neutral-800/50 rounded-xl group relative"
+                                        >
+                                            <div className="sm:col-span-4">
+                                                <Input
+                                                    {...register(`scopeOfWork.timeline.${index}.phase`)}
+                                                    placeholder="Phase (e.g. Design)"
+                                                    className="bg-transparent"
+                                                />
+                                            </div>
+                                            <div className="sm:col-span-2">
+                                                <Input
+                                                    {...register(`scopeOfWork.timeline.${index}.duration`, { valueAsNumber: true })}
+                                                    placeholder="Duration"
+                                                    type="number"
+                                                    className="bg-transparent"
+                                                />
+                                            </div>
+                                            <div className="sm:col-span-2 relative">
+                                                <select
+                                                    {...register(`scopeOfWork.timeline.${index}.unit`)}
+                                                    className="w-full bg-neutral-950/40 border border-neutral-800/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-orange-500/30 text-white appearance-none cursor-pointer"
+                                                >
+                                                    <option value="Days">Days</option>
+                                                    <option value="Weeks">Weeks</option>
+                                                </select>
+                                                <div className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-500 pointer-events-none">
+                                                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                                                </div>
+                                            </div>
+                                            <div className="sm:col-span-3">
+                                                <Input
+                                                    {...register(`scopeOfWork.timeline.${index}.deliverables`)}
+                                                    placeholder="Deliverables"
+                                                    className="bg-transparent"
+                                                />
+                                            </div>
+                                            <div className="sm:col-span-1 flex justify-end">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => removeTimeline(index)}
+                                                    className="p-2 text-neutral-600 hover:text-red-400 hover:bg-red-400/10 rounded-lg transition-colors sm:opacity-0 sm:group-hover:opacity-100"
+                                                >
+                                                    <Trash2 className="w-4 h-4" />
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    ))}
+                                    {timelineFields.length === 0 && (
+                                        <div className="text-center py-6 text-neutral-600 border border-dashed border-neutral-800 rounded-xl text-xs">
+                                            No phases added to timeline
+                                        </div>
+                                    )}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
                 </div>
             </Section>
 
