@@ -91,79 +91,130 @@ export default function Home() {
         return sum + (Number(item.rate) || 0) * (Number(item.quantity) || 0);
       }, 0);
 
-      let cgstPrice = 0;
-      let sgstPrice = 0;
-      let igstPrice = 0;
+      let cgst = { rate: 0, amount: 0 };
+      let sgst = { rate: 0, amount: 0 };
+      let igst = { rate: 0, amount: 0 };
 
       if (!values.export_invoice && values.gstList && values.gstList.length > 0) {
         values.gstList.forEach((gst) => {
           const rate = Number(gst.rate) || 0;
           const taxAmount = (subTotal * rate) / 100;
-          if (gst.type === "CGST") cgstPrice += taxAmount;
-          if (gst.type === "SGST") sgstPrice += taxAmount;
-          if (gst.type === "IGST") igstPrice += taxAmount;
+          if (gst.type === "CGST") {
+            cgst.rate = rate;
+            cgst.amount += taxAmount;
+          }
+          if (gst.type === "SGST") {
+            sgst.rate = rate;
+            sgst.amount += taxAmount;
+          }
+          if (gst.type === "IGST") {
+            igst.rate = rate;
+            igst.amount += taxAmount;
+          }
         });
       }
 
-      const grandTotal = subTotal + cgstPrice + sgstPrice + igstPrice;
+      const grandTotal = subTotal + cgst.amount + sgst.amount + igst.amount;
 
-      // 2. Build Normalized Data Schema
-      const data = {
-        meta: {
-          username: username,
-          clientName: values.clientDetails.clientName,
-          clientCompany: values.clientDetails.clientCompany,
-          clientEmail: values.clientDetails.clientEmail,
-          projectNumber: values.clientDetails.projectNumber,
-          date: values.clientDetails.date,
-          clientLocality: values.clientDetails.clientLocality,
-          clientCity: values.clientDetails.clientCity,
-          clientPincode: values.clientDetails.clientPincode,
-          clientState: values.clientDetails.clientState,
-          invoiceNumber: values.invoiceDetails?.invoiceNumber,
-          invoiceDate: values.invoiceDetails?.invoiceDate,
-        },
-        scopeOfWork: docType === "proposal" ? (values.scopeOfWork?.sections || []) : [],
-        timeline: (docType === "proposal" && values.scopeOfWork?.timelineEnabled) ? (values.scopeOfWork?.timeline || []) : [],
-        estimation: {
-          rows: docType === "proposal" ? (values.estimation?.map(item => ({
-            description: item.description,
+      let payload: any;
+
+      if (docType === "proposal") {
+        // Flatten Scope of Work items into a flat sections array for the payload
+        const sowSections: any[] = [];
+        values.scopeOfWork?.sections?.forEach((section, sIndex) => {
+          section.items.forEach((item, iIndex) => {
+            sowSections.push({
+              sectionId: `sow-${sIndex + 1}-${iIndex + 1}`,
+              title: section.title,
+              subtitle: {
+                enabled: !!item.subTitle,
+                text: item.subTitle || ""
+              },
+              description: Array.isArray(item.content) ? item.content.join("\n") : item.content
+            });
+          });
+        });
+
+        payload = {
+          documentType: docType,
+          meta: {
+            proposalNumber: values.clientDetails.projectNumber,
+            date: values.clientDetails.date,
+            generatedBy: { username }
+          },
+          client: {
+            clientName: values.clientDetails.clientName,
+            companyName: values.clientDetails.clientCompany,
+            projectNumber: values.clientDetails.projectNumber
+          },
+          scopeOfWork: {
+            sections: sowSections
+          },
+          projectTimeline: {
+            enabled: !!values.scopeOfWork?.timelineEnabled,
+            phases: (values.scopeOfWork?.timeline || []).map((p, i) => ({
+              phaseId: `phase-${i + 1}`,
+              phaseName: p.phase || "",
+              duration: {
+                value: Number(p.duration) || 0,
+                unit: (p.unit || "Days").toLowerCase()
+              },
+              deliverables: p.deliverables || ""
+            }))
+          },
+          estimation: {
+            enabled: (values.estimation?.length || 0) > 0,
+            items: (values.estimation || []).map((e, i) => ({
+              itemId: `est-${i + 1}`,
+              description: e.description || "",
+              quantity: Number(e.qty) || 0,
+              rate: Number(e.rate) || 0,
+              amount: (Number(e.rate) || 0) * (Number(e.qty) || 0)
+            })),
+            summary: {
+              totalPayable: values.estimation?.reduce((sum, item) => sum + (Number(item.rate) || 0) * (Number(item.qty) || 0), 0) || 0
+            }
+          }
+        };
+      } else {
+        // New Schema for Invoice or Quotation
+        payload = {
+          documentType: docType,
+          meta: {
+            generatedBy: { username },
+            invoiceNumber: values.invoiceDetails?.invoiceNumber,
+            invoiceDate: values.invoiceDetails?.invoiceDate,
+            exportInvoice: !!values.export_invoice,
+            lutNumber: values.export_invoice ? values.lut_number || "" : "",
+          },
+          client: {
+            name: values.clientDetails.clientName,
+            company: values.clientDetails.clientCompany,
+            email: values.clientDetails.clientEmail,
+            locality: values.clientDetails.clientLocality,
+            city: values.clientDetails.clientCity,
+            pincode: Number(values.clientDetails.clientPincode) || values.clientDetails.clientPincode,
+            state: values.clientDetails.clientState,
+            gstin: values.clientDetails.clientGstIn || "",
+          },
+          items: values.items.map(item => ({
+            description: item.name,
             rate: Number(item.rate),
-            qty: Number(item.qty),
-            total: (Number(item.rate) || 0) * (Number(item.qty) || 0)
-          })) || []) : [],
-          subtotal: docType === "proposal" ? (values.estimation?.reduce((sum, item) => sum + (Number(item.rate) || 0) * (Number(item.qty) || 0), 0) || 0) : 0,
-          total: docType === "proposal" ? (values.estimation?.reduce((sum, item) => sum + (Number(item.rate) || 0) * (Number(item.qty) || 0), 0) || 0) : 0,
-        },
-        standardItems: values.items.map(item => ({
-          name: item.name,
-          rate: Number(item.rate),
-          quantity: Number(item.quantity),
-          total: (Number(item.rate) || 0) * (Number(item.quantity) || 0)
-        })),
-        flags: {
-          exportInvoice: values.export_invoice,
-          timelineEnabled: values.scopeOfWork?.timelineEnabled || false,
-        },
-        compliance: {
-          clientGstin: values.clientDetails.clientGstIn || "",
-          lutNumber: values.export_invoice ? values.lut_number || "" : "",
-        },
-        // Totals for Root level integration
-        subtotal: subTotal.toFixed(2),
-        total: grandTotal.toFixed(2),
-        value: subTotal.toFixed(2),
-        taxDetails: {
-          cgst: cgstPrice.toFixed(2),
-          sgst: sgstPrice.toFixed(2),
-          igst: igstPrice.toFixed(2)
-        }
-      };
-
-      const payload = {
-        documentType: docType,
-        data,
-      };
+            quantity: Number(item.quantity),
+            amount: (Number(item.rate) || 0) * (Number(item.quantity) || 0)
+          })),
+          tax: {
+            cgst: { rate: cgst.rate, amount: cgst.amount },
+            sgst: { rate: sgst.rate, amount: sgst.amount },
+            igst: { rate: igst.rate, amount: igst.amount }
+          },
+          totals: {
+            subtotal: subTotal,
+            taxTotal: cgst.amount + sgst.amount + igst.amount,
+            grandTotal: grandTotal
+          }
+        };
+      }
 
       console.log("FINAL PAYLOAD:", payload);
 
