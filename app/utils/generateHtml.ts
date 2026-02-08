@@ -26,7 +26,7 @@ export function generateScopeOfWorkHtml(sections: ScopeOfWorkSection[]): string 
 
         // Main Section Title (if present, usually handled by template structure, but fitting into 'scope-of-work' block)
         if (section.title) {
-            sectionHtml += `<h3 style="font-size: 14pt; font-weight: 700; color: #ee731b; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid #ee731b; display: inline-block; padding-bottom: 4px;">${section.title}</h3>`;
+            sectionHtml += `<h3 style="font-size: 14pt; font-weight: 700; color: #000000; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid #ee731b; display: inline-block; padding-bottom: 4px;">${section.title}</h3>`;
         }
 
         section.items.forEach((item) => {
