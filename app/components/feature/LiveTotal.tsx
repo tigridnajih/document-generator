@@ -83,7 +83,7 @@ export function LiveTotal({ docType }: LiveTotalProps) {
 
     return (
         <Section title="Total Summary">
-            <div className="space-y-4">
+            <div className="bg-neutral-900/30 border border-white/5 rounded-2xl p-6 space-y-4 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.02)] backdrop-blur-sm">
                 {/* Calculation Stack */}
                 <div className="space-y-4">
                     <div className="flex justify-between items-center">
