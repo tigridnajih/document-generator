@@ -52,11 +52,11 @@ export function SectionItem({ data, onChange, onRemove, dragControls }: SectionI
     };
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-6 pt-2 pb-6 border-b border-neutral-800/60 last:border-0 relative group/section">
             {/* Section Header */}
-            <div className="flex items-center gap-3 px-1">
+            <div className="flex items-center gap-4 px-1 group-hover/section:opacity-100 transition-opacity">
                 <div
-                    className="cursor-grab active:cursor-grabbing text-neutral-600 hover:text-neutral-400 p-1"
+                    className="cursor-grab active:cursor-grabbing text-neutral-700 hover:text-neutral-400 p-1 opacity-0 group-hover/section:opacity-100 transition-opacity"
                     onPointerDown={(e) => dragControls?.start(e)}
                 >
                     <GripVertical className="w-5 h-5" />
@@ -68,13 +68,13 @@ export function SectionItem({ data, onChange, onRemove, dragControls }: SectionI
                         value={data.title}
                         onChange={(e) => onChange({ ...data, title: e.target.value })}
                         placeholder="Section Title (e.g. Scope of Work)"
-                        className="w-full bg-transparent border-b border-neutral-800/50 outline-none text-base font-semibold text-white placeholder:text-neutral-600 focus:border-orange-500/50 transition-colors py-1"
+                        className="w-full bg-transparent border-b border-neutral-800 focus:border-orange-500 py-2 outline-none text-lg font-bold text-white placeholder:text-neutral-700 transition-colors"
                     />
                 </div>
 
                 <button
                     onClick={onRemove}
-                    className="text-neutral-600 hover:text-red-500 p-2 hover:bg-red-500/10 rounded-md transition-colors"
+                    className="text-neutral-700 hover:text-red-500 p-2 hover:bg-red-500/10 rounded-md transition-colors opacity-0 group-hover/section:opacity-100"
                     title="Delete Section"
                 >
                     <Trash2 className="w-4 h-4" />
@@ -82,21 +82,7 @@ export function SectionItem({ data, onChange, onRemove, dragControls }: SectionI
             </div>
 
             {/* Section Content */}
-            <div className="space-y-4">
-                {data.items.length === 0 && (
-                    <div className="text-center py-6 border-2 border-dashed border-neutral-800/50 rounded-lg">
-                        <p className="text-neutral-500 text-sm mb-3">No content blocks yet</p>
-                        <button
-                            type="button"
-                            onClick={handleAddBlock}
-                            className="inline-flex items-center gap-2 px-3 py-1.5 bg-neutral-800 hover:bg-neutral-700 text-neutral-300 rounded-md text-xs font-medium transition-colors"
-                        >
-                            <Plus className="w-3.5 h-3.5" />
-                            Add First Block
-                        </button>
-                    </div>
-                )}
-
+            <div className="space-y-6 pl-10">
                 <Reorder.Group
                     axis="y"
                     values={data.items}
@@ -114,16 +100,16 @@ export function SectionItem({ data, onChange, onRemove, dragControls }: SectionI
                     ))}
                 </Reorder.Group>
 
-                {data.items.length > 0 && (
+                <div className="flex justify-start pt-2">
                     <button
                         type="button"
                         onClick={handleAddBlock}
-                        className="w-full py-4 flex items-center justify-center gap-2 border border-dashed border-neutral-800 hover:border-orange-500/30 hover:bg-orange-500/5 text-neutral-500 hover:text-orange-500 rounded-xl transition-all text-sm font-medium"
+                        className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-neutral-500 hover:text-orange-500 transition-colors rounded-md hover:bg-orange-500/10"
                     >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-3.5 h-3.5" />
                         Add Content Block
                     </button>
-                )}
+                </div>
             </div>
         </div>
     );
