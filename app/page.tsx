@@ -242,7 +242,7 @@ export default function Home() {
 
       console.log("FINAL PAYLOAD:", payload);
 
-      const res = await fetch(API_URL, {
+      const res = await fetch("/api/generate-doc", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
