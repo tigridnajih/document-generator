@@ -23,6 +23,7 @@ import { DocumentSuccessModal } from "@/components/voice/DocumentSuccessModal";
 import { DocType } from "@/lib/types";
 import { API_URL } from "@/lib/constants";
 import { documentFormSchema, DocumentFormValues } from "@/lib/schemas";
+import { generateProposalHtml } from "./utils/generateHtml";
 
 
 export default function Home() {
@@ -184,6 +185,14 @@ export default function Home() {
             }
           }
         };
+
+        // --- HTML GENERATION (Strategy Test) ---
+        // We cast values to any to match the loose interface in generateHtml for now
+        const generatedHtml = generateProposalHtml(values as any);
+        console.log("GENERATED PROPOSAL HTML PREVIEW:", generatedHtml);
+        payload.html = generatedHtml;
+        // ---------------------------------------
+
       } else {
         // New Schema for Invoice or Quotation
         payload = {

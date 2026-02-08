@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -202,6 +202,7 @@
             font-weight: 800;
             margin-top: 10px;
             text-transform: uppercase;
+            font-family: inherit;
         }
 
         .cover-details {
@@ -450,7 +451,7 @@
                 </div>
             </div>
         </section>
-
+        
         <!-- SCOPE OF WORK -->
         <section class="section-container">
             <h2>Scope of Work</h2>
@@ -644,4 +645,4 @@
 
 </body>
 
-</html>
+</html>`;
