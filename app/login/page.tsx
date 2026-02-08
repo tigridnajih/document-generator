@@ -70,16 +70,6 @@ export default function LoginPage() {
             {/* Content Container */}
             <div className="relative z-10 w-full max-w-[400px]">
                 <div className="text-center mb-10">
-                    {/* Profile Icon */}
-                    <motion.div
-                        initial={{ scale: 0, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        transition={{ duration: 0.5, delay: 0.2 }}
-                        className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neutral-900/50 border border-white/10 shadow-[0_0_30px_-10px_rgba(255,255,255,0.1)] mb-6"
-                    >
-                        <User className="w-8 h-8 text-white" />
-                    </motion.div>
-
                     {/* Typing Animation Title */}
                     <h1 className="text-4xl sm:text-5xl font-bold tracking-tighter text-white drop-shadow-sm h-14 overflow-visible flex justify-center">
                         {text.split("").map((char, i) => (
@@ -146,14 +136,7 @@ export default function LoginPage() {
                         disabled={isLoading || isSuccess || !username || !password}
                         whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(255,255,255,0.2)" }}
                         whileTap={{ scale: 0.98 }}
-                        className={`
-                            w-full h-[52px] flex items-center justify-center text-[15px] font-semibold rounded-xl transition-colors duration-300 mt-6
-                            ${isSuccess
-                                ? "bg-white text-neutral-950"
-                                : "bg-white text-neutral-950 hover:bg-neutral-200"
-                            }
-                            disabled:opacity-70 disabled:cursor-not-allowed
-                        `}
+                        className="w-full h-[52px] flex items-center justify-center text-[15px] font-semibold rounded-xl transition-colors duration-300 mt-6 bg-white text-neutral-950 hover:bg-neutral-200 disabled:opacity-100 disabled:cursor-not-allowed"
                     >
                         <AnimatePresence mode="wait">
                             {isSuccess ? (
