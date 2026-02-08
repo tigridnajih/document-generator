@@ -1,8 +1,9 @@
-"use client";
-
-import { Trash2, GripVertical, Plus, List, AlignLeft, X } from "lucide-react";
+import { Trash2, GripVertical, Plus, List, AlignLeft, X, Mic, Square, Loader2 } from "lucide-react";
 import { DragControls } from "framer-motion";
 import { cn } from "@/lib/utils";
+import { useState, useRef } from "react";
+import { useFormContext } from "react-hook-form";
+import { toast } from "sonner";
 
 export type ContentType = "paragraph" | "bullets";
 
@@ -21,6 +22,12 @@ interface ContentBlockProps {
 }
 
 export function ContentBlock({ data, onChange, onRemove, dragControls }: ContentBlockProps) {
+    const { getValues } = useFormContext();
+    const [isListening, setIsListening] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
+    const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+    const audioChunksRef = useRef<Blob[]>([]);
+
     const handleTypeChange = (value: ContentType) => {
         let newContent: string | string[] = "";
         if (value === "paragraph") {
@@ -41,6 +48,86 @@ export function ContentBlock({ data, onChange, onRemove, dragControls }: Content
 
     const handleContentChange = (val: string | string[]) => {
         onChange({ ...data, content: val });
+    };
+
+    const toggleVoice = async () => {
+        if (isListening) {
+            // STOP
+            if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+                mediaRecorderRef.current.stop();
+            }
+            setIsListening(false);
+        } else {
+            // START
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                audioChunksRef.current = [];
+                const mediaRecorder = new MediaRecorder(stream);
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) audioChunksRef.current.push(event.data);
+                };
+
+                mediaRecorder.onstop = async () => {
+                    // Cleanup tracks
+                    stream.getTracks().forEach(track => track.stop());
+
+                    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                    setIsProcessing(true);
+                    const loadingToast = toast.loading("Transcribing...");
+
+                    try {
+                        const formData = new FormData();
+                        formData.append("audio", audioBlob, "recording.webm");
+                        // We send current values to give context, but mainly we want the transcript
+                        formData.append("currentValues", JSON.stringify(getValues()));
+
+                        // Fake a focused field context to help the AI understand where we are
+                        formData.append("focusedField", JSON.stringify({
+                            name: "content_block_description",
+                            type: "textarea",
+                            placeholder: "Description"
+                        }));
+
+                        const response = await fetch("/api/voice-action", {
+                            method: "POST",
+                            body: formData,
+                        });
+
+                        if (!response.ok) throw new Error("Transcription failed");
+
+                        const { transcript } = await response.json();
+
+                        if (transcript) {
+                            if (isParagraph) {
+                                // Append to existing text
+                                const currentText = textContent;
+                                const newText = currentText ? `${currentText} ${transcript}` : transcript;
+                                handleContentChange(newText);
+                            } else {
+                                // For bullets, add as new item
+                                const newList = [...bulletList, transcript];
+                                handleContentChange(newList);
+                            }
+                            toast.success("Transcribed!");
+                        }
+                    } catch (error) {
+                        console.error(error);
+                        toast.error("Failed to transcribe");
+                    } finally {
+                        setIsProcessing(false);
+                        toast.dismiss(loadingToast);
+                    }
+                };
+
+                mediaRecorderRef.current = mediaRecorder;
+                mediaRecorder.start();
+                setIsListening(true);
+            } catch (err) {
+                console.error("Mic Error:", err);
+                toast.error("Could not access microphone");
+            }
+        }
     };
 
     // Safe typed helpers
@@ -72,8 +159,29 @@ export function ContentBlock({ data, onChange, onRemove, dragControls }: Content
                             />
                         </div>
 
-                        {/* Type Selector */}
-                        <div className="flex justify-start sm:justify-end">
+                        {/* Type Selector & Mic */}
+                        <div className="flex justify-start sm:justify-end gap-2">
+                            <button
+                                type="button"
+                                onClick={toggleVoice}
+                                disabled={isProcessing}
+                                className={cn(
+                                    "flex items-center justify-center w-8 h-8 rounded-lg transition-all border",
+                                    isListening
+                                        ? "bg-red-500/10 text-red-500 border-red-500/50 animate-pulse"
+                                        : "bg-neutral-900/50 text-neutral-400 border-neutral-800/60 hover:text-orange-500 hover:border-orange-500/50"
+                                )}
+                                title="Dictate Description"
+                            >
+                                {isProcessing ? (
+                                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                ) : isListening ? (
+                                    <Square className="w-3.5 h-3.5 fill-current" />
+                                ) : (
+                                    <Mic className="w-3.5 h-3.5" />
+                                )}
+                            </button>
+
                             <div className="flex items-center gap-1 bg-neutral-900/50 rounded-lg p-1 border border-neutral-800/60">
                                 <button
                                     type="button"
