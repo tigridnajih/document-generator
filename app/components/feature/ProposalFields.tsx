@@ -127,7 +127,7 @@ export function ProposalFields() {
                                                     placeholder="Deliverables"
                                                 />
                                             </div>
-                                            <div className="sm:col-span-1 flex justify-end">
+                                            <div className="sm:col-span-1 flex justify-end sm:justify-center pt-2 sm:pt-3">
                                                 <button
                                                     type="button"
                                                     onClick={() => removeTimeline(index)}
