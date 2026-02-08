@@ -75,9 +75,9 @@ export default function LoginPage() {
                         initial={{ scale: 0, opacity: 0 }}
                         animate={{ scale: 1, opacity: 1 }}
                         transition={{ duration: 0.5, delay: 0.2 }}
-                        className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-neutral-900/50 border border-orange-500/20 shadow-[0_0_30px_-10px_rgba(249,115,22,0.3)] mb-6"
+                        className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-neutral-900/50 border border-white/10 shadow-[0_0_30px_-10px_rgba(255,255,255,0.1)] mb-6"
                     >
-                        <User className="w-8 h-8 text-orange-500" />
+                        <User className="w-8 h-8 text-white" />
                     </motion.div>
 
                     {/* Typing Animation Title */}
@@ -117,7 +117,7 @@ export default function LoginPage() {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                             required
-                            className="w-full h-[52px] pl-11 pr-4 bg-neutral-900 md:bg-black/40 border border-neutral-800 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/10 transition-all font-sans"
+                            className="w-full h-[52px] pl-11 pr-4 bg-neutral-900 md:bg-neutral-900 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:bg-neutral-800 transition-all font-sans"
                             placeholder="Username"
                             disabled={isLoading || isSuccess}
                         />
@@ -134,7 +134,7 @@ export default function LoginPage() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             required
-                            className="w-full h-[52px] pl-11 pr-4 bg-neutral-900 md:bg-black/40 border border-neutral-800 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/10 transition-all font-sans"
+                            className="w-full h-[52px] pl-11 pr-4 bg-neutral-900 md:bg-neutral-900 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:bg-neutral-800 transition-all font-sans"
                             placeholder="Password"
                             disabled={isLoading || isSuccess}
                         />
@@ -144,12 +144,12 @@ export default function LoginPage() {
                     <motion.button
                         type="submit"
                         disabled={isLoading || isSuccess || !username || !password}
-                        whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(255,255,255,0.1)" }}
+                        whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(255,255,255,0.2)" }}
                         whileTap={{ scale: 0.98 }}
                         className={`
                             w-full h-[52px] flex items-center justify-center text-[15px] font-semibold rounded-xl transition-colors duration-300 mt-6
                             ${isSuccess
-                                ? "bg-green-500 text-white"
+                                ? "bg-white text-neutral-950"
                                 : "bg-white text-neutral-950 hover:bg-neutral-200"
                             }
                             disabled:opacity-70 disabled:cursor-not-allowed
