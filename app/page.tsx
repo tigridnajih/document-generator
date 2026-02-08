@@ -130,7 +130,15 @@ export default function Home() {
                 enabled: !!item.subTitle,
                 text: item.subTitle || ""
               },
-              description: Array.isArray(item.content) ? item.content.join("\n") : item.content
+              description: item.contentType === "bullets"
+                ? {
+                  type: "list",
+                  items: (Array.isArray(item.content) ? item.content : [item.content]).filter(i => i && i.trim() !== "")
+                }
+                : {
+                  type: "text",
+                  text: (Array.isArray(item.content) ? item.content.join("\n") : (item.content || "")).trim()
+                }
             });
           });
         });
