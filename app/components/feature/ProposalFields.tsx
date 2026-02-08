@@ -100,7 +100,7 @@ export function ProposalFields() {
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, scale: 0.95 }}
-                                            className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-start p-4 bg-neutral-900/30 border border-neutral-800/50 rounded-xl group relative"
+                                            className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-start group relative"
                                         >
                                             <div className="sm:col-span-4">
                                                 <Input
