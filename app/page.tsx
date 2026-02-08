@@ -23,7 +23,8 @@ import { DocumentSuccessModal } from "@/components/voice/DocumentSuccessModal";
 import { DocType } from "@/lib/types";
 import { API_URL } from "@/lib/constants";
 import { documentFormSchema, DocumentFormValues } from "@/lib/schemas";
-import { generateProposalHtml } from "./utils/generateHtml";
+import { generateProposalHtml } from "./utils/generateProposalHtml";
+import { generateInvoiceHtml } from "./utils/generateInvoiceHtml";
 
 
 export default function Home() {
@@ -231,6 +232,12 @@ export default function Home() {
             grandTotal: grandTotal
           }
         };
+
+        // --- HTML GENERATION (Strategy Test) ---
+        const generatedHtml = generateInvoiceHtml(payload);
+        console.log("GENERATED INVOICE/QUOTATION HTML PREVIEW:", generatedHtml);
+        payload.html = generatedHtml;
+        // ---------------------------------------
       }
 
       console.log("FINAL PAYLOAD:", payload);

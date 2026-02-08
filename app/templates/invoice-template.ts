@@ -1,0 +1,445 @@
+export const INVOICE_TEMPLATE = `<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Invoice - Tigrid</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            font-size: 10pt;
+            line-height: 1.6;
+            color: #1e293b;
+            background: #ffffff;
+            padding: 20px;
+        }
+
+        .invoice-container {
+            width: 210mm;
+            width: 100%;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 0;
+            position: relative;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .logo-img {
+            max-height: 50px;
+            width: auto;
+            display: block;
+        }
+
+        .company-info {
+            text-align: right;
+            font-size: 9pt;
+            line-height: 1.5;
+            color: #000000;
+        }
+
+        .company-info strong {
+            font-size: 11.5pt;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Invoice Type Section */
+        .invoice-type-section {
+            margin-bottom: 12px;
+        }
+
+        .invoice-type {
+            font-size: 11pt;
+            font-weight: 800;
+            color: #000000;
+            text-transform: uppercase;
+        }
+
+        /* Client & Meta Details Section */
+        .info-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 0;
+        }
+
+        .client-section {
+            width: 48%;
+        }
+
+        .section-title {
+            font-weight: 600;
+            font-size: 8.5pt;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .placeholder {
+            font-size: 9pt;
+            line-height: 1.4;
+        }
+
+        .invoice-details {
+            width: 43%;
+            text-align: left;
+        }
+
+        .detail-row {
+            margin-bottom: 4px;
+            font-size: 9pt;
+            display: flex;
+            font-weight: 700;
+        }
+
+        .detail-row strong {
+            display: inline-block;
+            width: 130px;
+        }
+
+        /* Items Table */
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+            margin-bottom: 0;
+        }
+
+        .items-table th {
+            text-align: left;
+            padding: 16px 12px;
+            color: #000000;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 8pt;
+            letter-spacing: 0.05em;
+            border-top: 2px solid #ff6600;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .items-table td {
+            padding: 16px 12px;
+            border-bottom: 2px solid #e5e7eb;
+            vertical-align: top;
+            font-size: 10pt;
+            color: #1e293b;
+        }
+
+        .items-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .items-table td.description {
+            font-weight: 500;
+        }
+
+        /* Summary Section */
+        .summary-container {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 12px;
+        }
+
+        .summary-card {
+            width: 100%;
+        }
+
+        .summary-row {
+            display: flex;
+            font-size: 8pt;
+            font-weight: 700;
+            color: #000000;
+            padding: 8px 12px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+
+        .summary-row .label {
+            width: 80%;
+            text-align: right;
+            padding-right: 20px;
+        }
+
+        .summary-row .value {
+            width: 20%;
+            text-align: right;
+            color: #000000;
+            font-weight: 600;
+        }
+
+        .summary-grand-total {
+            display: flex;
+            margin-top: 8px;
+            padding: 16px 12px;
+            border-top: 2px solid #e5e7eb;
+            border-bottom: 2px solid #ff6600;
+            font-weight: 700;
+        }
+
+        .summary-grand-total .label {
+            width: 80%;
+            text-align: left;
+            padding-right: 20px;
+            font-size: 11pt;
+            color: #1e293b;
+            letter-spacing: 0.02em;
+        }
+
+        .summary-grand-total .value {
+            width: 20%;
+            text-align: right;
+            font-size: 12pt;
+            color: #ff6600;
+        }
+
+        /* Words & Declaration Section */
+        .words-declaration-section {
+            margin-top: 16px;
+        }
+
+        .amount-words {
+            font-size: 11pt;
+            font-weight: 800;
+            margin-bottom: 0;
+            margin-top: 2px;
+            text-transform: uppercase;
+        }
+
+        .declaration {
+            font-size: 9pt;
+            font-style: italic;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        /* Footer Section */
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 20px;
+        }
+
+        .bank-details {
+            width: 60%;
+        }
+
+        .bank-details .title {
+            font-weight: 800;
+            font-size: 10.5pt;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .bank-row {
+            margin-bottom: 4px;
+            font-size: 9.5pt;
+            display: flex;
+        }
+
+        .bank-row .label {
+            width: 110px;
+            font-weight: 700;
+        }
+
+        .bank-row .colon {
+            width: 20px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .bank-row .value {
+            font-weight: 500;
+        }
+
+        .signature-section {
+            width: 40%;
+            text-align: center;
+        }
+
+        .signature-box {
+            min-height: 80px;
+            margin-bottom: 8px;
+            position: relative;
+        }
+
+        .signature-img {
+            max-height: 80px;
+            width: auto;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .auth-text {
+            font-size: 9pt;
+            color: #000000;
+        }
+
+        @media print {
+            @page {
+                size: A4;
+                margin: 0;
+            }
+
+            body {
+                background: #ffffff;
+                padding: 0;
+            }
+
+            .invoice-container {
+                width: 100%;
+                margin: 0;
+                padding: 1.25cm;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="invoice-container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo-section">
+                <img src="https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Invoice/tigrid_logo.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvSW52b2ljZS90aWdyaWRfbG9nby5wbmciLCJpYXQiOjE3Njc5ODA0MzQsImV4cCI6MTc3MDU3MjQzNH0.maDLpLEqIJnDogiDSqzBIiIKH6ocGcyw7aAmN0HnEI0"
+                    alt="Tigrid Logo" class="logo-img">
+            </div>
+            <div class="company-info">
+                <strong>TIGRID TECHNOLOGIES PVT LTD</strong>
+                <div>98/102, 1st Floor, M squared Building,</div>
+                <div>Technopark, Trivandrum - 695581</div>
+                <div>Ph: +91 9867726557</div>
+                <div>Email: admin@tigrid.in</div>
+                <div>GSTIN: 32AALCT6907Q1ZU</div>
+                <div>[[lut_number]]</div>
+                <div>CIN: U62012KL2023PTC081294</div>
+            </div>
+        </header>
+
+        <!-- Invoice Type -->
+        <div class="invoice-type-section">
+            <div class="invoice-type">GST INVOICE - CASH / CREDIT</div>
+        </div>
+
+        <!-- Client & Meta Details -->
+        <section class="info-section">
+            <div class="client-section">
+                <h2 class="section-title">CLIENT ADDRESS:</h2>
+                <div class="placeholder">
+                    <div>[[client_name]]</div>
+                    <div>[[client_company_name]]</div>
+                    <div>[[client_town]]</div>
+                    <div>[[client_city]]</div>
+                    <div>[[client_pincode]]</div>
+                    <div>[[client_state]]</div>
+                </div>
+            </div>
+            <div class="invoice-details">
+                <div class="detail-row">
+                    <strong>GSTIN :</strong>
+                    <div>[[gst_in]]</div>
+                </div>
+                <div class="detail-row">
+                    <strong>INVOICE NUMBER :</strong>
+                    <div>[[invoice_no]]</div>
+                </div>
+                <div class="detail-row">
+                    <strong>INVOICE DATE :</strong>
+                    <div>[[invoice_date]]</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Items Table -->
+        <table class="items-table">
+            <thead>
+                <tr>
+                    <th style="width: 55%; text-align: left;">DESCRIPTION</th>
+                    <th style="width: 15%; text-align: center;">RATE</th>
+                    <th style="width: 10%; text-align: center;">QTY</th>
+                    <th style="width: 20%; text-align: right;">TOTAL</th>
+                </tr>
+            </thead>
+            <tbody>
+                [[item_row]]
+            </tbody>
+        </table>
+
+        <!-- Summary Section -->
+        <div class="summary-container">
+            <div class="summary-card">
+                <div class="summary-row">
+                    <div class="label">SUBTOTAL</div>
+                    <div class="value">
+                        <div>[[subtotal]]</div>
+                    </div>
+                </div>
+                <div class="summary-row">
+                    <div class="label">TAX DETAILS</div>
+                    <div class="value">
+                        <div>[[gst_details]]</div>
+                    </div>
+                </div>
+                <div class="summary-grand-total">
+                    <div class="label">Grand Total</div>
+                    <div class="value">
+                        <div>[[total]]</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Words & Declaration -->
+        <div class="words-declaration-section">
+            <div class="amount-words">
+                <div>INR [[price_in_text]] ONLY</div>
+            </div>
+            <div class="declaration">
+                <div>[[declaration]]</div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <div class="bank-details">
+                <h2 class="title">TIGrid Bank Details</h2>
+                <div class="bank-row"><span class="label">A/C NAME</span><span class="colon">:</span><span
+                        class="value">TIGRID TECHNOLOGIES PRIVATE LIMITED</span></div>
+                <div class="bank-row"><span class="label">A/C No</span><span class="colon">:</span><span
+                        class="value">41923692420</span></div>
+                <div class="bank-row"><span class="label">IFSC</span><span class="colon">:</span><span
+                        class="value">SBIN0070445</span></div>
+                <div class="bank-row"><span class="label">BRANCH</span><span class="colon">:</span><span
+                        class="value">KAZHAKUTTAM</span></div>
+                <div class="bank-row"><span class="label">BANK NAME</span><span class="colon">:</span><span
+                        class="value">STATE BANK OF INDIA</span></div>
+            </div>
+            <div class="signature-section">
+                <div class="signature-box">
+                    <img src="https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Invoice/invoice_signature.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvSW52b2ljZS9pbnZvaWNlX3NpZ25hdHVyZS5wbmciLCJpYXQiOjE3Njc5NzgyODYsImV4cCI6MjM5ODY5ODI4Nn0.68G38jtoQlZ2Gyv4tSSyt0GZ6_L5thIKC5Iw5oAM3wg"
+                        alt="Authorized Signature" class="signature-img">
+                </div>
+                <div class="auth-text">Authorised Signatory</div>
+            </div>
+        </footer>
+    </div>
+</body>
+
+</html>`;

@@ -10,21 +10,12 @@ interface ScopeOfWorkSection {
     }[];
 }
 
-interface ProposalData {
-    scopeOfWork?: {
-        sections?: ScopeOfWorkSection[];
-    };
-    // Add other fields as needed for future replacement
-    [key: string]: any;
-}
-
 export function generateScopeOfWorkHtml(sections: ScopeOfWorkSection[]): string {
     if (!sections || sections.length === 0) return "";
 
     return sections.map((section) => {
         let sectionHtml = `<div class="scope-section" style="margin-bottom: 30px;">`;
 
-        // Main Section Title (if present, usually handled by template structure, but fitting into 'scope-of-work' block)
         if (section.title) {
             sectionHtml += `<h3 style="font-size: 14pt; font-weight: 700; color: #000000; margin-bottom: 15px; text-transform: uppercase; border-bottom: 1px solid #ee731b; display: inline-block; padding-bottom: 4px;">${section.title}</h3>`;
         }
@@ -32,12 +23,10 @@ export function generateScopeOfWorkHtml(sections: ScopeOfWorkSection[]): string 
         section.items.forEach((item) => {
             sectionHtml += `<div class="scope-item-block" style="margin-bottom: 20px;">`;
 
-            // Subtitle
             if (item.subTitle) {
                 sectionHtml += `<h4 style="font-size: 11pt; font-weight: 700; margin-bottom: 8px; color: #000;">${item.subTitle}</h4>`;
             }
 
-            // Content
             if (item.contentType === "bullets" && Array.isArray(item.content)) {
                 sectionHtml += `<ul class="scope-list">`;
                 item.content.forEach((bullet) => {
@@ -47,7 +36,6 @@ export function generateScopeOfWorkHtml(sections: ScopeOfWorkSection[]): string 
                 });
                 sectionHtml += `</ul>`;
             } else if (typeof item.content === "string") {
-                // Handle paragraphs (newlines to <br> or <p>)
                 const paragraphs = item.content.split('\n').filter(p => p.trim());
                 paragraphs.forEach(p => {
                     sectionHtml += `<p>${p}</p>`;
@@ -62,16 +50,43 @@ export function generateScopeOfWorkHtml(sections: ScopeOfWorkSection[]): string 
     }).join("\n");
 }
 
-export function generateProposalHtml(data: ProposalData): string {
+export function generateEstimationHtml(items: any[]): string {
+    if (!items || items.length === 0) return "";
+
+    return items.map((item) => {
+        const rate = Number(item.rate) || 0;
+        const qty = Number(item.qty) || 0;
+        const total = rate * qty;
+
+        return `
+      <tr>
+        <td>${item.description || ""}<br><span class="text-muted">${item.detailedDescription || ""}</span></td>
+        <td>${rate.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
+        <td>${qty}</td>
+        <td>${total.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
+      </tr>
+    `;
+    }).join("");
+}
+
+export function generateProposalHtml(data: any): string {
     let html = PROPOSAL_TEMPLATE;
 
-    // 1. Generate Scope of Work HTML
-    const sowHtml = generateScopeOfWorkHtml(data.scopeOfWork?.sections || []);
+    html = html.replace("[[proposal_date]]", data.clientDetails?.date || "");
+    html = html.replace("[[PROJECT_TITLE]]", data.clientDetails?.projectTitle || "");
+    html = html.replace("[[PROJECT_NUMBER]]", data.clientDetails?.projectNumber || "");
+    html = html.replace("[[CLIENT_COMPANY]]", data.clientDetails?.clientCompany || "");
 
-    // 2. Replace Placeholder
+    const sowHtml = generateScopeOfWorkHtml(data.scopeOfWork?.sections || []);
     html = html.replace("[[scope_of_work]]", sowHtml);
 
-    // Note: Other placeholders are not replaced yet as per instructions to focus on SOW.
+    const estimationRows = generateEstimationHtml(data.estimation || []);
+    const totalPayable = (data.estimation || []).reduce((sum: number, item: any) =>
+        sum + (Number(item.rate) || 0) * (Number(item.qty) || 0), 0
+    );
+
+    html = html.replace("[[estimation_rows]]", estimationRows);
+    html = html.replace("[[total_payable]]", totalPayable.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }));
 
     return html;
 }
