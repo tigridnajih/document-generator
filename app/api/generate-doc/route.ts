@@ -5,7 +5,12 @@ export async function POST(req: Request) {
     try {
         const payload = await req.json();
 
-        console.log("PROXYING REQUEST TO n8n:", API_URL);
+        if (!API_URL) {
+            console.error("PROXY ERROR: API_URL is not defined");
+            return NextResponse.json({ error: "API_URL configuration missing" }, { status: 500 });
+        }
+
+        console.log("PROXYING REQUEST TO:", API_URL);
 
         const response = await fetch(API_URL, {
             method: "POST",
@@ -17,14 +22,13 @@ export async function POST(req: Request) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            console.error("n8n PROXY ERROR:", errorText);
+            console.error(`n8n PROXY ERROR (${response.status}):`, errorText);
             return NextResponse.json(
-                { error: "Failed to generate document via n8n" },
+                { error: `n8n error: ${errorText || response.statusText}` },
                 { status: response.status }
             );
         }
 
-        // Try to parse JSON, if not return raw text or success
         const contentType = response.headers.get("content-type") || "";
         if (contentType.includes("application/json")) {
             const result = await response.json();
@@ -34,10 +38,15 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: true, message: text });
         }
     } catch (error: any) {
-        console.error("API PROXY EXCEPTION:", error);
+        console.error("API PROXY CRITICAL EXCEPTION:", error);
         return NextResponse.json(
-            { error: error.message || "Internal server error" },
+            {
+                error: "Internal server error during proxying",
+                details: error.message,
+                stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+            },
             { status: 500 }
         );
     }
 }
+
