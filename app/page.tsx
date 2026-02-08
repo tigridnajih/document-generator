@@ -256,13 +256,14 @@ export default function Home() {
                 <User className="w-3.5 h-3.5 text-orange-500" />
                 <span className="text-xs font-medium text-neutral-300">{getUser()?.username || "User"}</span>
               </div>
-              <Link
-                href="/dashboard"
+              <button
+                type="button"
+                onClick={() => router.push("/dashboard")}
                 className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-neutral-900 bg-white hover:bg-neutral-100 transition-all px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full shadow-lg shadow-white/5 active:scale-[0.98] active:translate-y-[1px] duration-200 border border-transparent"
               >
                 <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 stroke-[2.5]" />
                 <span>View Dashboard</span>
-              </Link>
+              </button>
               <button
                 onClick={() => {
                   logout();
@@ -289,15 +290,7 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-              <DocCard
-                label="Dashboard"
-                description="View Statistics"
-                type="dashboard"
-                currentType={docType}
-                onSelect={() => router.push("/dashboard")}
-                icon={<LayoutGrid className="w-5 h-5" />}
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <DocCard
                 label="Proposal"
                 description="Client pitch"
