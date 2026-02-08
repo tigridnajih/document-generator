@@ -1,89 +1,162 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { User, Lock, LogIn } from "lucide-react";
-
+import { User, Lock, ArrowRight, Check, Loader2 } from "lucide-react";
 import { login } from "@/lib/auth";
 import { toast } from "sonner";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
 
 export default function LoginPage() {
     const router = useRouter();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    const [isSuccess, setIsSuccess] = useState(false);
+    const [shake, setShake] = useState(false);
+
+    // Mouse parallax effect for background
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+
+    // Smooth spring animation for mouse movement
+    const userX = useSpring(mouseX, { stiffness: 50, damping: 20 });
+    const userY = useSpring(mouseY, { stiffness: 50, damping: 20 });
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        const { clientX, clientY } = e;
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        mouseX.set(clientX - centerX);
+        mouseY.set(clientY - centerY);
+    };
+
+    // Parallax transforms for background blobs
+    const orb1X = useTransform(userX, (value) => value * -0.05);
+    const orb1Y = useTransform(userY, (value) => value * -0.05);
+    const orb2X = useTransform(userX, (value) => value * 0.08);
+    const orb2Y = useTransform(userY, (value) => value * 0.08);
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setIsLoading(true);
+        setShake(false);
 
-        // Simulate a brief loading state for better UX
-        await new Promise((resolve) => setTimeout(resolve, 500));
+        // Simulate network delay for polish
+        await new Promise((resolve) => setTimeout(resolve, 800));
 
         const user = login(username, password);
 
         if (user) {
-            toast.success(`Welcome back, ${user.username}!`);
-            router.push("/");
+            setIsSuccess(true);
+            setTimeout(() => {
+                toast.success(`Welcome back, ${user.username}!`);
+                router.push("/");
+            }, 500);
         } else {
+            setIsLoading(false);
+            setShake(true);
             toast.error("Invalid username or password");
             setPassword("");
-            setIsLoading(false);
+            setTimeout(() => setShake(false), 500); // Reset shake
+        }
+    };
+
+    const containerVariants = {
+        hidden: { opacity: 0 },
+        visible: {
+            opacity: 1,
+            transition: {
+                staggerChildren: 0.1,
+                delayChildren: 0.2
+            }
+        }
+    };
+
+    const itemVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: {
+            opacity: 1,
+            y: 0,
+            transition: { duration: 0.5, ease: "easeOut" }
         }
     };
 
     return (
-        <main className="min-h-screen bg-[#020202] text-white relative overflow-hidden font-sans selection:bg-tigrid-orange/30">
+        <main
+            className="min-h-screen bg-[#020202] text-white relative overflow-hidden font-sans selection:bg-orange-500/30 flex items-center justify-center p-6"
+            onMouseMove={handleMouseMove}
+        >
             {/* Noise Overlay */}
-            <div className="noise-overlay" />
+            <div className="noise-overlay absolute inset-0 opacity-[0.03] pointer-events-none z-10" />
 
-            {/* Glowing Spheres Background */}
+            {/* Dynamic Background */}
             <div className="fixed inset-0 z-0 pointer-events-none">
                 {/* Large Bottom Left Sphere */}
-                <div className="absolute -bottom-24 -left-24 w-[500px] h-[500px] bg-orange-600/20 blur-[120px] rounded-full animate-pulse duration-[8000ms]" />
+                <motion.div
+                    style={{ x: orb1X, y: orb1Y }}
+                    className="absolute -bottom-24 -left-24 w-[600px] h-[600px] bg-orange-600/15 blur-[120px] rounded-full"
+                />
                 {/* Mid Right Sphere */}
-                <div className="absolute top-1/4 -right-12 w-[300px] h-[300px] bg-orange-600/15 blur-[100px] rounded-full animate-pulse duration-[6000ms]" />
-                {/* Top Center Sphere (Muted) */}
-                <div className="absolute top-20 left-1/2 -translate-x-1/2 w-[400px] h-[400px] bg-orange-950/20 blur-[150px] rounded-full" />
+                <motion.div
+                    style={{ x: orb2X, y: orb2Y }}
+                    className="absolute top-1/4 -right-20 w-[400px] h-[400px] bg-orange-500/10 blur-[100px] rounded-full"
+                />
+                {/* Subtle Top Center */}
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-blue-900/10 blur-[120px] rounded-full opacity-50" />
             </div>
 
-            {/* Top Left Logo - Aligned with website header */}
-            <div className="fixed top-6 left-6 z-20 animate-in fade-in slide-in-from-top-4 duration-700">
+            {/* Logo - Absolute Positioned */}
+            <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                className="fixed top-8 left-8 z-20"
+            >
                 <Image
                     src="/logo.png"
                     alt="TiGRID Logo"
-                    width={100}
-                    height={26}
-                    className="h-6.5 w-auto object-contain brightness-110"
+                    width={110}
+                    height={28}
+                    className="h-7 w-auto object-contain brightness-125 drop-shadow-[0_0_15px_rgba(255,255,255,0.1)]"
                     priority
                 />
-            </div>
+            </motion.div>
 
-            {/* Content Container */}
-            <div className="relative z-10 min-h-screen flex items-center justify-center p-6">
+            {/* Main Card Container */}
+            <motion.div
+                variants={containerVariants}
+                initial="hidden"
+                animate="visible"
+                className="relative z-10 w-full max-w-[420px]"
+            >
+                <motion.div
+                    animate={shake ? { x: [-5, 5, -5, 5, 0] } : {}}
+                    transition={{ duration: 0.4 }}
+                    className="bg-neutral-900/30 backdrop-blur-xl border border-white/5 rounded-3xl p-8 sm:p-10 shadow-[0_0_40px_-10px_rgba(0,0,0,0.5)] relative overflow-hidden group"
+                >
+                    {/* Glass Shine Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-                <div className="w-full max-w-[400px] animate-in fade-in zoom-in-95 duration-500">
-
-                    {/* Header: Workspace Aligned Hierarchy */}
-                    <div className="mb-12 text-center space-y-4">
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold tracking-tighter text-white drop-shadow-sm">
-                            Login
+                    <motion.div variants={itemVariants} className="text-center mb-10 space-y-3">
+                        <div className="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500/20 to-orange-600/5 mb-4 border border-orange-500/10 shadow-[0_0_20px_-5px_rgba(249,115,22,0.3)]">
+                            <Lock className="w-6 h-6 text-orange-500" />
+                        </div>
+                        <h1 className="text-3xl font-bold tracking-tight text-white drop-shadow-sm">
+                            Welcome Back
                         </h1>
-                        <p className="text-neutral-500 max-w-sm mx-auto text-sm leading-relaxed font-medium">
-                            Enter your credentials to access the document generator.
+                        <p className="text-neutral-400 text-sm font-medium">
+                            Enter your credentials to access the workspace.
                         </p>
-                    </div>
+                    </motion.div>
 
-                    {/* Ultra-Minimalist Form (No card, No labels, No borders) */}
-                    <div className="p-0 sm:p-4">
-                        <form onSubmit={handleSubmit} className="space-y-4">
-
-
-                            {/* Username Field */}
+                    <form onSubmit={handleSubmit} className="space-y-5 relative z-10">
+                        <motion.div variants={itemVariants} className="space-y-4">
+                            {/* Username Input */}
                             <div className="relative group/input">
-                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 opacity-30 group-focus-within/input:opacity-80 transition-opacity">
-                                    <User className="w-[16px] h-[16px] text-white" />
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 group-focus-within/input:text-orange-500 transition-colors duration-300">
+                                    <User className="w-5 h-5" />
                                 </div>
                                 <input
                                     id="username"
@@ -91,17 +164,16 @@ export default function LoginPage() {
                                     value={username}
                                     onChange={(e) => setUsername(e.target.value)}
                                     required
-                                    autoFocus
-                                    className="w-full h-[52px] pl-11 pr-4 bg-neutral-900 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-white/10 transition-all font-sans"
+                                    className="w-full h-14 pl-12 pr-4 bg-neutral-950/50 border border-neutral-800 rounded-2xl text-white placeholder-neutral-600 focus:outline-none focus:border-orange-500/50 focus:bg-neutral-900/80 focus:ring-4 focus:ring-orange-500/10 transition-all duration-300 shadow-inner"
                                     placeholder="Username"
-                                    disabled={isLoading}
+                                    disabled={isLoading || isSuccess}
                                 />
                             </div>
 
-                            {/* Password Field */}
+                            {/* Password Input */}
                             <div className="relative group/input">
-                                <div className="absolute left-3.5 top-1/2 -translate-y-1/2 z-20 opacity-30 group-focus-within/input:opacity-80 transition-opacity">
-                                    <Lock className="w-[16px] h-[16px] text-white" />
+                                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-500 group-focus-within/input:text-orange-500 transition-colors duration-300">
+                                    <Lock className="w-5 h-5" />
                                 </div>
                                 <input
                                     id="password"
@@ -109,36 +181,72 @@ export default function LoginPage() {
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     required
-                                    className="w-full h-[52px] pl-11 pr-4 bg-neutral-900 text-[14px] text-white placeholder-neutral-600 rounded-xl focus:outline-none focus:ring-1 focus:ring-white/10 transition-all font-sans"
+                                    className="w-full h-14 pl-12 pr-4 bg-neutral-950/50 border border-neutral-800 rounded-2xl text-white placeholder-neutral-600 focus:outline-none focus:border-orange-500/50 focus:bg-neutral-900/80 focus:ring-4 focus:ring-orange-500/10 transition-all duration-300 shadow-inner"
                                     placeholder="Password"
-                                    disabled={isLoading}
+                                    disabled={isLoading || isSuccess}
                                 />
                             </div>
+                        </motion.div>
 
-
-                            {/* Submit Button */}
-                            <button
+                        <motion.div variants={itemVariants} className="pt-2">
+                            <motion.button
                                 type="submit"
-                                disabled={isLoading || !username || !password}
-                                className="w-full h-[50px] flex items-center justify-center bg-white text-neutral-950 text-[15px] font-semibold rounded-xl transition-all duration-200 hover:bg-neutral-100 active:scale-[0.98] disabled:cursor-not-allowed disabled:active:scale-100"
+                                disabled={isLoading || isSuccess || !username || !password}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
+                                className={`
+                                    w-full h-14 flex items-center justify-center font-semibold rounded-2xl transition-all duration-300 shadow-lg
+                                    ${isSuccess
+                                        ? "bg-green-500 text-white hover:bg-green-600 shadow-green-500/25"
+                                        : "bg-white text-neutral-950 hover:bg-neutral-200 hover:shadow-white/10"
+                                    }
+                                    disabled:opacity-70 disabled:cursor-not-allowed disabled:transform-none
+                                `}
                             >
-                                {isLoading ? (
-                                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                ) : (
-                                    "Login"
-                                )}
-                            </button>
-                        </form>
-                    </div>
+                                <AnimatePresence mode="wait">
+                                    {isSuccess ? (
+                                        <motion.div
+                                            key="success"
+                                            initial={{ scale: 0.5, opacity: 0 }}
+                                            animate={{ scale: 1, opacity: 1 }}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <Check className="w-5 h-5 stroke-[3]" />
+                                            <span>Success</span>
+                                        </motion.div>
+                                    ) : isLoading ? (
+                                        <motion.div
+                                            key="loading"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                        >
+                                            <Loader2 className="w-5 h-5 animate-spin text-neutral-950/70" />
+                                        </motion.div>
+                                    ) : (
+                                        <motion.div
+                                            key="default"
+                                            initial={{ opacity: 0 }}
+                                            animate={{ opacity: 1 }}
+                                            exit={{ opacity: 0 }}
+                                            className="flex items-center gap-2"
+                                        >
+                                            <span>Sign In</span>
+                                            <ArrowRight className="w-4 h-4 opacity-50 group-hover:translate-x-1 transition-transform" />
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
+                            </motion.button>
+                        </motion.div>
+                    </form>
 
-                    {/* Legal/Footer */}
-                    <div className="mt-8 text-center px-4">
-                        <p className="text-[12px] text-neutral-600 font-medium leading-relaxed">
-                            Authorized access only.
+                    <motion.div variants={itemVariants} className="mt-8 text-center">
+                        <p className="text-xs text-neutral-600 font-medium tracking-wide">
+                            SECURE ACCESS • AUTHORIZED PERSONNEL ONLY
                         </p>
-                    </div>
-                </div>
-            </div>
+                    </motion.div>
+                </motion.div>
+            </motion.div>
         </main>
     );
 }
