@@ -6,9 +6,10 @@ import Image from "next/image";
 import { User, Lock, ArrowRight, Check, Loader2 } from "lucide-react";
 import { login } from "@/lib/auth";
 import { toast } from "sonner";
-import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, Variants } from "framer-motion";
 
 export default function LoginPage() {
+    // ... (lines 12-64 remain unchanged)
     const router = useRouter();
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
@@ -63,7 +64,7 @@ export default function LoginPage() {
         }
     };
 
-    const containerVariants = {
+    const containerVariants: Variants = {
         hidden: { opacity: 0 },
         visible: {
             opacity: 1,
@@ -74,7 +75,7 @@ export default function LoginPage() {
         }
     };
 
-    const itemVariants = {
+    const itemVariants: Variants = {
         hidden: { opacity: 0, y: 20 },
         visible: {
             opacity: 1,
