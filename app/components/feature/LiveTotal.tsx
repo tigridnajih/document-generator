@@ -1,7 +1,7 @@
 "use client";
 
 import { useFormContext, useWatch } from "react-hook-form";
-import { DocumentFormData } from "@/lib/types";
+import { DocumentFormData, DocType } from "@/lib/types";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { Section } from "@/components/ui/Section";
@@ -44,7 +44,7 @@ function CountUp({ value }: { value: number }) {
 }
 
 interface LiveTotalProps {
-    docType?: "proposal" | "quotation" | "invoice";
+    docType?: DocType;
 }
 
 export function LiveTotal({ docType }: LiveTotalProps) {
