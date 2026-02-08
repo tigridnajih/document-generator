@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-import { User, Building2, Mail, MapPin, Map, Navigation, FileText, FileCheck, FileSpreadsheet, Hash, Calendar, Eye, LogOut } from "lucide-react";
+import { User, Building2, Mail, MapPin, Map, Navigation, FileText, FileCheck, FileSpreadsheet, Hash, Calendar, Eye, LogOut, LayoutGrid } from "lucide-react";
 
 import { AuthProvider } from "@/components/auth/AuthProvider";
 import { getUser, logout } from "@/lib/auth";
@@ -25,6 +26,7 @@ import { documentFormSchema, DocumentFormValues } from "@/lib/schemas";
 
 
 export default function Home() {
+  const router = useRouter();
   const [docType, setDocType] = useState<DocType>("proposal");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -254,11 +256,12 @@ export default function Home() {
                 <User className="w-3.5 h-3.5 text-orange-500" />
                 <span className="text-xs font-medium text-neutral-300">{getUser()?.username || "User"}</span>
               </div>
-              <Link href="/dashboard">
-                <button className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-neutral-900 bg-white hover:bg-neutral-100 transition-all px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full shadow-lg shadow-white/5 active:scale-[0.98] active:translate-y-[1px] duration-200 border border-transparent">
-                  <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 stroke-[2.5]" />
-                  <span>View Dashboard</span>
-                </button>
+              <Link
+                href="/dashboard"
+                className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-neutral-900 bg-white hover:bg-neutral-100 transition-all px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full shadow-lg shadow-white/5 active:scale-[0.98] active:translate-y-[1px] duration-200 border border-transparent"
+              >
+                <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 stroke-[2.5]" />
+                <span>View Dashboard</span>
               </Link>
               <button
                 onClick={() => {
@@ -286,7 +289,15 @@ export default function Home() {
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <DocCard
+                label="Dashboard"
+                description="View Statistics"
+                type="dashboard"
+                currentType={docType}
+                onSelect={() => router.push("/dashboard")}
+                icon={<LayoutGrid className="w-5 h-5" />}
+              />
               <DocCard
                 label="Proposal"
                 description="Client pitch"
@@ -441,9 +452,9 @@ export default function Home() {
               <div className="transition-all duration-300">
                 {docType === "proposal" ? (
                   <ProposalFields />
-                ) : (
+                ) : (docType === "quotation" || docType === "invoice") ? (
                   <InvoiceFields />
-                )}
+                ) : null}
               </div>
 
               {/* Live Dashboard Summary - Visible for all document types */}
