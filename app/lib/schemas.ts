@@ -50,7 +50,7 @@ export const documentFormSchema = z.object({
             rate: z.coerce.number().min(0),
             quantity: z.coerce.number().min(1),
         })
-    ),
+    ).optional(),
     gstList: z.array(
         z.object({
             type: z.enum(["CGST", "SGST", "IGST"]),

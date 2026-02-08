@@ -64,7 +64,7 @@ export default function Home() {
         timeline: [],
       },
       estimation: [],
-      items: [{ name: "", rate: 0, quantity: 1 }],
+      items: [],
       gstList: [{ type: "CGST", rate: 9 }],
       export_invoice: false,
       lut_number: "",
@@ -87,7 +87,7 @@ export default function Home() {
       const username = currentUser?.username || "Unknown";
 
       // 1. Calculate Standard Totals
-      const subTotal = values.items.reduce((sum, item) => {
+      const subTotal = (values.items || []).reduce((sum, item) => {
         return sum + (Number(item.rate) || 0) * (Number(item.quantity) || 0);
       }, 0);
 
@@ -197,7 +197,7 @@ export default function Home() {
             state: values.clientDetails.clientState,
             gstin: values.clientDetails.clientGstIn || "",
           },
-          items: values.items.map(item => ({
+          items: (values.items || []).map(item => ({
             description: item.name,
             rate: Number(item.rate),
             quantity: Number(item.quantity),
@@ -380,7 +380,7 @@ export default function Home() {
               docType={docType}
             />
             <form
-              onSubmit={handleSubmit(onSubmit)}
+              onSubmit={handleSubmit(onSubmit, (errors) => console.error("FORM VALIDATION ERRORS:", errors))}
               className="relative space-y-10 transition-all duration-300"
             >
               <Section title="Client Information">
