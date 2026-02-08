@@ -52,9 +52,9 @@ export function SectionItem({ data, onChange, onRemove, dragControls }: SectionI
     };
 
     return (
-        <div className="bg-neutral-950/80 border border-neutral-800 rounded-xl overflow-hidden shadow-sm hover:border-neutral-700 transition-colors">
+        <div className="space-y-4">
             {/* Section Header */}
-            <div className="bg-neutral-900/50 border-b border-neutral-800 p-4 flex items-center gap-3">
+            <div className="flex items-center gap-3 px-1">
                 <div
                     className="cursor-grab active:cursor-grabbing text-neutral-600 hover:text-neutral-400 p-1"
                     onPointerDown={(e) => dragControls?.start(e)}
@@ -68,7 +68,7 @@ export function SectionItem({ data, onChange, onRemove, dragControls }: SectionI
                         value={data.title}
                         onChange={(e) => onChange({ ...data, title: e.target.value })}
                         placeholder="Section Title (e.g. Scope of Work)"
-                        className="w-full bg-transparent border-none outline-none text-base font-semibold text-white placeholder:text-neutral-600"
+                        className="w-full bg-transparent border-b border-neutral-800/50 outline-none text-base font-semibold text-white placeholder:text-neutral-600 focus:border-orange-500/50 transition-colors py-1"
                     />
                 </div>
 
@@ -82,7 +82,7 @@ export function SectionItem({ data, onChange, onRemove, dragControls }: SectionI
             </div>
 
             {/* Section Content */}
-            <div className="p-4 space-y-4">
+            <div className="space-y-4">
                 {data.items.length === 0 && (
                     <div className="text-center py-6 border-2 border-dashed border-neutral-800/50 rounded-lg">
                         <p className="text-neutral-500 text-sm mb-3">No content blocks yet</p>
@@ -101,7 +101,7 @@ export function SectionItem({ data, onChange, onRemove, dragControls }: SectionI
                     axis="y"
                     values={data.items}
                     onReorder={handleReorderBlocks}
-                    className="space-y-4"
+                    className="space-y-6"
                 >
                     {data.items.map((block, index) => (
                         <BlockWrapper key={block.id} item={block}>
@@ -109,8 +109,6 @@ export function SectionItem({ data, onChange, onRemove, dragControls }: SectionI
                                 data={block}
                                 onChange={(updated) => handleUpdateBlock(index, updated)}
                                 onRemove={() => handleRemoveBlock(index)}
-                            // Pass drag controls manually if we wanted tight control, 
-                            // but BlockWrapper handles the Reorder.Item context
                             />
                         </BlockWrapper>
                     ))}
@@ -120,7 +118,7 @@ export function SectionItem({ data, onChange, onRemove, dragControls }: SectionI
                     <button
                         type="button"
                         onClick={handleAddBlock}
-                        className="w-full py-3 flex items-center justify-center gap-2 border border-dashed border-neutral-800 hover:border-orange-500/30 hover:bg-orange-500/5 text-neutral-500 hover:text-orange-500 rounded-lg transition-all text-sm font-medium"
+                        className="w-full py-4 flex items-center justify-center gap-2 border border-dashed border-neutral-800 hover:border-orange-500/30 hover:bg-orange-500/5 text-neutral-500 hover:text-orange-500 rounded-xl transition-all text-sm font-medium"
                     >
                         <Plus className="w-4 h-4" />
                         Add Content Block

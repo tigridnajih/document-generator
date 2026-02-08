@@ -49,7 +49,7 @@ export function ContentBlock({ data, onChange, onRemove, dragControls }: Content
     const textContent = typeof data.content === "string" ? data.content : "";
 
     return (
-        <div className="bg-neutral-900/40 border border-neutral-800 rounded-lg p-4 group transition-all hover:border-neutral-700">
+        <div className="group transition-all">
             <div className="flex items-start gap-3">
                 {/* Drag Handle */}
                 <div
@@ -74,7 +74,7 @@ export function ContentBlock({ data, onChange, onRemove, dragControls }: Content
 
                         {/* Type Selector */}
                         <div className="flex justify-start sm:justify-end">
-                            <div className="flex items-center gap-1 bg-neutral-950 rounded-lg p-1 border border-neutral-800">
+                            <div className="flex items-center gap-1 bg-neutral-900/50 rounded-lg p-1 border border-neutral-800/60">
                                 <button
                                     type="button"
                                     onClick={() => handleTypeChange("paragraph")}
@@ -112,7 +112,7 @@ export function ContentBlock({ data, onChange, onRemove, dragControls }: Content
                                 value={textContent}
                                 onChange={(e) => handleContentChange(e.target.value)}
                                 placeholder="Enter description..."
-                                className="w-full h-full min-h-[80px] bg-neutral-950/50 rounded-md border border-neutral-800 p-3 text-sm text-neutral-300 placeholder:text-neutral-600 outline-none focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/50 resize-y"
+                                className="w-full h-full min-h-[80px] bg-neutral-900/40 rounded-xl border border-neutral-800/50 p-4 text-sm text-neutral-300 placeholder:text-neutral-600 outline-none focus:border-orange-500/50 focus:ring-4 focus:ring-orange-500/5 transition-all resize-y"
                             />
                         ) : (
                             <div className="space-y-2">
@@ -139,7 +139,6 @@ export function ContentBlock({ data, onChange, onRemove, dragControls }: Content
                                                     const newList = [...bulletList];
                                                     newList.splice(idx, 1);
                                                     handleContentChange(newList);
-                                                    // Focus management would be ideal here but sticking to controlled simplicity
                                                 }
                                             }}
                                             placeholder="List item..."
@@ -149,7 +148,7 @@ export function ContentBlock({ data, onChange, onRemove, dragControls }: Content
                                             type="button"
                                             onClick={() => {
                                                 const newList = bulletList.filter((_, i) => i !== idx);
-                                                handleContentChange(newList.length ? newList : [""]); // Keep at least one or empty?
+                                                handleContentChange(newList.length ? newList : [""]);
                                             }}
                                             className="mt-1 p-1 text-neutral-700 hover:text-red-500 opacity-0 group-hover/bullet:opacity-100 transition-opacity"
                                         >
@@ -173,7 +172,7 @@ export function ContentBlock({ data, onChange, onRemove, dragControls }: Content
                 {/* Remove Block */}
                 <button
                     onClick={onRemove}
-                    className="mt-2 p-1.5 text-neutral-700 hover:text-red-500 transition-colors rounded-md hover:bg-neutral-800"
+                    className="mt-2 p-1.5 text-neutral-700 hover:text-red-500 transition-colors rounded-md hover:bg-neutral-800 sm:opacity-0 group-hover:opacity-100"
                     title="Remove Block"
                 >
                     <Trash2 className="w-4 h-4" />
