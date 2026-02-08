@@ -55,26 +55,20 @@ export function ProposalFields() {
                 </div>
             </Section>
 
-            <Section title="Project Timeline">
+            <Section
+                title="Project Timeline"
+                action={
+                    <label className="relative inline-flex items-center cursor-pointer">
+                        <input
+                            type="checkbox"
+                            {...register("scopeOfWork.timelineEnabled")}
+                            className="sr-only peer"
+                        />
+                        <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600 peer-checked:after:bg-white border border-neutral-700/50"></div>
+                    </label>
+                }
+            >
                 <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                        <div className="space-y-1">
-                            <h3 className="text-sm font-medium text-white flex items-center gap-2">
-                                <Calendar className="w-4 h-4 text-orange-500" />
-                                Timeline Control
-                            </h3>
-                            <p className="text-xs text-neutral-500">Enable to specify project phases and durations.</p>
-                        </div>
-                        <label className="relative inline-flex items-center cursor-pointer">
-                            <input
-                                type="checkbox"
-                                {...register("scopeOfWork.timelineEnabled")}
-                                className="sr-only peer"
-                            />
-                            <div className="w-11 h-6 bg-neutral-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-neutral-400 after:border-neutral-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600 peer-checked:after:bg-white border border-neutral-700/50"></div>
-                        </label>
-                    </div>
-
                     <AnimatePresence>
                         {timelineEnabled && (
                             <motion.div
@@ -106,7 +100,6 @@ export function ProposalFields() {
                                                 <Input
                                                     {...register(`scopeOfWork.timeline.${index}.phase`)}
                                                     placeholder="Phase (e.g. Design)"
-                                                    className="bg-transparent"
                                                 />
                                             </div>
                                             <div className="sm:col-span-2">
@@ -114,13 +107,12 @@ export function ProposalFields() {
                                                     {...register(`scopeOfWork.timeline.${index}.duration`, { valueAsNumber: true })}
                                                     placeholder="Duration"
                                                     type="number"
-                                                    className="bg-transparent"
                                                 />
                                             </div>
                                             <div className="sm:col-span-2 relative">
                                                 <select
                                                     {...register(`scopeOfWork.timeline.${index}.unit`)}
-                                                    className="w-full bg-neutral-950/40 border border-neutral-800/50 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-orange-500/30 text-white appearance-none cursor-pointer"
+                                                    className="w-full h-[54px] bg-neutral-900/40 backdrop-blur-md border border-neutral-800/50 rounded-xl px-4 py-3.5 text-sm font-medium focus:outline-none focus:ring-4 focus:ring-orange-500/5 focus:border-orange-500/20 text-neutral-200 appearance-none cursor-pointer shadow-[inset_0_1px_2px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.02)] hover:bg-neutral-800/40 hover:border-neutral-700/60 transition-all duration-150"
                                                 >
                                                     <option value="Days">Days</option>
                                                     <option value="Weeks">Weeks</option>
@@ -133,7 +125,6 @@ export function ProposalFields() {
                                                 <Input
                                                     {...register(`scopeOfWork.timeline.${index}.deliverables`)}
                                                     placeholder="Deliverables"
-                                                    className="bg-transparent"
                                                 />
                                             </div>
                                             <div className="sm:col-span-1 flex justify-end">
