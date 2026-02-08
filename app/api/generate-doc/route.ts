@@ -50,3 +50,11 @@ export async function POST(req: Request) {
     }
 }
 
+export async function GET() {
+    return NextResponse.json({
+        status: "Online",
+        api_url_configured: !!API_URL,
+        api_url_preview: API_URL ? `${API_URL.substring(0, 15)}...` : "NONE",
+        timestamp: new Date().toISOString()
+    });
+}
