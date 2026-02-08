@@ -56,7 +56,7 @@ export function SectionItem({ data, onChange, onRemove, dragControls }: SectionI
             {/* Section Header */}
             <div className="flex items-center gap-4 px-1 group-hover/section:opacity-100 transition-opacity">
                 <div
-                    className="cursor-grab active:cursor-grabbing text-neutral-700 hover:text-neutral-400 p-1 opacity-0 group-hover/section:opacity-100 transition-opacity"
+                    className="cursor-grab active:cursor-grabbing text-neutral-700 hover:text-neutral-400 p-1 transition-colors"
                     onPointerDown={(e) => dragControls?.start(e)}
                 >
                     <GripVertical className="w-5 h-5" />
