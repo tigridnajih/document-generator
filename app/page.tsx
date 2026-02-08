@@ -258,7 +258,7 @@ export default function Home() {
               </div>
               <button
                 type="button"
-                onClick={() => router.push("/dashboard")}
+                onClick={() => window.location.href = "/dashboard"}
                 className="flex items-center gap-2 text-xs sm:text-sm font-semibold text-neutral-900 bg-white hover:bg-neutral-100 transition-all px-3.5 py-1.5 sm:px-5 sm:py-2.5 rounded-full shadow-lg shadow-white/5 active:scale-[0.98] active:translate-y-[1px] duration-200 border border-transparent"
               >
                 <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 stroke-[2.5]" />
