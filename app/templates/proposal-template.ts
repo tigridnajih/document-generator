@@ -33,6 +33,7 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         html {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            height: 100%; /* REQUIRED for percentage heights to work */
         }
 
         body {
@@ -42,6 +43,7 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             margin: 0; 
             padding: 0;
             font-size: 14px;
+            height: 100%; /* Propagate height */
         }
 
         /* 2. TYPOGRAPHY */
@@ -82,13 +84,17 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         .cover {
             /* Visual styling */
             background-color: var(--bg-cover);
+            /* Image path confirmed from previous version */
             background-image: url('https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Proposal/Proposal_front_bg.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvUHJvcG9zYWwvUHJvcG9zYWxfZnJvbnRfYmcucG5nIiwiaWF0IjoxNzY5MzU5NzExLCJleHAiOjUyNjk4NTU3MTF9.4C4e0xcGb2FfNdPvB42oqZVFaeuvlksv_dfob2qnnXg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             color: white;
             
-            /* Sizing via padding only - NO fixed height */
+            /* Sizing to fill the viewport (page) */
+            min-height: 100vh;
+            width: 100%;
+            
             padding: 80px 40px; 
             
             /* Layout */
