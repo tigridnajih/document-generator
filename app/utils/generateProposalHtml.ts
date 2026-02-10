@@ -55,7 +55,7 @@ export function generateEstimationHtml(items: any[]): string {
 
     return items.map((item) => {
         const rate = Number(item.rate) || 0;
-        const qty = Number(item.qty) || 0;
+        const qty = Number(item.qty || item.quantity) || 0;
         const total = rate * qty;
 
         return `
@@ -69,6 +69,42 @@ export function generateEstimationHtml(items: any[]): string {
     }).join("");
 }
 
+
+export function generateProjectTimelineHtml(data: any): string {
+    const timeline = data.projectTimeline;
+    if (!timeline || !timeline.enabled) return "";
+
+    const rows = (timeline.phases || []).map((phase: any) => `
+        <tr>
+            <td>${phase.phaseName || ""}</td>
+            <td>${phase.duration?.value || 0} ${phase.duration?.unit || "Days"}</td>
+            <td>${phase.deliverables || ""}</td>
+        </tr>
+    `).join("");
+
+    return `
+    <!-- PAGE: PROJECT TIMELINE -->
+    <div class="page">
+        <div class="page-content">
+            <h2>Project Timeline</h2>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Phase</th>
+                        <th style="width: 20%;">Duration</th>
+                        <th style="width: 55%;">Deliverables</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${rows}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    `;
+}
+
 export function generateProposalHtml(data: any): string {
     let html = PROPOSAL_TEMPLATE;
 
@@ -80,12 +116,27 @@ export function generateProposalHtml(data: any): string {
     const sowHtml = generateScopeOfWorkHtml(data.scopeOfWork?.sections || []);
     html = html.replace("[[scope_of_work]]", sowHtml);
 
-    const estimationRows = generateEstimationHtml(data.estimation || []);
-    const totalPayable = (data.estimation || []).reduce((sum: number, item: any) =>
-        sum + (Number(item.rate) || 0) * (Number(item.qty) || 0), 0
-    );
+    const timelineHtml = generateProjectTimelineHtml(data);
+    html = html.replace("[[project_timeline_section]]", timelineHtml);
 
-    html = html.replace("[[estimation_rows]]", estimationRows);
+    const estimationRows = generateEstimationHtml(data.estimation?.items || []);
+    // Note: totalPayable logic depends on structure passed from page.tsx. 
+    // page.tsx passes { estimation: { items: [...], summary: { totalPayable: ... } } }
+    // OR it passes { estimation: [...] } if legacy?
+    // Let's check page.tsx payload construction again.
+    // page.tsx payload: estimation: { enabled, items: [], summary: { totalPayable } }
+
+    // However, the interface in generateEstimationHtml expects an array of items.
+    // Let's adjust access to estimation items to be robust.
+    const estimationItems = Array.isArray(data.estimation) ? data.estimation : (data.estimation?.items || []);
+
+    // Re-generate rows with correct array
+    const estimationRowsHtml = generateEstimationHtml(estimationItems);
+
+    const totalPayable = data.estimation?.summary?.totalPayable
+        ?? estimationItems.reduce((sum: number, item: any) => sum + (Number(item.rate) || 0) * (Number(item.quantity || item.qty) || 0), 0);
+
+    html = html.replace("[[estimation_rows]]", estimationRowsHtml);
     html = html.replace("[[total_payable]]", totalPayable.toLocaleString('en-IN', { style: 'currency', currency: 'INR' }));
 
     return html;

@@ -355,44 +355,7 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         </div>
     </div>
 
-    <!-- PAGE 5: PROJECT TIMELINE -->
-    <div class="page">
-        <div class="page-content">
-            <h2>Project Timeline</h2>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 25%;">Phase</th>
-                        <th style="width: 20%;">Duration</th>
-                        <th style="width: 55%;">Deliverables</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Discovery</td>
-                        <td>1 Week</td>
-                        <td>Project Plan, Tech Spec</td>
-                    </tr>
-                    <tr>
-                        <td>Design</td>
-                        <td>2 Weeks</td>
-                        <td>Figma Files, Style Guide</td>
-                    </tr>
-                    <tr>
-                        <td>Development</td>
-                        <td>4 Weeks</td>
-                        <td>Functional Beta</td>
-                    </tr>
-                    <tr>
-                        <td>Deployment</td>
-                        <td>1 Week</td>
-                        <td>Live Site, Documentation</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
+[[project_timeline_section]]
 
     <!-- PAGE 6: ESTIMATION & PAYMENT -->
     <div class="page">
