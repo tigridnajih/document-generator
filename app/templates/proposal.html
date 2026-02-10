@@ -12,13 +12,12 @@
     <style>
         /* 
          * PROPOSAL TEMPLATE - PDFSHIFT STRICT FLOW
-         * 
-         * RULES implied by User:
-         * 1. Page size/margins controlled via PDFShift API.
-         * 2. NO @page rules in CSS.
-         * 3. Cover page must be a normal section with `break-after: page`.
-         * 4. NO fixed heights (no vh if viewport is small).
-         * 5. Implicit pagination for everything else.
+         * Rules:
+         * 1. No @page or CSS margins (handled by PDFShift).
+         * 2. No fixed sizes except cover.
+         * 3. Cover min-height: 100vh + break-after: page.
+         * 4. Content sections wrapped in .content with padding.
+         * 5. Implicit pagination.
          */
 
         :root {
@@ -27,7 +26,6 @@
             --text-color: #374151;
             --text-heading: #111827;
             --bg-cover: #1a202c;
-            /* Fallback */
             --border-color: #e5e7eb;
             --font-main: 'Inter', sans-serif;
         }
@@ -40,6 +38,7 @@
         html {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
+            height: 100%;
         }
 
         body {
@@ -49,6 +48,7 @@
             margin: 0;
             padding: 0;
             font-size: 14px;
+            height: 100%;
         }
 
         /* 2. TYPOGRAPHY */
@@ -71,7 +71,6 @@
             margin-bottom: 24px;
             display: inline-block;
             margin-top: 32px;
-            /* Add top margin for separation in flow */
         }
 
         h3 {
@@ -96,8 +95,16 @@
         }
 
         /* 3. LAYOUT UTILITIES */
+        /* Wrapper for non-cover content */
+        .content {
+            width: 100%;
+            /* Padding used for internal spacing, not margin */
+            padding-top: 20px;
+        }
+
         .section {
             width: 100%;
+            /* Avoid page break right after a section starts if possible */
         }
 
         .no-break-inside {
@@ -105,8 +112,12 @@
             page-break-inside: avoid;
         }
 
-        /* 4. COVER SECTION (Strict Rules) */
+        /* 4. COVER SECTION */
         .cover {
+            /* Full page height coverage as requested */
+            min-height: 100vh;
+            width: 100%;
+
             /* Visual styling */
             background-color: var(--bg-cover);
             background-image: url('https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Proposal/Proposal_front_bg.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvUHJvcG9zYWwvUHJvcG9zYWxfZnJvbnRfYmcucG5nIiwiaWF0IjoxNzY5MzU5NzExLCJleHAiOjUyNjk4NTU3MTF9.4C4e0xcGb2FfNdPvB42oqZVFaeuvlksv_dfob2qnnXg');
@@ -115,19 +126,13 @@
             background-repeat: no-repeat;
             color: white;
 
-            /* Sizing: Full A4 Height to guarantee coverage */
-            min-height: 297mm;
-            width: 100%;
-
             padding: 80px 40px;
 
-            /* Layout */
             display: flex;
             flex-direction: column;
             gap: 60px;
-            /* Space between elements */
 
-            /* CRITICAL: End Page 1 here */
+            /* Force page break after cover */
             break-after: page;
             page-break-after: always;
         }
@@ -174,7 +179,6 @@
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 40px;
             margin-top: auto;
-            /* Push to bottom of flex container if space allows */
         }
 
         .cover-detail-item label {
@@ -243,7 +247,6 @@
         .bank-details {
             border: 1px solid var(--border-color);
             border-radius: 4px;
-            /* Optional mild styling */
             padding: 24px;
             background-color: #f9fafb;
             margin-top: 24px;
@@ -278,12 +281,7 @@
 
 <body>
 
-    <!-- COVER SECTION: 
-         - Explicitly separate section 
-         - No constraints on height 
-         - Ends with break-after: page 
-         - Using 297mm min-height to ensure full background coverage
-    -->
+    <!-- COVER PAGE -->
     <div class="cover">
         <div class="cover-header">
             <div class="cover-date">[[proposal_date]]</div>
@@ -313,159 +311,164 @@
         </div>
     </div>
 
-    <!-- CONTENT START - Implicit pagination from here on -->
+    <!-- MAIN CONTENT CONTAINER -->
+    <div class="content">
 
-    <!-- INTRODUCTION -->
-    <div class="section">
-        <h2 class="mt-0">Welcome !</h2>
+        <!-- INTRODUCTION -->
+        <div class="section">
+            <h2 class="mt-0">Welcome !</h2>
 
-        <p>Dear <strong>Dr. Ameer Pichen Sir</strong>,</p>
-        <p>Greetings from Tigrid.</p>
+            <p>Dear <strong>Dr. Ameer Pichen Sir</strong>,</p>
+            <p>Greetings from Tigrid.</p>
 
-        <p>Welcome to a realm of limitless potential. Within the pages of this proposal, we invite you to discover how
-            together, we can transform your aspirations into remarkable achievements. We are genuinely thrilled by the
-            opportunity to partner up with <strong>SYBO TECH</strong>, aiming to heighten your brand's value.</p>
+            <p>Welcome to a realm of limitless potential. Within the pages of this proposal, we invite you to discover
+                how together, we can transform your aspirations into remarkable achievements. We are genuinely thrilled
+                by the opportunity to partner up with <strong>SYBO TECH</strong>, aiming to heighten your brand's value.
+            </p>
 
-        <p>Our commitment to excellence and your vision for success will converge here, and we look forward to embarking
-            on this rewarding venture with you. As you delve into these pages, envision a future where we work hand in
-            hand to bring your goals to life.</p>
+            <p>Our commitment to excellence and your vision for success will converge here, and we look forward to
+                embarking on this rewarding venture with you. As you delve into these pages, envision a future where we
+                work hand in hand to bring your goals to life.</p>
 
-        <p>With Tigrid, you not only gain access to top-tier talent but also a partner who values your trust and is
-            unwavering in its dedication to your project's success. We recognize the paramount importance of
-            safeguarding your business's sensitive information. All information contained in this proposal is
-            confidential and intended solely for the recipient.</p>
+            <p>With Tigrid, you not only gain access to top-tier talent but also a partner who values your trust and is
+                unwavering in its dedication to your project's success. We recognize the paramount importance of
+                safeguarding your business's sensitive information. All information contained in this proposal is
+                confidential and intended solely for the recipient.</p>
 
-        <p>Currently, we are living in an era where technology is evolving at an unprecedented pace. To stay ahead of
-            the curve, it is imperative to adapt to these changes and embrace innovation. At Tigrid, we are committed to
-            helping you navigate this dynamic landscape and leverage the power of technology to drive your business
-            forward.</p>
+            <p>Currently, we are living in an era where technology is evolving at an unprecedented pace. To stay ahead
+                of the curve, it is imperative to adapt to these changes and embrace innovation. At Tigrid, we are
+                committed to helping you navigate this dynamic landscape and leverage the power of technology to drive
+                your business forward.</p>
 
-        <p><strong>Accelerate your business with our technology driven strategic approach.</strong></p>
+            <p><strong>Accelerate your business with our technology driven strategic approach.</strong></p>
 
-        <h3 style="margin-top: 24px; color: var(--accent-color);">Be Remarkable!</h3>
-    </div>
-
-    <!-- WHY TIGRID -->
-    <div class="section">
-        <h2>Why Tigrid ?</h2>
-        <p>When seeking a reliable and innovative tech partner for visionary businesses, many turn to <strong>Tigrid
-                Technologies Private Limited</strong>. We are on a mission to revolutionize the process of creating and
-            enhancing brands.</p>
-
-        <img src="https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Proposal/proposal_whytigrid.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvUHJvcG9zYWwvcHJvcG9zYWxfd2h5dGlncmlkLnBuZyIsImlhdCI6MTc2OTI3MzI3MCwiZXhwIjoyNzE1MzUzMjcwfQ.DsvpaP0ivDbNMuLPIDJvdkD4NRS9a7YEva5rZbTVFcA"
-            alt="Why Tigrid" class="content-image">
-
-        <p>We pride ourselves on delivering exceptional results and providing a seamless experience for our clients.
-            Here’s why you should choose us as your trusted IT partner:</p>
-        <ul>
-            <li><strong>Expertise:</strong> Our team consists of highly skilled professionals with extensive experience
-                in the industry.</li>
-            <li><strong>Innovation:</strong> We leverage the latest technologies to deliver cutting-edge solutions.</li>
-            <li><strong>Customer-Centric:</strong> We prioritize your needs and work closely with you to achieve your
-                goals.</li>
-            <li><strong>Quality:</strong> We maintain the highest standards of quality in everything we do.</li>
-        </ul>
-    </div>
-
-    <!-- SCOPE OF WORK -->
-    <div class="section">
-        <h2>Scope of Work</h2>
-        <div class="scope-content">
-            [[scope_of_work]]
+            <h3 style="margin-top: 24px; color: var(--accent-color);">Be Remarkable!</h3>
         </div>
-    </div>
 
-    <!-- TIMELINE -->
-    <div class="section">
-        [[project_timeline_section]]
-    </div>
+        <!-- WHY TIGRID -->
+        <div class="section">
+            <h2>Why Tigrid ?</h2>
+            <p>When seeking a reliable and innovative tech partner for visionary businesses, many turn to <strong>Tigrid
+                    Technologies Private Limited</strong>. We are on a mission to revolutionize the process of creating
+                and enhancing brands.</p>
 
-    <!-- ESTIMATION -->
-    <div class="section">
-        <h2>Estimation</h2>
-        <p>The table below outlines the estimated costs for the project scope described above.</p>
+            <img src="https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Proposal/proposal_whytigrid.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvUHJvcG9zYWwvcHJvcG9zYWxfd2h5dGlncmlkLnBuZyIsImlhdCI6MTc2OTI3MzI3MCwiZXhwIjoyNzE1MzUzMjcwfQ.DsvpaP0ivDbNMuLPIDJvdkD4NRS9a7YEva5rZbTVFcA"
+                alt="Why Tigrid" class="content-image">
 
-        <table class="pricing-table">
-            <thead>
-                <tr>
-                    <th style="width: 50%;">Description</th>
-                    <th style="width: 20%;" class="text-right">Rate</th>
-                    <th style="width: 10%;" class="text-center">Qty</th>
-                    <th style="width: 20%;" class="text-right">Total</th>
-                </tr>
-            </thead>
-            <tbody>
-                [[estimation_rows]]
-                <tr class="pricing-total">
-                    <td colspan="3" class="text-right">Total Payable</td>
-                    <td class="text-right">[[total_payable]]</td>
-                </tr>
-            </tbody>
-        </table>
+            <p>We pride ourselves on delivering exceptional results and providing a seamless experience for our clients.
+                Here’s why you should choose us as your trusted IT partner:</p>
+            <ul>
+                <li><strong>Expertise:</strong> Our team consists of highly skilled professionals with extensive
+                    experience in the industry.</li>
+                <li><strong>Innovation:</strong> We leverage the latest technologies to deliver cutting-edge solutions.
+                </li>
+                <li><strong>Customer-Centric:</strong> We prioritize your needs and work closely with you to achieve
+                    your goals.</li>
+                <li><strong>Quality:</strong> We maintain the highest standards of quality in everything we do.</li>
+            </ul>
+        </div>
 
-        <h3>Payment Details</h3>
-        <ul style="list-style-type: decimal;">
-            <li>Advance: 50% due upon project initiation.</li>
-            <li>Final Payment: 50% upon completion and approval before launch.</li>
-            <li>Project will be initiated only after 1st advance instalment is paid.</li>
-            <li>18% GST will be applicable on the final invoice.</li>
-            <li>Any element additional to the above scope of work will be charged extra.</li>
-            <li>2 Months free maintenance and an AMC will be applicable if continued.</li>
-        </ul>
-
-        <div class="bank-details">
-            <h3>Tigrid Bank Details</h3>
-            <div class="bank-grid">
-                <div>A/C NAME</div>
-                <div>: TIGRID TECHNOLOGIES PRIVATE LIMITED</div>
-                <div>BANK NAME</div>
-                <div>: STATE BANK OF INDIA</div>
-                <div>BRANCH</div>
-                <div>: KAZHAKUTTAM</div>
-                <div>A/C NO.</div>
-                <div>: 41923692420</div>
-                <div>IFSC</div>
-                <div>: SBIN0070445</div>
+        <!-- SCOPE OF WORK -->
+        <div class="section">
+            <h2>Scope of Work</h2>
+            <div class="scope-content">
+                [[scope_of_work]]
             </div>
         </div>
-    </div>
 
-    <!-- TERMS & CONDITIONS -->
-    <div class="section">
-        <h2>Terms & Conditions</h2>
-        <p>The following terms and conditions are exclusively for this project.</p>
-        <ol>
-            <li>Any element additional to the above estimate and scope will be charged extra.</li>
-            <li>At least one person should be available from client-side for proper interaction.</li>
-            <li>The working days in a week will be from Monday-Friday (9AM-6PM IST).</li>
-            <li>Ample time must be provided in case of revisions, edits or change in creative path.</li>
-            <li>The client must provide us with sufficient data/resources. Delays may affect timeline.</li>
-            <li>When deliverables are no longer confidential, Tigrid may use Client’s name/logo for marketing.</li>
-            <li>Both parties will keep project information strictly confidential.</li>
-            <li>We will not be responsible for unavailability/damage caused by client misconduct.</li>
-            <li>Third-party costs (Domain, Hosting, SSL, etc.) are excluded and must be paid by client.</li>
-        </ol>
-    </div>
+        <!-- TIMELINE -->
+        <div class="section">
+            [[project_timeline_section]]
+        </div>
 
-    <!-- CLOSING -->
-    <div class="section">
-        <h2>Thank You</h2>
-        <p>I would like to express my heartfelt appreciation for your time and consideration in reviewing the proposal.
-            Choosing Tigrid means choosing a partner who is dedicated to your success.</p>
+        <!-- ESTIMATION -->
+        <div class="section">
+            <h2>Estimation</h2>
+            <p>The table below outlines the estimated costs for the project scope described above.</p>
 
-        <p>Should you have any queries, require further clarification, or wish to discuss any aspect in more detail,
-            please do not hesitate to reach out to us.</p>
+            <table class="pricing-table">
+                <thead>
+                    <tr>
+                        <th style="width: 50%;">Description</th>
+                        <th style="width: 20%;" class="text-right">Rate</th>
+                        <th style="width: 10%;" class="text-center">Qty</th>
+                        <th style="width: 20%;" class="text-right">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    [[estimation_rows]]
+                    <tr class="pricing-total">
+                        <td colspan="3" class="text-right">Total Payable</td>
+                        <td class="text-right">[[total_payable]]</td>
+                    </tr>
+                </tbody>
+            </table>
 
-        <p>Your success is our mission.</p>
+            <h3>Payment Details</h3>
+            <ul style="list-style-type: decimal;">
+                <li>Advance: 50% due upon project initiation.</li>
+                <li>Final Payment: 50% upon completion and approval before launch.</li>
+                <li>Project will be initiated only after 1st advance instalment is paid.</li>
+                <li>18% GST will be applicable on the final invoice.</li>
+                <li>Any element additional to the above scope of work will be charged extra.</li>
+                <li>2 Months free maintenance and an AMC will be applicable if continued.</li>
+            </ul>
 
-        <div class="signature-block">
-            <p>Warm regards,</p>
-            <div style="margin-top: 24px;">
-                <div style="font-size: 18px; font-weight: 700;">Najih Sulthan</div>
-                <div class="text-muted" style="font-weight: 500;">Chief Executive Officer</div>
+            <div class="bank-details">
+                <h3>Tigrid Bank Details</h3>
+                <div class="bank-grid">
+                    <div>A/C NAME</div>
+                    <div>: TIGRID TECHNOLOGIES PRIVATE LIMITED</div>
+                    <div>BANK NAME</div>
+                    <div>: STATE BANK OF INDIA</div>
+                    <div>BRANCH</div>
+                    <div>: KAZHAKUTTAM</div>
+                    <div>A/C NO.</div>
+                    <div>: 41923692420</div>
+                    <div>IFSC</div>
+                    <div>: SBIN0070445</div>
+                </div>
             </div>
         </div>
-    </div>
+
+        <!-- TERMS & CONDITIONS -->
+        <div class="section">
+            <h2>Terms & Conditions</h2>
+            <p>The following terms and conditions are exclusively for this project.</p>
+            <ol>
+                <li>Any element additional to the above estimate and scope will be charged extra.</li>
+                <li>At least one person should be available from client-side for proper interaction.</li>
+                <li>The working days in a week will be from Monday-Friday (9AM-6PM IST).</li>
+                <li>Ample time must be provided in case of revisions, edits or change in creative path.</li>
+                <li>The client must provide us with sufficient data/resources. Delays may affect timeline.</li>
+                <li>When deliverables are no longer confidential, Tigrid may use Client’s name/logo for marketing.</li>
+                <li>Both parties will keep project information strictly confidential.</li>
+                <li>We will not be responsible for unavailability/damage caused by client misconduct.</li>
+                <li>Third-party costs (Domain, Hosting, SSL, etc.) are excluded and must be paid by client.</li>
+            </ol>
+        </div>
+
+        <!-- CLOSING -->
+        <div class="section">
+            <h2>Thank You</h2>
+            <p>I would like to express my heartfelt appreciation for your time and consideration in reviewing the
+                proposal. Choosing Tigrid means choosing a partner who is dedicated to your success.</p>
+
+            <p>Should you have any queries, require further clarification, or wish to discuss any aspect in more detail,
+                please do not hesitate to reach out to us.</p>
+
+            <p>Your success is our mission.</p>
+
+            <div class="signature-block">
+                <p>Warm regards,</p>
+                <div style="margin-top: 24px;">
+                    <div style="font-size: 18px; font-weight: 700;">Najih Sulthan</div>
+                    <div class="text-muted" style="font-weight: 500;">Chief Executive Officer</div>
+                </div>
+            </div>
+        </div>
+
+    </div> <!-- End .content -->
 
 </body>
 
