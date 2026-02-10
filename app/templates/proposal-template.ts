@@ -16,6 +16,8 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
          * 3. Cover min-height: 100vh + break-after: page.
          * 4. Content sections wrapped in .content with padding.
          * 5. Implicit pagination.
+         *
+         * UPDATE: Added horizontal padding to .content to simulate margins.
          */
 
         :root {
@@ -76,8 +78,8 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         /* Wrapper for non-cover content */
         .content {
             width: 100%;
-            /* Padding used for internal spacing, not margin */
-            padding-top: 20px; 
+            /* PADDING ADDED: Creates 40px margins on all sides inside the container */
+            padding: 40px; 
         }
 
         .section {
