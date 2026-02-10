@@ -9,8 +9,9 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <style>
         /* 
-         * PRINT-FIRST A4 CSS
-         * Target: PDFShift / Chromium
+         * STRICT A4 PRINT CSS
+         * Target: PDFShift / Chromium (Headless)
+         * Units: mm (Physical)
          */
 
         :root {
@@ -21,15 +22,9 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             --border-light: #e5e7eb;
             --bg-white: #ffffff;
             --font-base: 'Inter', sans-serif;
-            
-            --a4-width: 210mm;
-            --a4-height: 297mm;
-            --page-padding-top: 20mm;
-            --page-padding-bottom: 20mm;
-            --page-padding-x: 25mm;
         }
 
-        /* 1. RESET & DEFAULTS (Apply to PDF/Print) */
+        /* 1. RESET & DEFAULTS */
         * {
             box-sizing: border-box;
             margin: 0;
@@ -38,61 +33,136 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             print-color-adjust: exact;
         }
 
+        /* 2. PAGE CONFIGURATION */
+        @page {
+            size: A4;
+            margin: 0; /* MANDATORY: Zero margins for full bleed */
+        }
+
         html, body {
-            width: var(--a4-width);
-            height: 100%; /* Allow flow if needed, but pages handle height */
+            width: 210mm; /* A4 Width */
             margin: 0;
             padding: 0;
-            background: white; /* Default for print */
+            background: white; 
             font-family: var(--font-base);
             font-size: 10.5pt;
             line-height: 1.5;
             color: var(--text-body);
         }
 
-        /* 2. PRINT SETUP */
-        @page {
-            size: A4;
-            margin: 0; /* CRITICAL */
-        }
-
-        /* 3. PAGE CONTAINER (Strict Dimensions) */
+        /* 3. PHYSICAL PAGE WRAPPER */
+        /* Represents one physical A4 sheet (210mm x 297mm) */
         .page {
-            width: var(--a4-width);
-            height: var(--a4-height);
             position: relative;
-            overflow: hidden; 
+            width: 210mm;
+            height: 297mm;
+            overflow: hidden; /* Clips content to page boundary */
+            background: white;
+            margin: 0; /* No margins */
+            padding: 0; /* No padding */
+            
+            /* Pagination Controls */
             page-break-after: always;
             break-after: page;
-            background: white;
-            /* No margin/padding on the container itself by default */
+            page-break-inside: avoid;
+            break-inside: avoid;
         }
 
-        /* 4. INTERNAL SAFE AREA */
+        /* 4. CONTENT PADDING (Internal Margins) */
         .page-content {
+            position: relative;
             width: 100%;
             height: 100%;
-            padding: var(--page-padding-top) var(--page-padding-x) var(--page-padding-bottom) var(--page-padding-x);
+            padding: 20mm 25mm; /* Top/Bottom: 20mm, Left/Right: 25mm */
             display: flex;
             flex-direction: column;
         }
 
-        /* 5. SCREEN / VIEWER STYLES ONLY */
-        @media screen {
-            body {
-                background-color: #525659; /* Grey viewer background */
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                padding-top: 20px;
-                padding-bottom: 20px;
-                width: 100%; /* Full screen width */
-            }
-            
-            .page {
-                box-shadow: 0 0 10px rgba(0,0,0,0.5);
-                margin-bottom: 20px; /* Spacing between pages */
-            }
+        /* 5. COVER PAGE (Full Bleed) */
+        .page.cover {
+            background-image: url('https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Proposal/Proposal_front_bg.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvUHJvcG9zYWwvUHJvcG9zYWxfZnJvbnRfYmcucG5nIiwiaWF0IjoxNzY5MzU5NzExLCJleHAiOjUyNjk4NTU3MTF9.4C4e0xcGb2FfNdPvB42oqZVFaeuvlksv_dfob2qnnXg');
+            background-size: cover; /* Should cover exactly 210mm x 297mm */
+            background-position: center;
+            background-repeat: no-repeat;
+            /* No internal padding, full image */
+        }
+
+        /* Cover Layout grid/flex */
+        .cover-layout {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            /* Padding if needed for content, but allow absolute positioning */
+        }
+
+        .cover-header {
+            position: absolute;
+            top: 20mm;
+            left: 25mm;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 15px;
+            font-size: 14pt;
+            font-weight: 500;
+            color: #ffffff;
+        }
+
+        .cover-logo {
+            position: absolute;
+            top: 20mm;
+            right: 25mm;
+            max-height: 40px;
+            width: auto;
+        }
+
+        .cover-main {
+            position: absolute;
+            top: 50%; /* Vertical center */
+            left: 25mm;
+            transform: translateY(-50%);
+        }
+
+        .cover-main .title-red {
+            color: #ff0000;
+            font-size: 48pt;
+            font-weight: 900;
+            line-height: 1.0;
+            letter-spacing: -1px;
+            text-transform: uppercase;
+        }
+
+        .cover-main .title-white {
+            color: #ffffff;
+            font-size: 32pt;
+            font-weight: 800;
+            margin-top: 10px;
+            text-transform: uppercase;
+            display: block;
+        }
+
+        .cover-details {
+            position: absolute;
+            bottom: 20mm;
+            left: 25mm;
+            right: 25mm;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .detail-group label {
+            display: block;
+            font-size: 14pt;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--accent-color);
+            margin-bottom: 2px;
+            letter-spacing: 1px;
+        }
+
+        .detail-group div {
+            font-size: 16pt;
+            font-weight: 600;
+            color: #ffffff;
         }
 
         /* --- TYPOGRAPHY --- */
@@ -126,92 +196,6 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         .text-muted { color: var(--text-muted); }
         strong { font-weight: 700; }
 
-        /* --- COVER PAGE STYLES (Full Bleed) --- */
-        .page.cover {
-            background-image: url('https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Proposal/Proposal_front_bg.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvUHJvcG9zYWwvUHJvcG9zYWxfZnJvbnRfYmcucG5nIiwiaWF0IjoxNzY5MzU5NzExLCJleHAiOjUyNjk4NTU3MTF9.4C4e0xcGb2FfNdPvB42oqZVFaeuvlksv_dfob2qnnXg');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-            padding: 0; 
-        }
-        
-        .cover-layout {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            padding: var(--page-padding-top) var(--page-padding-x);
-        }
-
-        .cover-header {
-            position: absolute;
-            top: var(--page-padding-top);
-            left: var(--page-padding-x);
-            border-left: 4px solid var(--accent-color);
-            padding-left: 15px;
-            font-size: 14pt;
-            font-weight: 500;
-            color: #ffffff;
-        }
-
-        .cover-logo {
-            position: absolute;
-            top: var(--page-padding-top);
-            right: var(--page-padding-x);
-            max-height: 40px;
-            width: auto;
-        }
-
-        .cover-main {
-            position: absolute;
-            top: 50%;
-            left: var(--page-padding-x);
-            transform: translateY(-50%);
-        }
-
-        .cover-main .title-red {
-            color: #ff0000;
-            font-size: 48pt;
-            font-weight: 900;
-            line-height: 1.0;
-            letter-spacing: -1px;
-            text-transform: uppercase;
-        }
-
-        .cover-main .title-white {
-            color: #ffffff;
-            font-size: 32pt;
-            font-weight: 800;
-            margin-top: 10px;
-            text-transform: uppercase;
-            display: block;
-        }
-
-        .cover-details {
-            position: absolute;
-            bottom: var(--page-padding-bottom);
-            left: var(--page-padding-x);
-            right: var(--page-padding-x);
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .detail-group label {
-            display: block;
-            font-size: 14pt;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--accent-color);
-            margin-bottom: 2px;
-            letter-spacing: 1px;
-        }
-
-        .detail-group div {
-            font-size: 16pt;
-            font-weight: 600;
-            color: #ffffff;
-        }
-
         /* --- COMPONENTS --- */
         table {
             width: 100%;
@@ -237,6 +221,12 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             vertical-align: top;
         }
 
+        /* Tables should try to avoid breaking internally, but allow rows to break if needed */
+        tr {
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+
         .pricing-table th:last-child,
         .pricing-table td:last-child { text-align: right; }
         
@@ -259,7 +249,24 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         .spacer { flex-grow: 1; }
         .mt-20 { margin-top: 20px; }
         .mb-0 { margin-bottom: 0; }
-        
+
+        /* --- SCREEN VIEW OVERRIDES --- */
+        /* Only apply when viewing in a browser, not for print/PDFShift */
+        @media screen {
+            body {
+                background-color: #525659;
+                padding: 20px 0;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                min-height: 100vh;
+            }
+            
+            .page {
+                box-shadow: 0 0 10px rgba(0,0,0,0.5);
+                margin-bottom: 20px; /* Space between pages */
+            }
+        }
     </style>
 </head>
 <body>
@@ -355,7 +362,7 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         </div>
     </div>
 
-[[project_timeline_section]]
+    [[project_timeline_section]]
 
     <!-- PAGE 6: ESTIMATION & PAYMENT -->
     <div class="page">
