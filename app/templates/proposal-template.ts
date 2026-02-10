@@ -9,9 +9,14 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
         /* 
-         * PROPOSAL TEMPLATE - PDFSHIFT COMPATIBLE
-         * Strict adherence to flow-based layout constraints.
-         * Margins and Page Size controlled by PDFShift API.
+         * PROPOSAL TEMPLATE - PDFSHIFT STRICT FLOW
+         * 
+         * RULES implied by User:
+         * 1. Page size/margins controlled via PDFShift API.
+         * 2. NO @page rules in CSS.
+         * 3. Cover page must be a normal section with \`break-after: page\`.
+         * 4. NO fixed heights (100vh, 297mm).
+         * 5. Implicit pagination for everything else.
          */
 
         :root {
@@ -19,12 +24,12 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             --accent-color: #ee731b;
             --text-color: #374151;
             --text-heading: #111827;
-            --bg-cover: #1a202c; /* Fallback for image */
+            --bg-cover: #1a202c; /* Fallback */
             --border-color: #e5e7eb;
             --font-main: 'Inter', sans-serif;
         }
 
-        /* 1. RESET & BASE STYLES */
+        /* 1. RESET & BASE */
         html {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
@@ -34,9 +39,9 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             font-family: var(--font-main);
             color: var(--text-color);
             line-height: 1.6;
-            margin: 0; /* Let PDFShift handle margins, but reset browser default */
+            margin: 0; 
             padding: 0;
-            font-size: 14px; /* Readable base size for print */
+            font-size: 14px;
         }
 
         /* 2. TYPOGRAPHY */
@@ -47,33 +52,35 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             line-height: 1.3;
         }
 
-        h1 { font-size: 32px; letter-spacing: -0.02em; }
-        h2 { font-size: 24px; border-bottom: 2px solid var(--accent-color); padding-bottom: 8px; margin-bottom: 24px; display: inline-block; }
-        h3 { font-size: 18px; margin-bottom: 12px; }
+        h2 { 
+            font-size: 24px; 
+            border-bottom: 2px solid var(--accent-color); 
+            padding-bottom: 8px; 
+            margin-bottom: 24px; 
+            display: inline-block; 
+            margin-top: 32px; /* Add top margin for separation in flow */
+        }
+        
+        h3 { font-size: 18px; margin-bottom: 12px; margin-top: 24px; }
         
         p { margin-bottom: 16px; text-align: justify; }
         ul, ol { margin-bottom: 16px; padding-left: 24px; }
         li { margin-bottom: 8px; }
 
-        /* 3. LAYOUT UTILITIES - NO FIXED SIZES */
+        /* 3. LAYOUT UTILITIES */
         .section {
-            margin-bottom: 32px;
             width: 100%;
+            /* No margin-bottom to avoid double spacing at breaks */
         }
 
-        /* Force a page break before major sections if necessary, but rely on flow mostly */
-        .section-break {
-            break-before: page;
-        }
-
-        /* Avoid breaking inside small components */
         .no-break-inside {
             break-inside: avoid;
+            page-break-inside: avoid;
         }
 
-        /* 4. COVER SECTION */
+        /* 4. COVER SECTION (Strict Rules) */
         .cover {
-            /* Visually dominant styling */
+            /* Visual styling */
             background-color: var(--bg-cover);
             background-image: url('https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Proposal/Proposal_front_bg.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvUHJvcG9zYWwvUHJvcG9zYWxfZnJvbnRfYmcucG5nIiwiaWF0IjoxNzY5MzU5NzExLCJleHAiOjUyNjk4NTU3MTF9.4C4e0xcGb2FfNdPvB42oqZVFaeuvlksv_dfob2qnnXg');
             background-size: cover;
@@ -81,28 +88,27 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             background-repeat: no-repeat;
             color: white;
             
-            /* Flow-based sizing - Padding creates the visual space */
-            padding: 60px 40px; 
-            margin-bottom: 40px;
+            /* Sizing via padding only - NO fixed height */
+            padding: 80px 40px; 
             
-            /* Ensure it is treated as a distinct block */
+            /* Layout */
             display: flex;
             flex-direction: column;
-            gap: 40px;
+            gap: 60px; /* Space between elements */
             
-            /* Ensure cover doesn't break if it fits, but otherwise it just flows */
-            break-inside: avoid; 
+            /* CRITICAL: End Page 1 here */
+            break-after: page;
+            page-break-after: always;
         }
 
         .cover-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 40px;
         }
 
         .cover-logo {
-            max-width: 150px;
+            max-width: 180px;
             height: auto;
         }
 
@@ -110,57 +116,58 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             font-size: 16px;
             font-weight: 500;
             border-left: 4px solid var(--accent-color);
-            padding-left: 12px;
+            padding-left: 16px;
         }
 
         .cover-title-block {
-            margin: 60px 0;
+            margin: 40px 0;
         }
 
         .cover-title-red {
-            color: #ef4444; /* Red for emphasis as per previous design */
-            font-size: 48px;
+            color: #ef4444; 
+            font-size: 56px;
             font-weight: 900;
             line-height: 1;
             text-transform: uppercase;
         }
 
         .cover-subtitle {
-            font-size: 36px;
+            font-size: 42px;
             font-weight: 800;
-            margin-top: 16px;
+            margin-top: 24px;
             text-transform: uppercase;
         }
 
         .cover-details-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 32px;
-            margin-top: auto;
+            gap: 40px;
+            margin-top: auto; /* Push to bottom of flex container if space allows */
         }
 
         .cover-detail-item label {
             display: block;
             color: var(--accent-color);
-            font-size: 12px;
+            font-size: 14px;
             font-weight: 700;
             text-transform: uppercase;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
             letter-spacing: 0.05em;
         }
 
         .cover-detail-item div {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
         }
 
-        /* 5. TABLES */
+        /* 5. COMPONENTS & TABLES */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 24px;
             font-size: 13px;
-            break-inside: avoid; /* Important rule */
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
 
         th {
@@ -190,19 +197,20 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             border-top: 2px solid var(--accent-color);
         }
 
-        /* 6. HELPERS */
-        .text-muted { color: #6b7280; }
         .signature-block {
             margin-top: 60px;
             break-inside: avoid;
+            page-break-inside: avoid;
         }
         
         .bank-details {
             border: 1px solid var(--border-color);
-            border-radius: 4px;
+            border-radius: 4px; /* Optional mild styling */
             padding: 24px;
             background-color: #f9fafb;
+            margin-top: 24px;
             break-inside: avoid;
+            page-break-inside: avoid;
         }
 
         .bank-grid {
@@ -213,20 +221,28 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             font-weight: 500;
         }
 
-        /* Images in content */
         .content-image {
             width: 100%;
             height: auto;
             border-radius: 4px;
             margin: 24px 0;
             display: block;
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
+        
+        /* Utility */
+        .mt-0 { margin-top: 0 !important; }
 
     </style>
 </head>
 <body>
 
-    <!-- COVER SECTION: Flows naturally, no absolute pos, no fixed height -->
+    <!-- COVER SECTION: 
+         - Explicitly separate section 
+         - No constraints on height 
+         - Ends with break-after: page 
+    -->
     <div class="cover">
         <div class="cover-header">
             <div class="cover-date">[[proposal_date]]</div>
@@ -256,9 +272,11 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         </div>
     </div>
 
-    <!-- INTRODUCTION SECTION -->
-    <div class="section section-break">
-        <h2>Welcome !</h2>
+    <!-- CONTENT START - Implicit pagination from here on -->
+    
+    <!-- INTRODUCTION -->
+    <div class="section">
+        <h2 class="mt-0">Welcome !</h2>
         
         <p>Dear <strong>Dr. Ameer Pichen Sir</strong>,</p>
         <p>Greetings from Tigrid.</p>
@@ -276,13 +294,13 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         <h3 style="margin-top: 24px; color: var(--accent-color);">Be Remarkable!</h3>
     </div>
 
-    <!-- WHY TIGRID SECTION -->
+    <!-- WHY TIGRID -->
     <div class="section">
         <h2>Why Tigrid ?</h2>
         <p>When seeking a reliable and innovative tech partner for visionary businesses, many turn to <strong>Tigrid Technologies Private Limited</strong>. We are on a mission to revolutionize the process of creating and enhancing brands.</p>
         
         <img src="https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Proposal/proposal_whytigrid.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvUHJvcG9zYWwvcHJvcG9zYWxfd2h5dGlncmlkLnBuZyIsImlhdCI6MTc2OTI3MzI3MCwiZXhwIjoyNzE1MzUzMjcwfQ.DsvpaP0ivDbNMuLPIDJvdkD4NRS9a7YEva5rZbTVFcA" 
-             alt="Why Tigrid" class="content-image no-break-inside">
+             alt="Why Tigrid" class="content-image">
              
         <p>We pride ourselves on delivering exceptional results and providing a seamless experience for our clients. Here’s why you should choose us as your trusted IT partner:</p>
         <ul>
@@ -293,22 +311,21 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         </ul>
     </div>
 
-    <!-- SCOPE OF WORK SECTION -->
-    <div class="section section-break">
+    <!-- SCOPE OF WORK -->
+    <div class="section">
         <h2>Scope of Work</h2>
         <div class="scope-content">
             [[scope_of_work]]
         </div>
     </div>
 
-    <!-- TIMELINE SECTION -->
+    <!-- TIMELINE -->
     <div class="section">
-         <!-- Assuming the injected content has its own headers/structure, but wrapping it for safety -->
         [[project_timeline_section]]
     </div>
 
-    <!-- ESTIMATION SECTION -->
-    <div class="section section-break">
+    <!-- ESTIMATION -->
+    <div class="section">
         <h2>Estimation</h2>
         <p>The table below outlines the estimated costs for the project scope described above.</p>
 
@@ -340,7 +357,7 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             <li>2 Months free maintenance and an AMC will be applicable if continued.</li>
         </ul>
 
-        <div class="bank-details no-break-inside">
+        <div class="bank-details">
             <h3>Tigrid Bank Details</h3>
             <div class="bank-grid">
                 <div>A/C NAME</div>   <div>: TIGRID TECHNOLOGIES PRIVATE LIMITED</div>
@@ -353,7 +370,7 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
     </div>
 
     <!-- TERMS & CONDITIONS -->
-    <div class="section section-break">
+    <div class="section">
         <h2>Terms & Conditions</h2>
         <p>The following terms and conditions are exclusively for this project.</p>
         <ol>
@@ -369,7 +386,7 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         </ol>
     </div>
 
-    <!-- CLOSING / THANK YOU -->
+    <!-- CLOSING -->
     <div class="section">
         <h2>Thank You</h2>
         <p>I would like to express my heartfelt appreciation for your time and consideration in reviewing the proposal. Choosing Tigrid means choosing a partner who is dedicated to your success.</p>
