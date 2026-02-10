@@ -9,15 +9,11 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     <style>
         /* 
-         * STRICT A4 PDF CSS
+         * PRINT-FIRST A4 CSS
          * Target: PDFShift / Chromium
-         * Size: 210mm x 297mm
-         * Bleed: Full
-         * Margins: Controlled internally
          */
 
         :root {
-            /* Configuration */
             --accent-color: #ee731b;
             --text-heading: #000000;
             --text-body: #000000;
@@ -26,57 +22,53 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             --bg-white: #ffffff;
             --font-base: 'Inter', sans-serif;
             
-            /* Physical Dimensions */
             --a4-width: 210mm;
             --a4-height: 297mm;
-            
-            /* Safe Areas (Internal Padding) */
             --page-padding-top: 20mm;
             --page-padding-bottom: 20mm;
             --page-padding-x: 25mm;
         }
 
-        /* 1. RESET */
+        /* 1. RESET & DEFAULTS (Apply to PDF/Print) */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        html, body {
+            width: var(--a4-width);
+            height: 100%; /* Allow flow if needed, but pages handle height */
+            margin: 0;
+            padding: 0;
+            background: white; /* Default for print */
+            font-family: var(--font-base);
+            font-size: 10.5pt;
+            line-height: 1.5;
+            color: var(--text-body);
         }
 
         /* 2. PRINT SETUP */
         @page {
             size: A4;
-            margin: 0; /* CRITICAL: Disables browser default margins */
+            margin: 0; /* CRITICAL */
         }
 
-        /* 3. BASE STYLES */
-        body {
-            font-family: var(--font-base);
-            font-size: 10.5pt;
-            line-height: 1.5;
-            color: var(--text-body);
-            background-color: #525659; /* Grey background for browser preview */
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-        }
-
-        /* 4. PAGE CONTAINER */
-        /* Represents exactly one physical sheet of paper */
+        /* 3. PAGE CONTAINER (Strict Dimensions) */
         .page {
             width: var(--a4-width);
             height: var(--a4-height);
-            background: white;
             position: relative;
-            overflow: hidden; /* Ensures strict size adherence */
+            overflow: hidden; 
             page-break-after: always;
             break-after: page;
-            
-            /* Center in browser view */
-            margin: 0 auto 20px auto;
-            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            background: white;
+            /* No margin/padding on the container itself by default */
         }
 
-        /* Internal Safe Area wrapper for content */
+        /* 4. INTERNAL SAFE AREA */
         .page-content {
             width: 100%;
             height: 100%;
@@ -85,17 +77,21 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             flex-direction: column;
         }
 
-        /* Remove UI artifacts for print */
-        @media print {
+        /* 5. SCREEN / VIEWER STYLES ONLY */
+        @media screen {
             body {
-                background: none;
+                background-color: #525659; /* Grey viewer background */
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding-top: 20px;
+                padding-bottom: 20px;
+                width: 100%; /* Full screen width */
             }
+            
             .page {
-                margin: 0;
-                box-shadow: none;
-                /* Ensure no extra break after the last page if needed, 
-                   but usually page-break-after: always on all pages is safer 
-                   to enforce the boundary.*/
+                box-shadow: 0 0 10px rgba(0,0,0,0.5);
+                margin-bottom: 20px; /* Spacing between pages */
             }
         }
 
@@ -136,10 +132,9 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            padding: 0; /* Full bleed, no padding on the page itself */
+            padding: 0; 
         }
         
-        /* We typically don't use .page-content for cover, or custom one */
         .cover-layout {
             position: relative;
             width: 100%;
@@ -261,7 +256,7 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         li { margin-bottom: 5px; }
 
         /* Helpers */
-        .spacer { flex-grow: 1; } /* Pushes content to bottom if needed */
+        .spacer { flex-grow: 1; }
         .mt-20 { margin-top: 20px; }
         .mb-0 { margin-bottom: 0; }
         
