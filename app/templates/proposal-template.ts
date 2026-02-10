@@ -48,6 +48,7 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             font-size: 10.5pt;
             line-height: 1.5;
             color: var(--text-body);
+            /* DO NOT SET HEIGHT: 100% OR MIN-HEIGHT: 100% HERE */
         }
 
         /* 3. PHYSICAL PAGE WRAPPER */
@@ -66,6 +67,13 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             break-after: page;
             page-break-inside: avoid;
             break-inside: avoid;
+        }
+
+        /* Eliminate page break after the very last page to prevent blank trailer */
+        .page:last-child {
+            page-break-after: auto !important;
+            break-after: auto !important;
+            margin-bottom: 0 !important;
         }
 
         /* 4. CONTENT PADDING (Internal Margins) */
