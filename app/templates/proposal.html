@@ -35,7 +35,6 @@
         /* 1. RESET & BASE */
         * {
             box-sizing: border-box;
-            /* RESTORED: Vital for consistent layout */
         }
 
         html {
@@ -50,7 +49,6 @@
             margin: 0;
             padding: 0;
             font-size: 14px;
-            /* Removed height: 100% to rely on flow + min-height */
         }
 
         /* 2. TYPOGRAPHY */
@@ -100,7 +98,6 @@
         /* 3. LAYOUT UTILITIES */
         .section {
             width: 100%;
-            /* No margin-bottom to avoid double spacing at breaks */
         }
 
         .no-break-inside {
@@ -112,15 +109,14 @@
         .cover {
             /* Visual styling */
             background-color: var(--bg-cover);
-            /* Image path confirmed */
             background-image: url('https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Proposal/Proposal_front_bg.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvUHJvcG9zYWwvUHJvcG9zYWxfZnJvbnRfYmcucG5nIiwiaWF0IjoxNzY5MzU5NzExLCJleHAiOjUyNjk4NTU3MTF9.4C4e0xcGb2FfNdPvB42oqZVFaeuvlksv_dfob2qnnXg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             color: white;
 
-            /* Sizing: Use physical units (safe A4 bounds) to ensure coverage regardless of viewport */
-            min-height: 250mm;
+            /* Sizing: Full A4 Height to guarantee coverage */
+            min-height: 297mm;
             width: 100%;
 
             padding: 80px 40px;
@@ -286,6 +282,7 @@
          - Explicitly separate section 
          - No constraints on height 
          - Ends with break-after: page 
+         - Using 297mm min-height to ensure full background coverage
     -->
     <div class="cover">
         <div class="cover-header">
