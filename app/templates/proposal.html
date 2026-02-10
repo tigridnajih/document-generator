@@ -17,7 +17,7 @@
          * 1. Page size/margins controlled via PDFShift API.
          * 2. NO @page rules in CSS.
          * 3. Cover page must be a normal section with `break-after: page`.
-         * 4. NO fixed heights (100vh, 297mm).
+         * 4. NO fixed heights (no vh if viewport is small).
          * 5. Implicit pagination for everything else.
          */
 
@@ -33,11 +33,14 @@
         }
 
         /* 1. RESET & BASE */
+        * {
+            box-sizing: border-box;
+            /* RESTORED: Vital for consistent layout */
+        }
+
         html {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
-            height: 100%;
-            /* REQUIRED for percentage heights to work */
         }
 
         body {
@@ -47,8 +50,7 @@
             margin: 0;
             padding: 0;
             font-size: 14px;
-            height: 100%;
-            /* Propagate height */
+            /* Removed height: 100% to rely on flow + min-height */
         }
 
         /* 2. TYPOGRAPHY */
@@ -110,15 +112,15 @@
         .cover {
             /* Visual styling */
             background-color: var(--bg-cover);
-            /* Image path confirmed from previous version */
+            /* Image path confirmed */
             background-image: url('https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Proposal/Proposal_front_bg.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvUHJvcG9zYWwvUHJvcG9zYWxfZnJvbnRfYmcucG5nIiwiaWF0IjoxNzY5MzU5NzExLCJleHAiOjUyNjk4NTU3MTF9.4C4e0xcGb2FfNdPvB42oqZVFaeuvlksv_dfob2qnnXg');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             color: white;
 
-            /* Sizing to fill the viewport (page) */
-            min-height: 100vh;
+            /* Sizing: Use physical units (safe A4 bounds) to ensure coverage regardless of viewport */
+            min-height: 250mm;
             width: 100%;
 
             padding: 80px 40px;
