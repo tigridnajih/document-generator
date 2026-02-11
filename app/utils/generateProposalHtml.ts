@@ -71,36 +71,38 @@ export function generateEstimationHtml(items: any[]): string {
 
 
 export function generateProjectTimelineHtml(data: any): string {
-    const timeline = data.projectTimeline;
-    if (!timeline || !timeline.enabled) return "";
+    // Check if timeline is enabled in the form data (scopeOfWork.timelineEnabled)
+    const sow = data.scopeOfWork;
+    if (!sow || !sow.timelineEnabled) return "";
 
-    const rows = (timeline.phases || []).map((phase: any) => `
+    const timelineItems: any[] = sow.timeline || [];
+    if (timelineItems.length === 0) return "";
+
+    const rows = timelineItems.map((phase: any) => `
         <tr>
-            <td>${phase.phaseName || ""}</td>
-            <td>${phase.duration?.value || 0} ${phase.duration?.unit || "Days"}</td>
+            <td>${phase.phase || ""}</td>
+            <td>${phase.duration || 0} ${phase.unit || "Days"}</td>
             <td>${phase.deliverables || ""}</td>
         </tr>
     `).join("");
 
     return `
-    <!-- PAGE: PROJECT TIMELINE -->
-    <div class="page">
-        <div class="page-content">
-            <h2>Project Timeline</h2>
-            
-            <table>
-                <thead>
-                    <tr>
-                        <th style="width: 25%;">Phase</th>
-                        <th style="width: 20%;">Duration</th>
-                        <th style="width: 55%;">Deliverables</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    ${rows}
-                </tbody>
-            </table>
-        </div>
+    <!-- PROJECT TIMELINE -->
+    <div class="section">
+        <h2>Project Timeline</h2>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th style="width: 25%;">Phase</th>
+                    <th style="width: 20%;">Duration</th>
+                    <th style="width: 55%;">Deliverables</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${rows}
+            </tbody>
+        </table>
     </div>
     `;
 }

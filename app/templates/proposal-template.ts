@@ -56,6 +56,9 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             font-weight: 700;
             margin-top: 0;
             line-height: 1.3;
+            /* Avoid breaking after headings (orphans) */
+            break-after: avoid;
+            page-break-after: avoid;
         }
 
         h2 { 
@@ -64,7 +67,8 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             padding-bottom: 8px; 
             margin-bottom: 24px; 
             display: inline-block; 
-            margin-top: 32px; 
+            margin-top: 0; /* Removing top margin to let sections control spacing */
+            padding-top: 10px;
         }
         
         h3 { font-size: 18px; margin-bottom: 12px; margin-top: 24px; }
@@ -82,6 +86,20 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
 
         .section {
             width: 100%;
+            margin-bottom: 20px;
+        }
+
+        /* Forces a new page before this element */
+        .page-break {
+            break-before: page;
+            page-break-before: always;
+            margin-top: 0 !important;
+        }
+
+        /* Prevents breaking inside an element */
+        .keep-together {
+            break-inside: avoid;
+            page-break-inside: avoid;
         }
 
         .no-break-inside {
@@ -288,7 +306,7 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
     <!-- CONTENT WRAPPER: All non-cover content starts here -->
     <div class="content">
         
-        <!-- INTRODUCTION -->
+        <!-- INTRODUCTION: Starts immediately on Page 2 -->
         <div class="section">
             <h2 class="mt-0">Welcome !</h2>
             
@@ -308,8 +326,8 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             <h3 style="margin-top: 24px; color: var(--accent-color);">Be Remarkable!</h3>
         </div>
 
-        <!-- WHY TIGRID -->
-        <div class="section">
+        <!-- WHY TIGRID: Forced New Page -->
+        <div class="section page-break">
             <h2>Why Tigrid ?</h2>
             <p>When seeking a reliable and innovative tech partner for visionary businesses, many turn to <strong>Tigrid Technologies Private Limited</strong>. We are on a mission to revolutionize the process of creating and enhancing brands.</p>
             
@@ -325,21 +343,19 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             </ul>
         </div>
 
-        <!-- SCOPE OF WORK -->
-        <div class="section">
+        <!-- SCOPE OF WORK: Forced New Page -->
+        <div class="section page-break">
             <h2>Scope of Work</h2>
             <div class="scope-content">
                 [[scope_of_work]]
             </div>
         </div>
 
-        <!-- TIMELINE -->
-        <div class="section">
-            [[project_timeline_section]]
-        </div>
+        <!-- TIMELINE: Flows naturally. Will break if needed. -->
+        [[project_timeline_section]]
 
-        <!-- ESTIMATION -->
-        <div class="section">
+        <!-- ESTIMATION: Forced New Page -->
+        <div class="section page-break">
             <h2>Estimation</h2>
             <p>The table below outlines the estimated costs for the project scope described above.</p>
 
@@ -361,30 +377,33 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
                 </tbody>
             </table>
 
-            <h3>Payment Details</h3>
-            <ul style="list-style-type: decimal;">
-                <li>Advance: 50% due upon project initiation.</li>
-                <li>Final Payment: 50% upon completion and approval before launch.</li>
-                <li>Project will be initiated only after 1st advance instalment is paid.</li>
-                <li>18% GST will be applicable on the final invoice.</li>
-                <li>Any element additional to the above scope of work will be charged extra.</li>
-                <li>2 Months free maintenance and an AMC will be applicable if continued.</li>
-            </ul>
+            <!-- Keep payment and bank details together with the table if possible, or at least together with each other -->
+            <div class="keep-together">
+                <h3>Payment Details</h3>
+                <ul style="list-style-type: decimal;">
+                    <li>Advance: 50% due upon project initiation.</li>
+                    <li>Final Payment: 50% upon completion and approval before launch.</li>
+                    <li>Project will be initiated only after 1st advance instalment is paid.</li>
+                    <li>18% GST will be applicable on the final invoice.</li>
+                    <li>Any element additional to the above scope of work will be charged extra.</li>
+                    <li>2 Months free maintenance and an AMC will be applicable if continued.</li>
+                </ul>
 
-            <div class="bank-details">
-                <h3>Tigrid Bank Details</h3>
-                <div class="bank-grid">
-                    <div>A/C NAME</div>   <div>: TIGRID TECHNOLOGIES PRIVATE LIMITED</div>
-                    <div>BANK NAME</div>  <div>: STATE BANK OF INDIA</div>
-                    <div>BRANCH</div>     <div>: KAZHAKUTTAM</div>
-                    <div>A/C NO.</div>    <div>: 41923692420</div>
-                    <div>IFSC</div>       <div>: SBIN0070445</div>
+                <div class="bank-details">
+                    <h3>Tigrid Bank Details</h3>
+                    <div class="bank-grid">
+                        <div>A/C NAME</div>   <div>: TIGRID TECHNOLOGIES PRIVATE LIMITED</div>
+                        <div>BANK NAME</div>  <div>: STATE BANK OF INDIA</div>
+                        <div>BRANCH</div>     <div>: KAZHAKUTTAM</div>
+                        <div>A/C NO.</div>    <div>: 41923692420</div>
+                        <div>IFSC</div>       <div>: SBIN0070445</div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- TERMS & CONDITIONS -->
-        <div class="section">
+        <!-- TERMS & CONDITIONS: Forced New Page -->
+        <div class="section page-break">
             <h2>Terms & Conditions</h2>
             <p>The following terms and conditions are exclusively for this project.</p>
             <ol>
@@ -400,8 +419,8 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             </ol>
         </div>
 
-        <!-- CLOSING -->
-        <div class="section">
+        <!-- CLOSING: Forced New Page -->
+        <div class="section page-break">
             <h2>Thank You</h2>
             <p>I would like to express my heartfelt appreciation for your time and consideration in reviewing the proposal. Choosing Tigrid means choosing a partner who is dedicated to your success.</p>
             
