@@ -10,14 +10,13 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
     <style>
         /* 
          * PROPOSAL TEMPLATE - PDFSHIFT STRICT FLOW
-         * Rules:
-         * 1. No @page or CSS margins (handled by PDFShift).
-         * 2. No fixed sizes except cover.
-         * 3. Cover min-height: 100vh + break-after: page.
-         * 4. Content sections wrapped in .content with padding.
-         * 5. Implicit pagination.
          *
-         * UPDATE: Added horizontal padding to .content to simulate margins.
+         * RULES:
+         * 1. The cover must be the first element inside body.
+         * 2. The cover must NOT be wrapped inside any padded container
+         * 3. All non-cover content is wrapped inside <div class="content">
+         * 4. The .content container must use padding: 20mm
+         * 5. The cover uses min-height: 100vh and break-after: page
          */
 
         :root {
@@ -74,17 +73,15 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         ul, ol { margin-bottom: 16px; padding-left: 24px; }
         li { margin-bottom: 8px; }
 
-        /* 3. LAYOUT UTILITIES */
-        /* Wrapper for non-cover content */
+        /* 3. LAYOUT UTILITIES for Content */
+        /* Wrapper for non-cover content, provides page margins of 20mm */
         .content {
             width: 100%;
-            /* PADDING ADDED: Creates 40px margins on all sides inside the container */
-            padding: 40px; 
+            padding: 20mm; 
         }
 
         .section {
             width: 100%;
-            /* Avoid page break right after a section starts if possible */
         }
 
         .no-break-inside {
@@ -101,11 +98,12 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             /* Visual styling */
             background-color: var(--bg-cover);
             background-image: url('https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Proposal/Proposal_front_bg.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvUHJvcG9zYWwvUHJvcG9zYWxfZnJvbnRfYmcucG5nIiwiaWF0IjoxNzY5MzU5NzExLCJleHAiOjUyNjk4NTU3MTF9.4C4e0xcGb2FfNdPvB42oqZVFaeuvlksv_dfob2qnnXg');
-            background-size: cover;
+            background-size: cover; 
             background-position: center;
             background-repeat: no-repeat;
             color: white;
             
+            /* Internal padding for cover content */
             padding: 80px 40px; 
             
             display: flex;
@@ -115,6 +113,9 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             /* Force page break after cover */
             break-after: page;
             page-break-after: always;
+            
+            /* No margin interference */
+            margin: 0;
         }
 
         .cover-header {
@@ -254,7 +255,7 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
 </head>
 <body>
 
-    <!-- COVER PAGE -->
+    <!-- COVER SECTION: Must be first, no parent wrapper -->
     <div class="cover">
         <div class="cover-header">
             <div class="cover-date">[[proposal_date]]</div>
@@ -284,7 +285,7 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         </div>
     </div>
 
-    <!-- MAIN CONTENT CONTAINER -->
+    <!-- CONTENT WRAPPER: All non-cover content starts here -->
     <div class="content">
         
         <!-- INTRODUCTION -->

@@ -13,10 +13,12 @@
         /* 
          * PROPOSAL TEMPLATE - PDFSHIFT STRICT FLOW
          *
-         * IMPORTANT: 
-         * For the cover to be full-bleed (no white borders), you MUST set
-         * Margin Top/Left/Right/Bottom to 0 in your PDFShift settings.
-         * The margins for the content are handled manually by the .content padding below.
+         * RULES:
+         * 1. The cover must be the first element inside body.
+         * 2. The cover must NOT be wrapped inside any padded container
+         * 3. All non-cover content is wrapped inside <div class="content">
+         * 4. The .content container must use padding: 20mm
+         * 5. The cover uses min-height: 100vh and break-after: page
          */
 
         :root {
@@ -93,16 +95,11 @@
             margin-bottom: 8px;
         }
 
-        /* 3. LAYOUT UTILITIES */
-        /* Wrapper for non-cover content */
+        /* 3. LAYOUT UTILITIES for Content */
+        /* Wrapper for non-cover content, provides page margins of 20mm */
         .content {
             width: 100%;
-            /* 
-             * PADDING: This acts as the page margin for text content.
-             * Since PDFShift global margins must be 0 for the cover to work,
-             * we add the spacing here.
-             */
-            padding: 40px;
+            padding: 20mm;
         }
 
         .section {
@@ -124,7 +121,6 @@
             background-color: var(--bg-cover);
             background-image: url('https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Proposal/Proposal_front_bg.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvUHJvcG9zYWwvUHJvcG9zYWxfZnJvbnRfYmcucG5nIiwiaWF0IjoxNzY5MzU5NzExLCJleHAiOjUyNjk4NTU3MTF9.4C4e0xcGb2FfNdPvB42oqZVFaeuvlksv_dfob2qnnXg');
             background-size: cover;
-            /* Ensures image covers the area */
             background-position: center;
             background-repeat: no-repeat;
             color: white;
@@ -140,7 +136,7 @@
             break-after: page;
             page-break-after: always;
 
-            /* Ensure NO external margin influence */
+            /* No margin interference */
             margin: 0;
         }
 
@@ -288,7 +284,7 @@
 
 <body>
 
-    <!-- COVER PAGE -->
+    <!-- COVER SECTION: Must be first, no parent wrapper -->
     <div class="cover">
         <div class="cover-header">
             <div class="cover-date">[[proposal_date]]</div>
@@ -318,7 +314,7 @@
         </div>
     </div>
 
-    <!-- MAIN CONTENT CONTAINER -->
+    <!-- CONTENT WRAPPER: All non-cover content starts here -->
     <div class="content">
 
         <!-- INTRODUCTION -->
