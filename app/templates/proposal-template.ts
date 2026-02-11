@@ -64,11 +64,12 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         h2 { 
             font-size: 24px; 
             border-bottom: 2px solid var(--accent-color); 
-            padding-bottom: 8px; 
+            padding-bottom: 12px; /* Uniform padding */
             margin-bottom: 24px; 
-            display: inline-block; 
-            margin-top: 0; /* Removing top margin to let sections control spacing */
-            padding-top: 10px;
+            display: block; 
+            margin-top: 0; 
+            padding-top: 12px; /* Uniform padding */
+            text-transform: uppercase;
         }
         
         h3 { font-size: 18px; margin-bottom: 12px; margin-top: 24px; }
