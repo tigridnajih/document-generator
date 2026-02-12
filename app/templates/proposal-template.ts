@@ -83,51 +83,29 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         .content {
             width: 100%;
             padding: 20mm; 
+            padding-bottom: 30mm; /* Space for Page Number */
+            position: relative;
         }
 
         .section {
             width: 100%;
             margin-bottom: 20px;
         }
-
-        /* HEADER & FOOTER - Fixed */
-        .doc-header, .doc-footer {
+        
+        /* Dynamic Page Number - Bottom Right */
+        .page-cnt {
             position: fixed;
-            left: 0;
-            right: 0;
-            padding: 0 20mm;
-            height: 20mm;
-            background: white; 
-            display: flex;
-            align-items: center;
+            bottom: 15mm;
+            right: 20mm;
+            color: var(--accent-color);
+            font-weight: 800;
+            font-size: 14px;
             z-index: 5;
         }
-
-        .doc-header {
-            top: 0;
-            border-bottom: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between; 
-            align-items: center;
-            width: 100%; 
-            box-sizing: border-box; 
+        
+        .page-cnt:after {
+            content: counter(page);
         }
-
-        .doc-footer {
-            bottom: 0;
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between; 
-            align-items: center;
-            width: 100%;
-            box-sizing: border-box;
-            color: var(--text-color);
-            font-size: 11px;
-        }
-
-        /* Page Numbers */
-        .page-number { font-weight: 700; color: var(--accent-color); font-size: 14px; }
-        .page-number:after { content: counter(page); }
 
         /* Forces a new page before this element */
         .page-break {
@@ -358,18 +336,8 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
     </div>
 
     <!-- CONTENT WRAPPER: All non-cover content starts here -->
-    <div class="doc-header">
-        <img src="https://pdsggplxeglpkmltwzlb.supabase.co/storage/v1/object/sign/Document_Images/Tigrid_Assets/Tigrid_black_logo.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV83MTczYWI1Yy0xNDZjLTQ3NGEtYjNmNi1iNzYzZDExZDJmYzgiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJEb2N1bWVudF9JbWFnZXMvVGlncmlkX0Fzc2V0cy9UaWdyaWRfYmxhY2tfbG9nby5wbmciLCJpYXQiOjE3Njk0MDI0NDMsImV4cCI6NTI2OTg5ODQ0M30.F_rPjGypc329kRUY3yT9k4E4p98a0yY_A3QRebr9kQg" 
-             alt="Tigrid Logo" style="height: 40px; width: auto;">
-        <div style="font-weight: 600; font-size: 12px; color: var(--text-color);">[[PROJECT_TITLE]]</div>
-    </div>
-
-    <div class="doc-footer">
-        <div>Tigrid Technologies Pvt. Ltd.</div>
-        <div class="page-number">Page </div>
-    </div>
-
     <div class="content">
+        <div class="page-cnt"></div>
         
         <!-- INTRODUCTION: Starts immediately on Page 2 -->
         <div class="section">
