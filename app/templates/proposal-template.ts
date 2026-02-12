@@ -215,16 +215,29 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             color: var(--text-heading);
             border-bottom: 2px solid var(--border-color);
             font-size: 11px;
+            white-space: nowrap;
         }
 
         td {
             padding: 12px;
             border-bottom: 1px solid var(--border-color);
-            vertical-align: top;
+            vertical-align: middle;
         }
 
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
+        /* Column Specifics */
+        .col-desc { width: 40%; text-align: left; }
+        .col-rate { width: 25%; text-align: right; }
+        .col-qty { width: 10%; text-align: center; }
+        .col-total { width: 25%; text-align: right; }
+
+        .text-right {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .text-center {
+            text-align: center;
+        }
         
         .pricing-total td {
             background-color: #f9fafb;
@@ -363,10 +376,10 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
             <table class="pricing-table">
                 <thead>
                     <tr>
-                        <th style="width: 50%;">Description</th>
-                        <th style="width: 20%;" class="text-right">Rate</th>
-                        <th style="width: 10%;" class="text-center">Qty</th>
-                        <th style="width: 20%;" class="text-right">Total</th>
+                        <th class="col-desc">Description</th>
+                        <th class="col-rate">Rate</th>
+                        <th class="col-qty">Qty</th>
+                        <th class="col-total">Total</th>
                     </tr>
                 </thead>
                 <tbody>

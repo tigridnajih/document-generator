@@ -61,9 +61,9 @@ export function generateEstimationHtml(items: any[]): string {
         return `
       <tr>
         <td>${item.description || ""}<br><span class="text-muted">${item.detailedDescription || ""}</span></td>
-        <td>${rate.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
-        <td>${qty}</td>
-        <td>${total.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
+        <td class="text-right">${rate.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
+        <td class="text-center">${qty}</td>
+        <td class="text-right">${total.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
       </tr>
     `;
     }).join("");
@@ -78,9 +78,12 @@ export function generateProjectTimelineHtml(data: any): string {
     const timelineItems: any[] = sow.timeline || [];
     if (timelineItems.length === 0) return "";
 
+    // Calculate total duration (assuming "Days" for simplicity, or just summing values)
+    const totalDuration = timelineItems.reduce((acc, item) => acc + (Number(item.duration) || 0), 0);
+
     const rows = timelineItems.map((phase: any) => `
         <tr>
-            <td>${phase.phase || ""}</td>
+            <td style="font-weight: 600;">${phase.phase || ""}</td>
             <td>${phase.duration || 0} ${phase.unit || "Days"}</td>
             <td>${phase.deliverables || ""}</td>
         </tr>
@@ -101,6 +104,11 @@ export function generateProjectTimelineHtml(data: any): string {
             </thead>
             <tbody>
                 ${rows}
+                <!-- Total Row -->
+                <tr style="background-color: #f9fafb; border-top: 2px solid #ee731b; font-weight: 700;">
+                    <td>Total Timeline</td>
+                    <td colspan="2">${totalDuration} Days (Approx)</td>
+                </tr>
             </tbody>
         </table>
     </div>
