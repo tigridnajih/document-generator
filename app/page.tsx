@@ -191,6 +191,7 @@ export default function Home() {
         // We cast values to any to match the loose interface in generateHtml for now
         const generatedHtml = generateProposalHtml(values as any);
         console.log("GENERATED PROPOSAL HTML PREVIEW:", generatedHtml);
+
         payload.html = generatedHtml;
         // ---------------------------------------
 

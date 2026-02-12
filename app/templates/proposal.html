@@ -107,7 +107,7 @@
         .content {
             width: 100%;
             padding: 20mm;
-            padding-bottom: 30mm;
+            padding-bottom: 25mm;
             /* Space for Page Number */
             position: relative;
         }
@@ -115,21 +115,6 @@
         .section {
             width: 100%;
             margin-bottom: 20px;
-        }
-
-        /* Dynamic Page Number - Bottom Right */
-        .page-cnt {
-            position: fixed;
-            bottom: 15mm;
-            right: 20mm;
-            color: var(--accent-color);
-            font-weight: 800;
-            font-size: 14px;
-            z-index: 5;
-        }
-
-        .page-cnt:after {
-            content: counter(page);
         }
 
         /* Forces a new page before this element */
@@ -379,7 +364,6 @@
 
     <!-- CONTENT WRAPPER: All non-cover content starts here -->
     <div class="content">
-        <div class="page-cnt"></div>
 
         <!-- INTRODUCTION: Starts immediately on Page 2 -->
         <div class="section">

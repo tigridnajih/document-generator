@@ -79,32 +79,15 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
         li { margin-bottom: 8px; }
 
         /* 3. LAYOUT UTILITIES for Content */
-        /* Wrapper for non-cover content, provides page margins of 20mm */
+        /* Wrapper for non-cover content */
         .content {
             width: 100%;
             padding: 20mm; 
-            padding-bottom: 30mm; /* Space for Page Number */
-            position: relative;
         }
 
         .section {
             width: 100%;
             margin-bottom: 20px;
-        }
-        
-        /* Dynamic Page Number - Bottom Right */
-        .page-cnt {
-            position: fixed;
-            bottom: 15mm;
-            right: 20mm;
-            color: var(--accent-color);
-            font-weight: 800;
-            font-size: 14px;
-            z-index: 5;
-        }
-        
-        .page-cnt:after {
-            content: counter(page);
         }
 
         /* Forces a new page before this element */
@@ -337,7 +320,6 @@ export const PROPOSAL_TEMPLATE = `<!DOCTYPE html>
 
     <!-- CONTENT WRAPPER: All non-cover content starts here -->
     <div class="content">
-        <div class="page-cnt"></div>
         
         <!-- INTRODUCTION: Starts immediately on Page 2 -->
         <div class="section">

@@ -78,8 +78,11 @@ export function generateProjectTimelineHtml(data: any): string {
     const timelineItems: any[] = sow.timeline || [];
     if (timelineItems.length === 0) return "";
 
-    // Calculate total duration (assuming "Days" for simplicity, or just summing values)
-    const totalDuration = timelineItems.reduce((acc, item) => acc + (Number(item.duration) || 0), 0);
+    // Calculate total duration (parsing numbers out of strings if necessary)
+    const totalDuration = timelineItems.reduce((acc, item) => {
+        const d = typeof item.duration === 'string' ? parseInt(item.duration, 10) : Number(item.duration);
+        return acc + (isNaN(d) ? 0 : d);
+    }, 0);
 
     const rows = timelineItems.map((phase: any) => `
         <tr>
